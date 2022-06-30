@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_channel_id">E_OfficeDesk_Default</string>
+    <string name="facebook_app_id">965895800985392</string>
+</resources>
