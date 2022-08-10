@@ -1,24 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:soleoserp/blocs/base/base_bloc.dart';
-import 'package:soleoserp/models/api_requests/inquiry_list_request.dart';
-import 'package:soleoserp/models/api_requests/quotation_list_request.dart';
+import 'package:soleoserp/models/api_requests/SalesBill/sales_bill_search_by_id_request.dart';
+import 'package:soleoserp/models/api_requests/SalesBill/sales_bill_search_by_name_request.dart';
 import 'package:soleoserp/models/api_requests/sales_bill_generate_pdf_request.dart';
 import 'package:soleoserp/models/api_requests/sales_bill_list_request.dart';
-import 'package:soleoserp/models/api_requests/search_quotation_list_by_name_request.dart';
-import 'package:soleoserp/models/api_requests/search_quotation_list_by_number_request.dart';
 import 'package:soleoserp/models/api_requests/search_sale_bill_list_by_name_request.dart';
-import 'package:soleoserp/models/api_responses/inquiry_list_reponse.dart';
-import 'package:soleoserp/models/api_responses/quotation_list_response.dart';
+import 'package:soleoserp/models/api_responses/SaleBill/sales_bill_search_by_name_response.dart';
 import 'package:soleoserp/models/api_responses/sales_bill_generate_pdf_response.dart';
 import 'package:soleoserp/models/api_responses/sales_bill_list_response.dart';
-import 'package:soleoserp/models/api_responses/search_quotation_list_response.dart';
 import 'package:soleoserp/models/api_responses/search_sales_bill_search_response.dart';
 import 'package:soleoserp/repositories/repository.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-part 'salesbill_event.dart';
 
 part 'salebill_states.dart';
+part 'salesbill_event.dart';
 
 class SalesBillBloc extends Bloc<SalesBillEvents, SalesBillStates> {
   Repository userRepository = Repository.getInstance();
@@ -27,8 +22,7 @@ class SalesBillBloc extends Bloc<SalesBillEvents, SalesBillStates> {
   SalesBillBloc(this.baseBloc) : super(SalesBillInitialState());
 
   @override
-  Stream<SalesBillStates> mapEventToState(
-      SalesBillEvents event) async* {
+  Stream<SalesBillStates> mapEventToState(SalesBillEvents event) async* {
     /// sets state based on events
     if (event is SalesBillListCallEvent) {
       yield* _mapQuotationListCallEventToState(event);
@@ -44,7 +38,9 @@ class SalesBillBloc extends Bloc<SalesBillEvents, SalesBillStates> {
       yield* _mapSalesBillPDFGenerateCallEventToState(event);
     }
 
-
+    if (event is SalesBillSearchByIdRequestCallEvent) {
+      yield* _mapSearchSaleBillListByIDCallEventToState(event);
+    }
   }
 
   ///event functions to states implementation
@@ -52,9 +48,9 @@ class SalesBillBloc extends Bloc<SalesBillEvents, SalesBillStates> {
       SalesBillListCallEvent event) async* {
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
-      SalesBillListResponse response =
-      await userRepository.getSalesBillList(event.pageNo,event.salesBillListRequest);
-      yield SalesBillListCallResponseState(response,event.pageNo);
+      SalesBillListResponse response = await userRepository.getSalesBillList(
+          event.pageNo, event.salesBillListRequest);
+      yield SalesBillListCallResponseState(response, event.pageNo);
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
       print(stacktrace);
@@ -68,8 +64,23 @@ class SalesBillBloc extends Bloc<SalesBillEvents, SalesBillStates> {
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
       SearchSalesBillListResponse response =
-      await userRepository.getSalesBillListSearchByName(event.request);
+          await userRepository.getSalesBillListSearchByName(event.request);
       yield SearchSalesBillListByNameCallResponseState(response);
+    } catch (error, stacktrace) {
+      baseBloc.emit(ApiCallFailureState(error));
+      print(stacktrace);
+    } finally {
+      baseBloc.emit(ShowProgressIndicatorState(false));
+    }
+  }
+
+  Stream<SalesBillStates> _mapSearchSaleBillListByIDCallEventToState(
+      SalesBillSearchByIdRequestCallEvent event) async* {
+    try {
+      baseBloc.emit(ShowProgressIndicatorState(true));
+      SalesBillListResponse response = await userRepository
+          .getSalesBillSearchDetailsAPI(event.custID, event.request);
+      yield SalesBillSearchByIDResponseState(response);
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
       print(stacktrace);
@@ -108,13 +119,12 @@ class SalesBillBloc extends Bloc<SalesBillEvents, SalesBillStates> {
     }
   }*/
 
-
   Stream<SalesBillStates> _mapSalesBillPDFGenerateCallEventToState(
       SalesBillPDFGenerateCallEvent event) async* {
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
       SalesBillPDFGenerateResponse response =
-      await userRepository.getSalesBillPDFGenerate(event.request);
+          await userRepository.getSalesBillPDFGenerate(event.request);
       yield SalesBillPDFGenerateResponseState(response);
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));

@@ -38,7 +38,15 @@ class MissedPunchDeleteCallEvent extends MissedPunchScreenEvents {
 }
 class MissedPunchApprovalListCallEvent extends MissedPunchScreenEvents {
 
-  final LoanApprovalListRequest loanApprovalListRequest;
+  final MissedPunchApprovalListRequest missedPunchApprovalListRequest;
 
-  MissedPunchApprovalListCallEvent(this.loanApprovalListRequest);
+  MissedPunchApprovalListCallEvent(this.missedPunchApprovalListRequest);
+}
+
+class MissedPunchApprovalSaveRequestCallEvent extends MissedPunchScreenEvents {
+
+  int pkID;
+  final MissedPunchApprovalSaveRequest missedPunchApprovalSaveRequest;
+
+  MissedPunchApprovalSaveRequestCallEvent(this.pkID,this.missedPunchApprovalSaveRequest);
 }

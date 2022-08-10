@@ -1,30 +1,20 @@
-import 'dart:io';
-
-import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
-import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/leave_request/leave_request_bloc.dart';
-import 'package:soleoserp/models/api_requests/attendance_employee_list_request.dart';
 import 'package:soleoserp/models/api_requests/leave_request_save_request.dart';
 import 'package:soleoserp/models/api_requests/leave_request_type_request.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/follower_employee_list_response.dart';
 import 'package:soleoserp/models/api_responses/leave_request_list_response.dart';
-import 'package:soleoserp/models/api_responses/leave_request_type_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
 import 'package:soleoserp/models/common/all_name_id_list.dart';
-import 'package:soleoserp/models/common/globals.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/customer_add_edit.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/leave_request/leave_request_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
-import 'package:soleoserp/ui/widgets/common_input_text_filed.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
 import 'package:soleoserp/utils/General_Constants.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
@@ -53,7 +43,6 @@ class _LeaveRequestAddEditScreenState
     with BasicScreen, WidgetsBindingObserver, SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
-
   final TextEditingController edt_fromDateController = TextEditingController();
   final TextEditingController edt_fromTimeController = TextEditingController();
 
@@ -66,7 +55,6 @@ class _LeaveRequestAddEditScreenState
   final TextEditingController edt_LeaveTypepkID = TextEditingController();
   final TextEditingController edt_EmployeeID = TextEditingController();
   final TextEditingController edt_EmployeeName = TextEditingController();
-
 
   List<ALL_Name_ID> arr_ALL_Name_ID_For_FolowupType = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_LeaveType = [];
@@ -93,7 +81,6 @@ class _LeaveRequestAddEditScreenState
   DateTime ToDate = DateTime.now();
   FocusNode LeaveAppliedForFocusNode;
 
-
   @override
   void initState() {
     super.initState();
@@ -101,13 +88,15 @@ class _LeaveRequestAddEditScreenState
     LeaveAppliedForFocusNode = FocusNode();
     _offlineLoggedInData = SharedPrefHelper.instance.getLoginUserData();
     _offlineCompanyData = SharedPrefHelper.instance.getCompanyData();
-    _offlineFollowerEmployeeListData = SharedPrefHelper.instance.getFollowerEmployeeList();
-   // _offlineLeaveRequestTypeResponseData = SharedPrefHelper.instance.getLeaveRequestType();
+    _offlineFollowerEmployeeListData =
+        SharedPrefHelper.instance.getFollowerEmployeeList();
+    // _offlineLeaveRequestTypeResponseData = SharedPrefHelper.instance.getLeaveRequestType();
     CompanyID = _offlineCompanyData.details[0].pkId;
     LoginUserID = _offlineLoggedInData.details[0].userID;
-    _onFollowerEmployeeListByStatusCallSuccess(_offlineFollowerEmployeeListData);
-    //_onLeaveRequestTypeSuccessResponse(_offlineLeaveRequestTypeResponseData);
 
+    _onFollowerEmployeeListByStatusCallSuccess(
+        _offlineFollowerEmployeeListData);
+    //_onLeaveRequestTypeSuccessResponse(_offlineLeaveRequestTypeResponseData);
 
     edt_LeaveType.addListener(() {
       LeaveAppliedForFocusNode.requestFocus();
@@ -117,47 +106,46 @@ class _LeaveRequestAddEditScreenState
     if (_isForUpdate) {
       _editModel = widget.arguments.editModel;
       fillData(_editModel);
+    } else {
+      edt_fromDateController.text = selectedDate.day.toString() +
+          "-" +
+          selectedDate.month.toString() +
+          "-" +
+          selectedDate.year.toString();
+      edt_toDateController.text = selectedDate.day.toString() +
+          "-" +
+          selectedDate.month.toString() +
+          "-" +
+          selectedDate.year.toString();
+
+      TimeOfDay selectedTime1234 = TimeOfDay(hour: 0, minute: 0);
+      String AM_PM123 =
+          selectedTime1234.periodOffset.toString() == "12" ? "PM" : "AM";
+      String beforZeroHour123 = selectedTime1234.hourOfPeriod <= 9
+          ? "0" + selectedTime1234.hourOfPeriod.toString()
+          : selectedTime1234.hourOfPeriod.toString();
+      String beforZerominute123 = selectedTime1234.minute <= 9
+          ? "0" + selectedTime1234.minute.toString()
+          : selectedTime1234.minute.toString();
+      edt_fromTimeController.text = beforZeroHour123 +
+          ":" +
+          beforZerominute123 +
+          " " +
+          AM_PM123; //picked_s.periodOffset.toString();
+
+      TimeOfDay selectedTime123 = TimeOfDay(hour: 11, minute: 59);
+      String AM_PM1 =
+          selectedTime123.periodOffset.toString() == "12" ? "AM" : "PM";
+      edt_toTimeController.text = selectedTime123.hour.toString() +
+          ":" +
+          selectedTime123.minute.toString() +
+          " " +
+          AM_PM1; //picked_s.periodOffset.toString();
+
+      edt_EmployeeName.text = _offlineLoggedInData.details[0].employeeName;
+      edt_EmployeeID.text =
+          _offlineLoggedInData.details[0].employeeID.toString();
     }
-    else
-      {
-
-        edt_fromDateController.text = selectedDate.day.toString() +
-            "-" +
-            selectedDate.month .toString() +
-            "-" +
-            selectedDate.year.toString();
-        edt_toDateController.text = selectedDate.day.toString() +
-            "-" +
-            selectedDate.month .toString() +
-            "-" +
-            selectedDate.year.toString();
-
-        TimeOfDay selectedTime1234 = TimeOfDay(hour: 0, minute: 0);
-        String AM_PM123 = selectedTime1234.periodOffset.toString() == "12" ? "PM" : "AM";
-        String beforZeroHour123 = selectedTime1234.hourOfPeriod <= 9
-            ? "0" + selectedTime1234.hourOfPeriod.toString()
-            : selectedTime1234.hourOfPeriod.toString();
-        String beforZerominute123 = selectedTime1234.minute <= 9
-            ? "0" + selectedTime1234.minute.toString()
-            : selectedTime1234.minute.toString();
-        edt_fromTimeController.text = beforZeroHour123 +
-            ":" +
-            beforZerominute123 +
-            " " +
-            AM_PM123; //picked_s.periodOffset.toString();
-
-
-        TimeOfDay selectedTime123 = TimeOfDay(hour: 11, minute: 59);
-        String AM_PM1 = selectedTime123.periodOffset.toString() == "12" ? "AM" : "PM";
-        edt_toTimeController.text = selectedTime123.hour.toString() +
-            ":" +
-            selectedTime123.minute.toString() +
-            " " +
-            AM_PM1; //picked_s.periodOffset.toString();
-      }
-
-
-
   }
 
   @override
@@ -169,18 +157,13 @@ class _LeaveRequestAddEditScreenState
 
       child: BlocConsumer<LeaveRequestScreenBloc, LeaveRequestStates>(
         builder: (BuildContext context, LeaveRequestStates state) {
-
-
           return super.build(context);
         },
         buildWhen: (oldState, currentState) {
-
           return false;
         },
         listener: (BuildContext context, LeaveRequestStates state) {
-
-          if(state is LeaveRequestSaveResponseState)
-          {
+          if (state is LeaveRequestSaveResponseState) {
             _onLeaveSaveStatusCallSuccess(state);
           }
 
@@ -188,10 +171,10 @@ class _LeaveRequestAddEditScreenState
             _onLeaveRequestTypeSuccessResponse(state);
           }
           return super.build(context);
-
         },
         listenWhen: (oldState, currentState) {
-          if (currentState is LeaveRequestSaveResponseState || currentState is LeaveRequestTypeResponseState ) {
+          if (currentState is LeaveRequestSaveResponseState ||
+              currentState is LeaveRequestTypeResponseState) {
             return true;
           }
           return false;
@@ -236,7 +219,6 @@ class _LeaveRequestAddEditScreenState
                           height: 15,
                         ),
                         todateandtime(),
-
                         SizedBox(
                           width: 20,
                           height: 15,
@@ -246,10 +228,9 @@ class _LeaveRequestAddEditScreenState
                           width: 20,
                           height: 15,
                         ),
-
                         showcustomdialogWithID1("Leave Type",
                             enable1: false,
-                            title: "Type Of Leave *",
+                            title: "Type Of Leave ",
                             hintTextvalue: "Tap to Select Leave Type",
                             icon: Icon(
                               Icons.arrow_drop_down,
@@ -285,9 +266,9 @@ class _LeaveRequestAddEditScreenState
                                 contentPadding: EdgeInsets.all(10.0),
                                 hintText: 'Enter Details',
                                 hintStyle: TextStyle(color: Colors.grey),
-
                                 border: OutlineInputBorder(
-                                    borderSide: new BorderSide(color: colorPrimary),
+                                  borderSide:
+                                      new BorderSide(color: colorPrimary),
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(10)),
                                 )),
@@ -297,99 +278,211 @@ class _LeaveRequestAddEditScreenState
                           width: 20,
                           height: 15,
                         ),
-
-
-
-
                         getCommonButton(baseTheme, () {
+                          print("LeaveFromDate1" +
+                              edt_fromDateController.text.toString() +
+                              " " +
+                              edt_fromTimeController.text.toString());
+                          print("LeaveFromDate2" +
+                              "Valid Date : " +
+                              FromDate.isAfter(ToDate).toString() +
+                              " From : " +
+                              FromDate.toString() +
+                              "TO : " +
+                              ToDate.toString());
+                          print("LeaveReverseDate" +
+                              " From : " +
+                              edt_fromDateController.text
+                                  .getFormattedDate(
+                                      fromFormat: "dd-MM-yyyy",
+                                      toFormat: "yyyy-MM-dd")
+                                  .toString() +
+                              " ToDate : " +
+                              edt_toDateController.text
+                                  .getFormattedDate(
+                                      fromFormat: "dd-MM-yyyy",
+                                      toFormat: "yyyy-MM-dd")
+                                  .toString() +
+                              "Timeeee : " +
+                              stringToTimeOfDay(edt_fromTimeController.text)
+                                  .hour
+                                  .toString() +
+                              ":" +
+                              stringToTimeOfDay(edt_fromTimeController.text)
+                                  .minute
+                                  .toString());
+                          print("BothTimeValid" +
+                              FromDate.isBefore(ToDate).toString() +
+                              " Equal : " +
+                              FromDate.isAtSameMomentAs(ToDate).toString());
 
-                          print("LeaveFromDate1"+ edt_fromDateController.text.toString() +" "+ edt_fromTimeController.text.toString());
-                          print("LeaveFromDate2"+ "Valid Date : "+ FromDate.isAfter(ToDate).toString() +" From : "+ FromDate.toString() +"TO : "+ ToDate.toString());
-                          print("LeaveReverseDate"+ " From : "+ edt_fromDateController.text.getFormattedDate(
-                              fromFormat: "dd-MM-yyyy", toFormat: "yyyy-MM-dd").toString() + " ToDate : " + edt_toDateController.text.getFormattedDate(
-                              fromFormat: "dd-MM-yyyy", toFormat: "yyyy-MM-dd").toString() + "Timeeee : " + stringToTimeOfDay(edt_fromTimeController.text).hour.toString() +":"+ stringToTimeOfDay( edt_fromTimeController.text).minute.toString() );
-                          print("BothTimeValid" + FromDate.isBefore(ToDate).toString() + " Equal : "+FromDate.isAtSameMomentAs(ToDate).toString());
-
-
-                          bool isValidDate = FromDate.isBefore(ToDate); // FromDate.isAtSameMomentAs(ToDate) ;
-                          bool isequalTime = FromDate==ToDate;
+                          bool isValidDate = FromDate.isBefore(
+                              ToDate); // FromDate.isAtSameMomentAs(ToDate) ;
+                          bool isequalTime = FromDate == ToDate;
 
                           /*if(edt_fromTimeController.text=="0:0:00.000")
                             {
                               edt_fromTimeController.text = "12:00 AM";
                             }*/
-                          String TempFromDate =  edt_fromDateController.text.getFormattedDate(
-                              fromFormat: "dd-MM-yyyy", toFormat: "yyyy-MM-dd").toString()+stringToTimeOfDay(edt_fromTimeController.text).hour.toString() +":"+ stringToTimeOfDay( edt_fromTimeController.text).minute.toString()+":00.000";
-                          String TempToDate  =  edt_toDateController.text.getFormattedDate(
-                          fromFormat: "dd-MM-yyyy", toFormat: "yyyy-MM-dd").toString()+stringToTimeOfDay(edt_toTimeController.text).hour.toString() +":"+ stringToTimeOfDay( edt_toTimeController.text).minute.toString()+":00.000";
-                          print("BothTimeFormatefromUI" + " TempFromDate : " + TempFromDate + " TempToDate : " + TempToDate);
+                          String TempFromDate = edt_fromDateController.text
+                                  .getFormattedDate(
+                                      fromFormat: "dd-MM-yyyy",
+                                      toFormat: "yyyy-MM-dd")
+                                  .toString() +
+                              stringToTimeOfDay(edt_fromTimeController.text)
+                                  .hour
+                                  .toString() +
+                              ":" +
+                              stringToTimeOfDay(edt_fromTimeController.text)
+                                  .minute
+                                  .toString() +
+                              ":00.000";
+                          String TempToDate = edt_toDateController.text
+                                  .getFormattedDate(
+                                      fromFormat: "dd-MM-yyyy",
+                                      toFormat: "yyyy-MM-dd")
+                                  .toString() +
+                              stringToTimeOfDay(edt_toTimeController.text)
+                                  .hour
+                                  .toString() +
+                              ":" +
+                              stringToTimeOfDay(edt_toTimeController.text)
+                                  .minute
+                                  .toString() +
+                              ":00.000";
+                          print("BothTimeFormatefromUI" +
+                              " TempFromDate : " +
+                              TempFromDate +
+                              " TempToDate : " +
+                              TempToDate);
 
-                          print("RemoveDash" + " TempFromDate : " + RemoveMultipleChar(TempFromDate) + " TempToDate : " + RemoveMultipleChar(TempToDate));
+                          print("RemoveDash" +
+                              " TempFromDate : " +
+                              RemoveMultipleChar(TempFromDate) +
+                              " TempToDate : " +
+                              RemoveMultipleChar(TempToDate));
 
-                          double intime = double.parse(RemoveMultipleChar(TempFromDate));
-                          double outtime = double.parse(RemoveMultipleChar(TempToDate));
+                          double intime =
+                              double.parse(RemoveMultipleChar(TempFromDate));
+                          double outtime =
+                              double.parse(RemoveMultipleChar(TempToDate));
 
-                          List<String> aaaa= edt_fromTimeController.text.toString().split(":");
-                          List<String> bbbb= edt_toTimeController.text.toString().split(":");
+                          List<String> aaaa =
+                              edt_fromTimeController.text.toString().split(":");
+                          List<String> bbbb =
+                              edt_toTimeController.text.toString().split(":");
 
                           List<String> removeAMPM = aaaa[1].split(" ");
                           List<String> removeAMPM1 = bbbb[1].split(" ");
 
-                          print("StrArrayy"+"First"+aaaa[0]+"Second"+removeAMPM[0]/*"Third"+aaaa[2]*/);
-                          print("StrArrayy123"+"First"+bbbb[0]+"Second"+removeAMPM1[0]/*"Third"+aaaa[2]*/);
+                          print("StrArrayy" +
+                              "First" +
+                              aaaa[0] +
+                              "Second" +
+                              removeAMPM[0] /*"Third"+aaaa[2]*/);
+                          print("StrArrayy123" +
+                              "First" +
+                              bbbb[0] +
+                              "Second" +
+                              removeAMPM1[0] /*"Third"+aaaa[2]*/);
 
-                          double Fromdatevalid= double.parse(edt_fromDateController.text.replaceAll("-", "")+aaaa[0]+removeAMPM[0]);
-                          double ToDateValid= double.parse(edt_toDateController.text.replaceAll("-", "")+bbbb[0]+removeAMPM1[0]);
+                          double Fromdatevalid = double.parse(
+                              edt_fromDateController.text.replaceAll("-", "") +
+                                  aaaa[0] +
+                                  removeAMPM[0]);
+                          double ToDateValid = double.parse(
+                              edt_toDateController.text.replaceAll("-", "") +
+                                  bbbb[0] +
+                                  removeAMPM1[0]);
 
-                          double Fromdatevalid1= double.parse(edt_fromDateController.text.replaceAll("-", ""));
-                          double ToDateValid1= double.parse(edt_toDateController.text.replaceAll("-", ""));
+                          double Fromdatevalid1 = double.parse(
+                              edt_fromDateController.text.replaceAll("-", ""));
+                          double ToDateValid1 = double.parse(
+                              edt_toDateController.text.replaceAll("-", ""));
 
-                          print("StrArrayyDate"+"From : "+ Fromdatevalid.toString() + "ToDate : "+ToDateValid.toString());
+                          print("StrArrayyDate" +
+                              "From : " +
+                              Fromdatevalid.toString() +
+                              "ToDate : " +
+                              ToDateValid.toString());
 
-                         // print("ValidDateFromdouble" + "In-Time" + edt_fromDateController.text.toString()+edt_fromTimeController.text.toString() + " Out-Time" + edt_toDateController.text.toString() +edt_toTimeController.text.toString()+ "False" );
+                          // print("ValidDateFromdouble" + "In-Time" + edt_fromDateController.text.toString()+edt_fromTimeController.text.toString() + " Out-Time" + edt_toDateController.text.toString() +edt_toTimeController.text.toString()+ "False" );
 
-                        //  print("testdate" + "In-Time" + Fromdatevalid.toString()+ " Out-Time" + ToDateValid.toString() );
+                          //  print("testdate" + "In-Time" + Fromdatevalid.toString()+ " Out-Time" + ToDateValid.toString() );
 
-                          if(edt_fromDateController.text.toString() != "")
-                            {
-                              if(edt_toDateController.text != "")
-                              {
-                                if(edt_LeaveType.text != "")
-                                {
-                                  if(edt_leaveNotes.text != "")
-                                  {
-                                    if(Fromdatevalid1<=ToDateValid1)
-                                      {
-                                        print("ValidDateFromdouble" + "In-Time" + intime.toString() + " Out-Time" + outtime.toString() + "True" );
+                          if (edt_fromDateController.text.toString() != "") {
+                            if (edt_toDateController.text != "") {
+                              if (edt_EmployeeName.text != "") {
+                                if (edt_leaveNotes.text != "") {
+                                  if (Fromdatevalid1 <= ToDateValid1) {
+                                    print("ValidDateFromdouble" +
+                                        "In-Time" +
+                                        intime.toString() +
+                                        " Out-Time" +
+                                        outtime.toString() +
+                                        "True");
 
+                                    showCommonDialogWithTwoOptions(context,
+                                        "Are you sure you want to Save this Leave Request?",
+                                        negativeButtonTitle: "No",
+                                        positiveButtonTitle: "Yes",
+                                        onTapOfPositiveButton: () {
+                                      Navigator.of(context).pop();
 
-                                            showCommonDialogWithTwoOptions(
-                                                context, "Are you sure you want to Save this Leave Request?",
-                                                negativeButtonTitle: "No",
-                                                positiveButtonTitle: "Yes", onTapOfPositiveButton: () {
-                                              Navigator.of(context).pop();
+                                      _leaveRequestScreenBloc.add(LeaveRequestSaveCallEvent(
+                                          LeavePkID,
+                                          LeaveRequestSaveAPIRequest(
+                                              CompanyId: CompanyID.toString(),
+                                              EmployeeID: edt_EmployeeID.text,
+                                              LeaveTypeID:
+                                                  edt_LeaveTypepkID.text,
+                                              FromDate: edt_fromDateController
+                                                      .text
+                                                      .getFormattedDate(
+                                                          fromFormat:
+                                                              "dd-MM-yyyy",
+                                                          toFormat:
+                                                              "yyyy-MM-dd")
+                                                      .toString() +
+                                                  " " +
+                                                  stringToTimeOfDay(edt_fromTimeController.text)
+                                                      .hour
+                                                      .toString() +
+                                                  ":" +
+                                                  stringToTimeOfDay(edt_fromTimeController.text)
+                                                      .minute
+                                                      .toString() +
+                                                  ":00.000",
+                                              ToDate: edt_toDateController.text
+                                                      .getFormattedDate(
+                                                          fromFormat:
+                                                              "dd-MM-yyyy",
+                                                          toFormat:
+                                                              "yyyy-MM-dd")
+                                                      .toString() +
+                                                  " " +
+                                                  stringToTimeOfDay(edt_toTimeController.text)
+                                                      .hour
+                                                      .toString() +
+                                                  ":" +
+                                                  stringToTimeOfDay(edt_toTimeController.text)
+                                                      .minute
+                                                      .toString() +
+                                                  ":00.000",
+                                              ReasonForLeave:
+                                                  edt_leaveNotes.text,
+                                              shouldmail: "0",
+                                              LoginUserID: LoginUserID)));
+                                    });
+                                  } else {
+                                    print("ValidDateFromdouble" +
+                                        "In-Time" +
+                                        intime.toString() +
+                                        " Out-Time" +
+                                        outtime.toString() +
+                                        "False");
 
-                                              _leaveRequestScreenBloc.add(LeaveRequestSaveCallEvent(LeavePkID,LeaveRequestSaveAPIRequest(
-                                                  CompanyId: CompanyID.toString(),
-                                                  EmployeeID: edt_EmployeeID.text,
-                                                  LeaveTypeID: edt_LeaveTypepkID.text,
-                                                  FromDate: edt_fromDateController.text.getFormattedDate(
-                                                      fromFormat: "dd-MM-yyyy", toFormat: "yyyy-MM-dd").toString() + " "+ stringToTimeOfDay(edt_fromTimeController.text).hour.toString() +":"+ stringToTimeOfDay( edt_fromTimeController.text).minute.toString()+":00.000" ,
-                                                  ToDate:  edt_toDateController.text.getFormattedDate(
-                                                      fromFormat: "dd-MM-yyyy", toFormat: "yyyy-MM-dd").toString() + " "+ stringToTimeOfDay(edt_toTimeController.text).hour.toString() +":"+ stringToTimeOfDay( edt_toTimeController.text).minute.toString()+":00.000",
-                                                  ReasonForLeave: edt_leaveNotes.text,
-                                                  shouldmail: "0",
-                                                  LoginUserID: LoginUserID
-                                              )));
-                                            });
-
-
-
-                                          }
-                                    else{
-                                      print("ValidDateFromdouble" + "In-Time" + intime.toString() + " Out-Time" + outtime.toString() + "False" );
-
-                                      /*if(isequalTime==true)
+                                    /*if(isequalTime==true)
                                       {
 
 
@@ -415,40 +508,32 @@ class _LeaveRequestAddEditScreenState
                                         });
                                       }
                                       else{*/
-                                        showCommonDialogWithSingleOption(
-                                            context, "FromTime should be less than ToTime ",
-                                            positiveButtonTitle: "OK");
-                                     /* }*/
-
-                                    }
-                                  }
-                                  else
-                                  {
-                                    showCommonDialogWithSingleOption(
-                                        context, "Leave applied for is required!",
+                                    showCommonDialogWithSingleOption(context,
+                                        "FromTime should be less than ToTime ",
                                         positiveButtonTitle: "OK");
+                                    /* }*/
+
                                   }
-                                }
-                                else
-                                {
+                                } else {
                                   showCommonDialogWithSingleOption(
-                                      context, "Type of leave is required!",
+                                      context, "Leave applied for is required!",
                                       positiveButtonTitle: "OK");
                                 }
-                              }
-                              else
-                              {
+                              } else {
                                 showCommonDialogWithSingleOption(
-                                    context, "To date is required!",
+                                    context, "Employee Name required!",
                                     positiveButtonTitle: "OK");
                               }
-                            }
-                          else
-                            {
+                            } else {
                               showCommonDialogWithSingleOption(
-                                  context, "From date is required!",
+                                  context, "To date is required!",
                                   positiveButtonTitle: "OK");
                             }
+                          } else {
+                            showCommonDialogWithSingleOption(
+                                context, "From date is required!",
+                                positiveButtonTitle: "OK");
+                          }
                         }, "Save", backGroundColor: colorPrimary),
                         SizedBox(
                           width: 20,
@@ -542,9 +627,6 @@ class _LeaveRequestAddEditScreenState
     return str;
   }
 
-
-
-
   Widget CustomDropDown1(String Category,
       {bool enable1,
       Icon icon,
@@ -636,8 +718,9 @@ class _LeaveRequestAddEditScreenState
       child: Column(
         children: [
           InkWell(
-            onTap: () =>  _leaveRequestScreenBloc.add(LeaveRequestTypeCallEvent(
-                LeaveRequestTypeAPIRequest(pkID: "",
+            onTap: () => _leaveRequestScreenBloc.add(LeaveRequestTypeCallEvent(
+                LeaveRequestTypeAPIRequest(
+                    pkID: "",
                     PageNo: "1",
                     PageSize: "1000",
                     LoginUserID: LoginUserID,
@@ -704,19 +787,16 @@ class _LeaveRequestAddEditScreenState
     );
   }
 
-
-
   void fillData(LeaveRequestDetails leaveRequestDetails) {
-
-    print("LeaveDateee"+ leaveRequestDetails.fromDate);
+    print("LeaveDateee" + leaveRequestDetails.fromDate);
     edt_fromDateController.text = leaveRequestDetails.fromDate.getFormattedDate(
         fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
     edt_toDateController.text = leaveRequestDetails.toDate.getFormattedDate(
         fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
     FromDate = DateTime.parse(leaveRequestDetails.fromDate);
     ToDate = DateTime.parse(leaveRequestDetails.toDate);
-    print("LeaveFromDate123"+ FromDate.toString());
-    print("LeaveToDate123"+ ToDate.toString());
+    print("LeaveFromDate123" + FromDate.toString());
+    print("LeaveToDate123" + ToDate.toString());
 
     edt_fromTimeController.text = leaveRequestDetails.fromDate.getFormattedDate(
         fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "hh:mm a");
@@ -725,7 +805,10 @@ class _LeaveRequestAddEditScreenState
     edt_toTimeController.text = leaveRequestDetails.toDate.getFormattedDate(
         fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "hh:mm a");
     edt_leaveNotes.text = leaveRequestDetails.reasonForLeave;
-    edt_LeaveType.text = leaveRequestDetails.leaveType == "--Not Available--"|| leaveRequestDetails.leaveType == "N/A"? "" : leaveRequestDetails.leaveType;
+    edt_LeaveType.text = leaveRequestDetails.leaveType == "--Not Available--" ||
+            leaveRequestDetails.leaveType == "N/A"
+        ? ""
+        : leaveRequestDetails.leaveType;
     edt_LeaveTypepkID.text = leaveRequestDetails.leaveTypeID.toString();
     edt_EmployeeName.text = leaveRequestDetails.employeeName.toString();
     edt_EmployeeID.text = leaveRequestDetails.employeeID.toString();
@@ -763,8 +846,8 @@ class _LeaveRequestAddEditScreenState
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15)),
                     child: GestureDetector(
-                      onTap: (){
-                        _selectFromDate(context,edt_fromDateController);
+                      onTap: () {
+                        _selectFromDate(context, edt_fromDateController);
                       },
                       child: Container(
                         height: 60,
@@ -775,12 +858,13 @@ class _LeaveRequestAddEditScreenState
                             Expanded(
                               child: Text(
                                 edt_fromDateController.text == null ||
-                                    edt_fromDateController.text == ""
+                                        edt_fromDateController.text == ""
                                     ? "DD-MM-YYYY"
                                     : edt_fromDateController.text,
                                 style: baseTheme.textTheme.headline3.copyWith(
-                                    color: edt_fromDateController.text == null ||
-                                        edt_fromDateController.text == ""
+                                    color: edt_fromDateController.text ==
+                                                null ||
+                                            edt_fromDateController.text == ""
                                         ? colorGrayDark
                                         : colorBlack),
                               ),
@@ -809,8 +893,8 @@ class _LeaveRequestAddEditScreenState
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15)),
                   child: GestureDetector(
-                    onTap: (){
-                      _selectFromTime(context,edt_fromTimeController);
+                    onTap: () {
+                      _selectFromTime(context, edt_fromTimeController);
                     },
                     child: Container(
                       height: 60,
@@ -869,7 +953,7 @@ class _LeaveRequestAddEditScreenState
                             fontWeight: FontWeight
                                 .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                    ),
+                        ),
                   ]),
                 ),
                 SizedBox(
@@ -881,8 +965,8 @@ class _LeaveRequestAddEditScreenState
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15)),
                     child: GestureDetector(
-                      onTap: (){
-                        _selectToDate(context,edt_toDateController);
+                      onTap: () {
+                        _selectToDate(context, edt_toDateController);
                       },
                       child: Container(
                         height: 60,
@@ -893,12 +977,12 @@ class _LeaveRequestAddEditScreenState
                             Expanded(
                               child: Text(
                                 edt_toDateController.text == null ||
-                                    edt_toDateController.text == ""
+                                        edt_toDateController.text == ""
                                     ? "DD-MM-YYYY"
                                     : edt_toDateController.text,
                                 style: baseTheme.textTheme.headline3.copyWith(
                                     color: edt_toDateController.text == null ||
-                                        edt_toDateController.text == ""
+                                            edt_toDateController.text == ""
                                         ? colorGrayDark
                                         : colorBlack),
                               ),
@@ -927,8 +1011,8 @@ class _LeaveRequestAddEditScreenState
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15)),
                   child: GestureDetector(
-                    onTap: (){
-                      _selectToTime(context,edt_toTimeController);
+                    onTap: () {
+                      _selectToTime(context, edt_toTimeController);
                     },
                     child: Container(
                       height: 60,
@@ -952,7 +1036,7 @@ class _LeaveRequestAddEditScreenState
                                 color: Color(0xFF000000),
                               ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                          ),
+                              ),
                         ),
                         /* Icon(
                               Icons.watch_later_outlined,
@@ -966,18 +1050,15 @@ class _LeaveRequestAddEditScreenState
         ],
       ),
     );
-
   }
 
   void _onLeaveRequestTypeSuccessResponse(LeaveRequestTypeResponseState state) {
     if (state.response.details.length != 0) {
       arr_ALL_Name_ID_For_LeaveType.clear();
-      for (var i = 0; i < state.response.details.length ; i++) {
-        print("description : " +
-            state.response.details[i].description);
+      for (var i = 0; i < state.response.details.length; i++) {
+        print("description : " + state.response.details[i].description);
         ALL_Name_ID all_name_id = ALL_Name_ID();
-        all_name_id.Name =
-            state.response.details[i].description;
+        all_name_id.Name = state.response.details[i].description;
         all_name_id.pkID = state.response.details[i].pkID;
         arr_ALL_Name_ID_For_LeaveType.add(all_name_id);
       }
@@ -989,16 +1070,14 @@ class _LeaveRequestAddEditScreenState
           controllerID: edt_LeaveTypepkID,
           lable: "Select Leave Type");
     }
-
   }
 
-  void _onFollowerEmployeeListByStatusCallSuccess(FollowerEmployeeListResponse state) {
+  void _onFollowerEmployeeListByStatusCallSuccess(
+      FollowerEmployeeListResponse state) {
     arr_ALL_Name_ID_For_Folowup_EmplyeeList.clear();
 
-    if(state.details!=null)
-    {
-      for(var i=0;i<state.details.length;i++)
-      {
+    if (state.details != null) {
+      for (var i = 0; i < state.details.length; i++) {
         ALL_Name_ID all_name_id = ALL_Name_ID();
         all_name_id.Name = state.details[i].employeeName;
         all_name_id.pkID = state.details[i].pkID;
@@ -1015,7 +1094,7 @@ class _LeaveRequestAddEditScreenState
             values: arr_ALL_Name_ID_For_Folowup_EmplyeeList,
             context1: context,
             controller: edt_EmployeeName,
-            controllerID: edt_EmployeeID ,
+            controllerID: edt_EmployeeID,
             lable: "Select Employee");
       },
       child: Column(
@@ -1023,18 +1102,16 @@ class _LeaveRequestAddEditScreenState
         children: [
           Container(
             margin: EdgeInsets.only(left: 5),
-            child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                      "Select Employee",
-                      style:TextStyle(fontSize: 12,color: colorPrimary,fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text("Select Employee *",
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: colorPrimary,
+                      fontWeight: FontWeight
+                          .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
                   ),
-                  Icon(
-                    Icons.filter_list_alt,
-                    color: colorPrimary,
-                  ),]),
+            ]),
           ),
           SizedBox(
             height: 5,
@@ -1043,38 +1120,40 @@ class _LeaveRequestAddEditScreenState
             elevation: 5,
             color: colorLightGray,
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
               padding: EdgeInsets.only(top: 5, bottom: 5, left: 5, right: 10),
               width: double.maxFinite,
               child: Row(
                 children: [
                   Expanded(
-                    child:/* Text(
+                    child: /* Text(
                         SelectedStatus =="" ?
                         "Tap to select Status" : SelectedStatus.Name,
                         style:TextStyle(fontSize: 12,color: Color(0xFF000000),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
                     ),*/
 
-                    TextField(
+                        TextField(
                       controller: edt_EmployeeName,
                       enabled: false,
                       /*  onChanged: (value) => {
                     print("StatusValue " + value.toString() )
-                },*/  style: TextStyle(
-                        color: Colors.black, // <-- Change this
-                        fontSize: 12, fontWeight: FontWeight.bold),
+                },*/
+                      style: TextStyle(
+                          color: Colors.black, // <-- Change this
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
                       decoration: new InputDecoration(
                           border: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
-                          contentPadding:
-                          EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-                          hintText: "Select"
-                      ),),
+                          contentPadding: EdgeInsets.only(
+                              left: 15, bottom: 11, top: 11, right: 15),
+                          hintText: "Tap to select employee"),
+                    ),
                     // dropdown()
                   ),
                   /*  Icon(
@@ -1090,9 +1169,10 @@ class _LeaveRequestAddEditScreenState
     );
   }
 
-  void _onLeaveSaveStatusCallSuccess(LeaveRequestSaveResponseState state) async {
+  void _onLeaveSaveStatusCallSuccess(
+      LeaveRequestSaveResponseState state) async {
     print("SaveResponseLeave : " + state.response.toString());
-   /* navigateTo(context, LeaveRequestListScreen.routeName,
+    /* navigateTo(context, LeaveRequestListScreen.routeName,
         clearAllStack: true);*/
     Navigator.of(context).pop();
   }
@@ -1114,7 +1194,7 @@ class _LeaveRequestAddEditScreenState
         selectedTime = picked_s;
 
         String AM_PM =
-        selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
+            selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
         String beforZeroHour = selectedTime.hourOfPeriod <= 9
             ? "0" + selectedTime.hourOfPeriod.toString()
             : selectedTime.hourOfPeriod.toString();
@@ -1129,6 +1209,7 @@ class _LeaveRequestAddEditScreenState
             AM_PM; //picked_s.periodOffset.toString();
       });
   }
+
   Future<void> _selectToTime(
       BuildContext context, TextEditingController F_datecontroller) async {
     final TimeOfDay picked_s = await showTimePicker(
@@ -1146,7 +1227,7 @@ class _LeaveRequestAddEditScreenState
         selectedTime = picked_s;
 
         String AM_PM =
-        selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
+            selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
         String beforZeroHour = selectedTime.hourOfPeriod <= 9
             ? "0" + selectedTime.hourOfPeriod.toString()
             : selectedTime.hourOfPeriod.toString();
@@ -1176,16 +1257,17 @@ class _LeaveRequestAddEditScreenState
           "-" +
           picked.year.toString();
     FromDate = picked;
-      setState(() {
-        //selectedDate = picked;
+    setState(() {
+      //selectedDate = picked;
 
       /*  .text = selectedDate.year.toString() +
             "-" +
             selectedDate.month.toString() +
             "-" +
             selectedDate.day.toString();*/
-      });
+    });
   }
+
   Future<void> _selectToDate(
       BuildContext context, TextEditingController F_datecontroller) async {
     final DateTime picked = await showDatePicker(
@@ -1193,27 +1275,25 @@ class _LeaveRequestAddEditScreenState
         initialDate: selectedDate,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
-    if (picked != null && picked != selectedDate)
-      ToDate = picked;
+    if (picked != null && picked != selectedDate) ToDate = picked;
     edt_toDateController.text = picked.day.toString() +
         "-" +
         picked.month.toString() +
         "-" +
         picked.year.toString();
-      setState(() {
-        //selectedDate = picked;
+    setState(() {
+      //selectedDate = picked;
 
-        /*  .text = selectedDate.year.toString() +
+      /*  .text = selectedDate.year.toString() +
             "-" +
             selectedDate.month.toString() +
             "-" +
             selectedDate.day.toString();*/
-      });
+    });
   }
 
   TimeOfDay stringToTimeOfDay(String tod) {
     final format = DateFormat.jm(); //"6:00 AM"
     return TimeOfDay.fromDateTime(format.parse(tod));
   }
-
 }

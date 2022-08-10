@@ -247,7 +247,7 @@ class _LoanListScreenState extends BaseState<LoanListScreen>
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
+/*        floatingActionButton: FloatingActionButton(
           onPressed: () async {
             // Add your onPressed code here!
             await _onTapOfDeleteALLContact();
@@ -255,7 +255,7 @@ class _LoanListScreenState extends BaseState<LoanListScreen>
           },
           child: const Icon(Icons.add),
           backgroundColor: colorPrimary,
-        ),
+        ),*/
         drawer: build_Drawer(
             context: context, UserName: "KISHAN", RolCode: "Admin"),
       ),
@@ -675,7 +675,7 @@ class _LoanListScreenState extends BaseState<LoanListScreen>
                 buttonHeight: 52.0,
                 buttonMinWidth: 90.0,
                 children: <Widget>[
-                  FlatButton(
+                  /*  FlatButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4.0)),
                     onPressed: () {
@@ -696,7 +696,7 @@ class _LoanListScreenState extends BaseState<LoanListScreen>
                         ),
                       ],
                     ),
-                  ),
+                  ),*/
                   isDeleteVisible == true
                       ? FlatButton(
                           shape: RoundedRectangleBorder(

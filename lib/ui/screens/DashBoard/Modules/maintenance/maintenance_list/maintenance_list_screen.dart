@@ -1,65 +1,34 @@
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_share_me/flutter_share_me.dart';
-import 'package:lottie/lottie.dart';
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/bank_voucher/bank_voucher_bloc.dart';
-import 'package:soleoserp/blocs/other/bloc_modules/customer/customer_bloc.dart';
-import 'package:soleoserp/blocs/other/bloc_modules/employee/employee_bloc.dart';
-import 'package:soleoserp/blocs/other/bloc_modules/inquiry/inquiry_bloc.dart';
-import 'package:soleoserp/blocs/other/bloc_modules/loan/loan_bloc.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/maintenance/maintenance_bloc.dart';
 import 'package:soleoserp/models/api_requests/bank_voucher_delete_request.dart';
-import 'package:soleoserp/models/api_requests/bank_voucher_list_request.dart';
-import 'package:soleoserp/models/api_requests/bank_voucher_search_by_id_request.dart';
-import 'package:soleoserp/models/api_requests/customer_delete_request.dart';
-import 'package:soleoserp/models/api_requests/customer_paggination_request.dart';
-import 'package:soleoserp/models/api_requests/customer_search_by_id_request.dart';
-import 'package:soleoserp/models/api_requests/employee_list_request.dart';
-import 'package:soleoserp/models/api_requests/employee_search_request.dart';
-import 'package:soleoserp/models/api_requests/inquiry_list_request.dart';
-import 'package:soleoserp/models/api_requests/loan_list_request.dart';
-import 'package:soleoserp/models/api_requests/loan_search_request.dart';
 import 'package:soleoserp/models/api_requests/maintenance_list_request.dart';
 import 'package:soleoserp/models/api_requests/maintenance_search_request.dart';
-import 'package:soleoserp/models/api_requests/search_inquiry_list_by_number_request.dart';
 import 'package:soleoserp/models/api_responses/bank_voucher_list_response.dart';
-import 'package:soleoserp/models/api_responses/bank_voucher_search_by_name_response.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/customer_details_api_response.dart';
-import 'package:soleoserp/models/api_responses/customer_label_value_response.dart';
-import 'package:soleoserp/models/api_responses/employee_list_response.dart';
-import 'package:soleoserp/models/api_responses/loan_list_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
 import 'package:soleoserp/models/api_responses/maintenance_list_response.dart';
 import 'package:soleoserp/models/common/contact_model.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/dimen_resources.dart';
-import 'package:soleoserp/ui/res/image_resources.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/customer_add_edit.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerList/search_customer_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/bank_voucher/bank_voucher_add_edit/bank_voucher_add_edit.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/bank_voucher/bank_voucher_list/search_bank_voucher_list_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/employee/employee_list/employee_search_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/search_inquiry_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/loan/loan_list/loan_search_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/maintenance/maintenance_list/maintenance_search_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
-import 'package:soleoserp/ui/widgets/custom_gredient_app_bar.dart';
-import 'package:soleoserp/utils/add_contact_page.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/general_utils.dart';
 import 'package:soleoserp/utils/offline_db_helper.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
-///import 'package:whatsapp_share/whatsapp_share.dart';
 
+///import 'package:whatsapp_share/whatsapp_share.dart';
 
 class MaintenanceListScreen extends BaseStatefulWidget {
   static const routeName = '/MaintenanceListScreen';
@@ -67,6 +36,7 @@ class MaintenanceListScreen extends BaseStatefulWidget {
   @override
   _MaintenanceListScreenState createState() => _MaintenanceListScreenState();
 }
+
 enum Share {
   facebook,
   twitter,
@@ -77,7 +47,6 @@ enum Share {
   share_instagram,
   share_telegram
 }
-
 
 class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
     with BasicScreen, WidgetsBindingObserver {
@@ -112,7 +81,6 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
 /*
   bool _hasPermission;
 */
-
 
   @override
   void initState() {
@@ -170,11 +138,11 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
     return BlocProvider(
       create: (BuildContext context) => _CustomerBloc
         ..add(MaintenanceListCallEvent(
-            _pageNo+ 1,
+            _pageNo + 1,
             MaintenanceListRequest(
-              pkID: "",
-              CompanyID: CompanyID.toString(),LoginUserID: LoginUserID
-            ))),
+                pkID: "",
+                CompanyID: CompanyID.toString(),
+                LoginUserID: LoginUserID))),
       child: BlocConsumer<MaintenanceScreenBloc, MaintenanceScreenStates>(
         builder: (BuildContext context, MaintenanceScreenStates state) {
           if (state is MaintenanceListResponseState) {
@@ -222,7 +190,7 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
         appBar: NewGradientAppBar(
           title: Text('Maintenance List'),
           gradient:
-          LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
+              LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
           actions: <Widget>[
             IconButton(
                 icon: Icon(
@@ -258,9 +226,9 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
                     _CustomerBloc.add(MaintenanceListCallEvent(
                         1,
                         MaintenanceListRequest(
-                          pkID: "",
-                          CompanyID: CompanyID.toString(),LoginUserID: LoginUserID
-                        )));
+                            pkID: "",
+                            CompanyID: CompanyID.toString(),
+                            LoginUserID: LoginUserID)));
                   },
                   child: Container(
                     padding: EdgeInsets.only(
@@ -280,7 +248,7 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
             ],
           ),
         ),
-       /* floatingActionButton: FloatingActionButton(
+        /* floatingActionButton: FloatingActionButton(
           onPressed: () async {
             // Add your onPressed code here!
             await _onTapOfDeleteALLContact();
@@ -313,7 +281,7 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
                     fontWeight: FontWeight
                         .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-            ),
+                ),
           ),
           SizedBox(
             height: 5,
@@ -322,7 +290,7 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
             elevation: 5,
             color: Color(0xffE0E0E0),
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             child: Container(
               height: 60,
               padding: EdgeInsets.only(left: 20, right: 20),
@@ -361,8 +329,8 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
         if (shouldPaginate(
-          scrollInfo,
-        ) &&
+              scrollInfo,
+            ) &&
             _searchDetails == null) {
           _onInquiryListPagination();
           return true;
@@ -395,7 +363,8 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
         _searchDetails = null;
         _inquiryListResponse = state.maintenanceListResponse;
       } else {
-        _inquiryListResponse.details.addAll(state.maintenanceListResponse.details);
+        _inquiryListResponse.details
+            .addAll(state.maintenanceListResponse.details);
       }
       _pageNo = state.newPage;
     }
@@ -407,9 +376,9 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
     _CustomerBloc.add(MaintenanceListCallEvent(
         _pageNo + 1,
         MaintenanceListRequest(
-          pkID: "",
-          CompanyID: CompanyID.toString(),LoginUserID: LoginUserID
-        )));
+            pkID: "",
+            CompanyID: CompanyID.toString(),
+            LoginUserID: LoginUserID)));
 
     /*if (_inquiryListResponse.details.length < _inquiryListResponse.totalCount) {
     }*/
@@ -430,8 +399,7 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
           expandedColor: Color(0xFFC1E0FA),
           leading: CircleAvatar(
               backgroundColor: Color(0xFF504F4F),
-              child: Image
-                  .network(
+              child: Image.network(
                 "http://demo.sharvayainfotech.in/images/profile.png",
                 height: 35,
                 fit: BoxFit.fill,
@@ -442,7 +410,6 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
             style: TextStyle(color: Colors.black),
           ),
           subtitle: GestureDetector(
-
             child: Text(
               model.inquiryNo.toString(),
               style: TextStyle(
@@ -456,210 +423,198 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
               thickness: 1.0,
               height: 1.0,
             ),
-
             Container(
                 margin: EdgeInsets.all(20),
-
                 child: Container(
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-
-
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Contract Type",
-                                                style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model.contractType == ""
-                                                    ? "N/A"
-                                                    : model.contractType.toString(),
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-                                  ]),
-                              SizedBox(
-                                height: sizeboxsize,
-                              ),
-                              Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Row(
-                                      children: [
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                            children: <Widget>[
-                                              Text("Total Amount",
-                                                  style: TextStyle(
-                                                      fontStyle: FontStyle.italic,
-                                                      color: Color(label_color),
-                                                      fontSize: _fontSize_Label,
-                                                      letterSpacing: .3)),
-                                              SizedBox(
-                                                width: 5,
-                                              ),
-                                              Text(
-                                                  model.totalAmount == 0.00
-                                                      ? "N/A"
-                                                      : model.totalAmount.toString(),
-                                                  style: TextStyle(
-                                                      color: Color(title_color),
-                                                      fontSize: _fontSize_Title,
-                                                      letterSpacing: .3))
-                                            ],
-                                          ),
+                                      children: <Widget>[
+                                        Text("Contract Type",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
                                         ),
-
+                                        Text(
+                                            model.contractType == ""
+                                                ? "N/A"
+                                                : model.contractType.toString(),
+                                            style: TextStyle(
+                                                color: Color(title_color),
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
                                       ],
-                                    ),
-
-                                  ]),
-                              SizedBox(
-                                height: sizeboxsize,
-                              ),
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Expanded(
-
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Start Date",
-                                                style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model.startDate.toString() == ""
-                                                    ? "N/A"
-                                                    : model.startDate.getFormattedDate(
-                                                    fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                                    toFormat: "dd-MM-yyyy") ??
-                                                    "-",
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-
-                                  ]),
-                              SizedBox(
-                                height: sizeboxsize,
-                              ),
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("End Date	",
-                                                style: TextStyle(
-                                                    fontStyle:
-                                                    FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model.endDate==
-                                                    null
-                                                    ? "N/A"
-                                                    : model.endDate.getFormattedDate(
-                                                    fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                                    toFormat: "dd-MM-yyyy") ??
-                                                    "-",
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-                                  ]),
-                              SizedBox(
-                                height: sizeboxsize,
-                              ),
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Sales Executive",
-                                                style: TextStyle(
-                                                    fontStyle:
-                                                    FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model.contactPerson==
-                                                    null
-                                                    ? "N/A"
-                                                    : model.contactPerson.toString(),
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-                                  ]),
-
-                            ],
+                                    )),
+                              ]),
+                          SizedBox(
+                            height: sizeboxsize,
                           ),
-                        ),
-                      ],
-                    ))),
-
+                          Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Text("Total Amount",
+                                              style: TextStyle(
+                                                  fontStyle: FontStyle.italic,
+                                                  color: Color(label_color),
+                                                  fontSize: _fontSize_Label,
+                                                  letterSpacing: .3)),
+                                          SizedBox(
+                                            width: 5,
+                                          ),
+                                          Text(
+                                              model.totalAmount == 0.00
+                                                  ? "N/A"
+                                                  : model.totalAmount
+                                                      .toString(),
+                                              style: TextStyle(
+                                                  color: Color(title_color),
+                                                  fontSize: _fontSize_Title,
+                                                  letterSpacing: .3))
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ]),
+                          SizedBox(
+                            height: sizeboxsize,
+                          ),
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                    child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text("Start Date",
+                                        style: TextStyle(
+                                            fontStyle: FontStyle.italic,
+                                            color: Color(label_color),
+                                            fontSize: _fontSize_Label,
+                                            letterSpacing: .3)),
+                                    SizedBox(
+                                      width: 5,
+                                    ),
+                                    Text(
+                                        model.startDate.toString() == ""
+                                            ? "N/A"
+                                            : model.startDate.getFormattedDate(
+                                                    fromFormat:
+                                                        "yyyy-MM-ddTHH:mm:ss",
+                                                    toFormat: "dd-MM-yyyy") ??
+                                                "-",
+                                        style: TextStyle(
+                                            color: Color(title_color),
+                                            fontSize: _fontSize_Title,
+                                            letterSpacing: .3)),
+                                  ],
+                                )),
+                              ]),
+                          SizedBox(
+                            height: sizeboxsize,
+                          ),
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text("End Date	",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                            model.endDate == null
+                                                ? "N/A"
+                                                : model.endDate.getFormattedDate(
+                                                        fromFormat:
+                                                            "yyyy-MM-ddTHH:mm:ss",
+                                                        toFormat:
+                                                            "dd-MM-yyyy") ??
+                                                    "-",
+                                            style: TextStyle(
+                                                color: Color(title_color),
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
+                                      ],
+                                    )),
+                              ]),
+                          SizedBox(
+                            height: sizeboxsize,
+                          ),
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text("Sales Executive",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                            model.contactPerson == null
+                                                ? "N/A"
+                                                : model.contactPerson
+                                                    .toString(),
+                                            style: TextStyle(
+                                                color: Color(title_color),
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
+                                      ],
+                                    )),
+                              ]),
+                        ],
+                      ),
+                    ),
+                  ],
+                ))),
             ButtonBar(
                 alignment: MainAxisAlignment.center,
                 buttonHeight: 52.0,
                 buttonMinWidth: 90.0,
                 children: <Widget>[
-                  FlatButton(
+                  /* FlatButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4.0)),
                     onPressed: () {
@@ -680,33 +635,32 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
                         ),
                       ],
                     ),
-                  ),
+                  ),*/
 
                   isDeleteVisible == true
-                      ?  FlatButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4.0)),
-                    onPressed: () {
-                      _onTapOfDeleteInquiry(model.pkID);
-                    },
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.delete,
-                          color: colorPrimary,
-                        ),
-                        Padding(
-                          padding:
-                          const EdgeInsets.symmetric(vertical: 2.0),
-                        ),
-                        Text(
-                          'Delete',
-                          style: TextStyle(color: colorPrimary),
-                        ),
-                      ],
-                    ),
-                  )
-
+                      ? FlatButton(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0)),
+                          onPressed: () {
+                            _onTapOfDeleteInquiry(model.pkID);
+                          },
+                          child: Column(
+                            children: <Widget>[
+                              Icon(
+                                Icons.delete,
+                                color: colorPrimary,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 2.0),
+                              ),
+                              Text(
+                                'Delete',
+                                style: TextStyle(color: colorPrimary),
+                              ),
+                            ],
+                          ),
+                        )
                       : Container(),
                 ]),
           ],
@@ -740,8 +694,11 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
             BankVoucherSearchByIDRequest(
                 CompanyId: CompanyID.toString(),
                 LoginUserID: LoginUserID)));*/
-        _CustomerBloc.add(MaintenanceSearchCallEvent(
-            MaintenanceSearchRequest(pkID:"",LoginUserID: LoginUserID,SearchKey: _searchDetails.customerName.toString(),CompanyID:CompanyID.toString())));
+        _CustomerBloc.add(MaintenanceSearchCallEvent(MaintenanceSearchRequest(
+            pkID: "",
+            LoginUserID: LoginUserID,
+            SearchKey: _searchDetails.customerName.toString(),
+            CompanyID: CompanyID.toString())));
       }
     });
   }
@@ -762,24 +719,20 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
         "");
     //baseBloc.refreshScreen();
 
-    if(state.bankVoucherDeleteResponse.details[0].column1.toString() =="Sorry ! Payroll Entry Exists for such period of Loan Date !")
-    {
-      showCommonDialogWithSingleOption(
-          context, state.bankVoucherDeleteResponse.details[0].column1.toString(),
+    if (state.bankVoucherDeleteResponse.details[0].column1.toString() ==
+        "Sorry ! Payroll Entry Exists for such period of Loan Date !") {
+      showCommonDialogWithSingleOption(context,
+          state.bankVoucherDeleteResponse.details[0].column1.toString(),
           positiveButtonTitle: "OK");
-    }
-    else
-    {
+    } else {
       navigateTo(context, MaintenanceListScreen.routeName, clearAllStack: true);
-
     }
   }
 
   void _onTapOfEditCustomer(BankVoucherDetails model) {
     navigateTo(context, BankVoucherAddEditScreen.routeName,
-        arguments: AddUpdateBankVoucherScreenArguments(model))
+            arguments: AddUpdateBankVoucherScreenArguments(model))
         .then((value) {
-
       setState(() {
         // baseBloc.refreshScreen();
         /* _CustomerBloc.add(BankVoucherListCallEvent(1,
@@ -787,7 +740,6 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
               CompanyID: CompanyID.toString(),
               LoginUserID: LoginUserID,)));*/
       });
-
     });
   }
 
@@ -805,7 +757,8 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
       ? await launch(urltest + txt)
       : throw 'Could not Launch $urltest';
   Future<void> onButtonTap(Share share, CustomerDetails customerDetails) async {
-    String msg = "";//"Thank you for contacting us! We will be in touch shortly";
+    String msg =
+        ""; //"Thank you for contacting us! We will be in touch shortly";
     //"Customer Name : "+customerDetails.customerName.toString()+"\n"+"Address : "+customerDetails.address+"\n"+"Mobile No. : " + customerDetails.contactNo1.toString();
     String url = 'https://pub.dev/packages/flutter_share_me';
 
@@ -827,7 +780,7 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
         break;
       case Share.whatsapp_personal:
         response = await flutterShareMe.shareWhatsAppPersonalMessage(
-            message: msg, phoneNumber: '+91'+customerDetails.contactNo1);
+            message: msg, phoneNumber: '+91' + customerDetails.contactNo1);
         break;
       case Share.share_telegram:
         response = await flutterShareMe.shareToTelegram(msg: msg);
@@ -847,9 +800,5 @@ class _MaintenanceListScreenState extends BaseState<MaintenanceListScreen>
 
   void _onSearchInquiryListCallSuccess(MaintenanceSearchResponseState state) {
     _inquiryListResponse = state.maintenanceListResponse;
-
   }
-
-
-
 }

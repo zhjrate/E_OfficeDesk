@@ -50,51 +50,60 @@ class ToDoDetails {
 
   ToDoDetails(
       {this.rowNum,
-        this.pkID,
-        this.taskDescription,
-        this.location,
-        this.taskDescriptionShort,
-        this.priority,
-        this.taskCategoryId,
-        this.taskCategory,
-        this.startDate,
-        this.dueDate,
-        this.completionDate,
-        this.employeeID,
-        this.employeeName,
-        this.fromEmployeeID,
-        this.fromEmployeeName,
-        this.duration,
-        this.taskStatus,
-        this.subTaskCompleted,
-        this.totalSubTask,
-        this.reminder,
-        this.reminderMonth,
-        this.closingRemarks});
+      this.pkID,
+      this.taskDescription,
+      this.location,
+      this.taskDescriptionShort,
+      this.priority,
+      this.taskCategoryId,
+      this.taskCategory,
+      this.startDate,
+      this.dueDate,
+      this.completionDate,
+      this.employeeID,
+      this.employeeName,
+      this.fromEmployeeID,
+      this.fromEmployeeName,
+      this.duration,
+      this.taskStatus,
+      this.subTaskCompleted,
+      this.totalSubTask,
+      this.reminder,
+      this.reminderMonth,
+      this.closingRemarks});
 
   ToDoDetails.fromJson(Map<String, dynamic> json) {
-    rowNum = json['RowNum'];
-    pkID = json['pkID'];
-    taskDescription = json['TaskDescription'];
-    location = json['Location'];
-    taskDescriptionShort = json['TaskDescriptionShort'];
-    priority = json['Priority'];
-    taskCategoryId = json['TaskCategoryId'];
-    taskCategory = json['TaskCategory'];
-    startDate = json['StartDate'];
-    dueDate = json['DueDate'];
-    completionDate = json['CompletionDate'];
-    employeeID = json['EmployeeID'];
-    employeeName = json['EmployeeName'];
-    fromEmployeeID = json['FromEmployeeID'];
-    fromEmployeeName = json['FromEmployeeName'];
-    duration = json['Duration'];
-    taskStatus = json['TaskStatus'];
-    subTaskCompleted = json['SubTaskCompleted'];
-    totalSubTask = json['TotalSubTask'];
-    reminder = json['Reminder'];
-    reminderMonth = json['ReminderMonth'];
-    closingRemarks = json['ClosingRemarks'];
+    rowNum = json['RowNum'] == null ? 0 : json['RowNum'];
+    pkID = json['pkID'] == null ? 0 : json['pkID'];
+    taskDescription =
+        json['TaskDescription'] == null ? "" : json['TaskDescription'];
+    location = json['Location'] == null ? "" : json['Location'];
+    taskDescriptionShort = json['TaskDescriptionShort'] == null
+        ? ""
+        : json['TaskDescriptionShort'];
+    priority = json['Priority'] == null ? "" : json['Priority'];
+    taskCategoryId =
+        json['TaskCategoryId'] == null ? 0 : json['TaskCategoryId'];
+    taskCategory = json['TaskCategory'] == null ? "" : json['TaskCategory'];
+    startDate = json['StartDate'] == null ? "" : json['StartDate'];
+    dueDate = json['DueDate'] == null ? "" : json['DueDate'];
+    completionDate =
+        json['CompletionDate'] == null ? "" : json['CompletionDate'];
+    employeeID = json['EmployeeID'] == null ? 0 : json['EmployeeID'];
+    employeeName = json['EmployeeName'] == null ? "" : json['EmployeeName'];
+    fromEmployeeID =
+        json['FromEmployeeID'] == null ? 0 : json['FromEmployeeID'];
+    fromEmployeeName =
+        json['FromEmployeeName'] == null ? "" : json['FromEmployeeName'];
+    duration = json['Duration'] == null ? 0 : json['Duration'];
+    taskStatus = json['TaskStatus'] == null ? "" : json['TaskStatus'];
+    subTaskCompleted =
+        json['SubTaskCompleted'] == null ? 0 : json['SubTaskCompleted'];
+    totalSubTask = json['TotalSubTask'] == null ? 0 : json['TotalSubTask'];
+    reminder = json['Reminder'] == null ? false : json['Reminder'];
+    reminderMonth = json['ReminderMonth'] == null ? 0 : json['ReminderMonth'];
+    closingRemarks =
+        json['ClosingRemarks'] == null ? "" : json['ClosingRemarks'];
   }
 
   Map<String, dynamic> toJson() {

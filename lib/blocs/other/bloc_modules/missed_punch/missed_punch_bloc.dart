@@ -1,25 +1,24 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:soleoserp/blocs/base/base_bloc.dart';
-import 'package:soleoserp/blocs/other/bloc_modules/loan/loan_bloc.dart';
+import 'package:soleoserp/models/api_requests/MissedPunch/missed_punch_approval_add_edit_request.dart';
+import 'package:soleoserp/models/api_requests/MissedPunch/missed_punch_approval_request.dart';
 import 'package:soleoserp/models/api_requests/bank_voucher_delete_request.dart';
-import 'package:soleoserp/models/api_requests/loan_approval_list_request.dart';
 import 'package:soleoserp/models/api_requests/missed_punch_list_request.dart';
 import 'package:soleoserp/models/api_requests/missed_punch_search_by_id_request.dart';
 import 'package:soleoserp/models/api_requests/missed_punch_search_by_name_request.dart';
+import 'package:soleoserp/models/api_responses/MissedPunch/missed_punch_add_edit_response.dart';
 import 'package:soleoserp/models/api_responses/bank_voucher_delete_response.dart';
 import 'package:soleoserp/models/api_responses/missed_punch_approval_list_response.dart';
 import 'package:soleoserp/models/api_responses/missed_punch_list_response.dart';
 import 'package:soleoserp/models/api_responses/missed_punch_search_by_name_response.dart';
 import 'package:soleoserp/repositories/repository.dart';
 
-
 part 'missed_punch_event.dart';
-
 part 'missed_punch_state.dart';
 
-class MissedPunchScreenBloc extends Bloc<MissedPunchScreenEvents, MissedPunchScreenStates> {
+class MissedPunchScreenBloc
+    extends Bloc<MissedPunchScreenEvents, MissedPunchScreenStates> {
   Repository userRepository = Repository.getInstance();
   BaseBloc baseBloc;
 
@@ -31,28 +30,23 @@ class MissedPunchScreenBloc extends Bloc<MissedPunchScreenEvents, MissedPunchScr
     if (event is MissedPunchListCallEvent) {
       yield* _mapBankVoucherListCallEventToState(event);
     }
-    if(event is MissedPunchSearchByNameCallEvent)
-      {
-        yield* _mapMissedPunchSearchByNameCallEventToState(event);
+    if (event is MissedPunchSearchByNameCallEvent) {
+      yield* _mapMissedPunchSearchByNameCallEventToState(event);
+    }
+    if (event is MissedPunchSearchByIDCallEvent) {
+      yield* _mapMissedPunchSearchByIDCallEventToState(event);
+    }
 
-      }
-    if(event is MissedPunchSearchByIDCallEvent)
-      {
-        yield* _mapMissedPunchSearchByIDCallEventToState(event);
+    if (event is MissedPunchDeleteCallEvent) {
+      yield* _mapMissedPunchDeleteCallEventToState(event);
+    }
+    if (event is MissedPunchApprovalListCallEvent) {
+      yield* _mapMissedPunchApprovalListCallEventToState(event);
+    }
 
-      }
-
-    if(event is MissedPunchDeleteCallEvent)
-      {
-        yield* _mapMissedPunchDeleteCallEventToState(event);
-
-      }
-    if(event is MissedPunchApprovalListCallEvent)
-      {
-        yield* _mapMissedPunchApprovalListCallEventToState(event);
-
-      }
-
+    if (event is MissedPunchApprovalSaveRequestCallEvent) {
+      yield* _mapMissedPunchApprovalSaveCallEventToState(event);
+    }
   }
 
   Stream<MissedPunchScreenStates> _mapBankVoucherListCallEventToState(
@@ -60,14 +54,14 @@ class MissedPunchScreenBloc extends Bloc<MissedPunchScreenEvents, MissedPunchScr
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
 
-      MissedPunchListResponse response = await userRepository.getMissedPunchList(event.pageNo,event.listRequest);
-      yield MissedPunchListResponseState(event.pageNo,response);
-
+      MissedPunchListResponse response = await userRepository
+          .getMissedPunchList(event.pageNo, event.listRequest);
+      yield MissedPunchListResponseState(event.pageNo, response);
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
       print(stacktrace);
     } finally {
-      await Future.delayed(const Duration(milliseconds: 500), (){});
+      await Future.delayed(const Duration(milliseconds: 500), () {});
       baseBloc.emit(ShowProgressIndicatorState(false));
     }
   }
@@ -77,15 +71,14 @@ class MissedPunchScreenBloc extends Bloc<MissedPunchScreenEvents, MissedPunchScr
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
 
-      MissedPunchSearchByNameResponse response =
-      await userRepository.getMissedPunchSearchByName(event.missedPunchSearchByNameRequest);
+      MissedPunchSearchByNameResponse response = await userRepository
+          .getMissedPunchSearchByName(event.missedPunchSearchByNameRequest);
       yield MissedPunchSearchByNameResponseState(response);
-
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
       print(stacktrace);
     } finally {
-      await Future.delayed(const Duration(milliseconds: 500), (){});
+      await Future.delayed(const Duration(milliseconds: 500), () {});
       baseBloc.emit(ShowProgressIndicatorState(false));
     }
   }
@@ -96,14 +89,14 @@ class MissedPunchScreenBloc extends Bloc<MissedPunchScreenEvents, MissedPunchScr
       baseBloc.emit(ShowProgressIndicatorState(true));
 
       MissedPunchListResponse response =
-      await userRepository.getMissedPunchSearchByID(event.pkID,event.missedPunchSearchByIDRequest);
+          await userRepository.getMissedPunchSearchByID(
+              event.pkID, event.missedPunchSearchByIDRequest);
       yield MissedPunchSearchByIDResponseState(response);
-
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
       print(stacktrace);
     } finally {
-      await Future.delayed(const Duration(milliseconds: 500), (){});
+      await Future.delayed(const Duration(milliseconds: 500), () {});
       baseBloc.emit(ShowProgressIndicatorState(false));
     }
   }
@@ -113,37 +106,50 @@ class MissedPunchScreenBloc extends Bloc<MissedPunchScreenEvents, MissedPunchScr
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
 
-      BankVoucherDeleteResponse response =
-      await userRepository.getMissedDeleteByID(event.pkID,event.bankVoucherDeleteRequest);
+      BankVoucherDeleteResponse response = await userRepository
+          .getMissedDeleteByID(event.pkID, event.bankVoucherDeleteRequest);
       yield MissedPunchDeleteResponseState(response);
-
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
       print(stacktrace);
     } finally {
-      await Future.delayed(const Duration(milliseconds: 500), (){});
+      await Future.delayed(const Duration(milliseconds: 500), () {});
       baseBloc.emit(ShowProgressIndicatorState(false));
     }
   }
-
 
   Stream<MissedPunchScreenStates> _mapMissedPunchApprovalListCallEventToState(
       MissedPunchApprovalListCallEvent event) async* {
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
 
-      MissedPunchApprovalListResponse response =
-      await userRepository.getMissedPunchApprovalList(event.loanApprovalListRequest);
+      MissedPunchApprovalListResponse response = await userRepository
+          .getMissedPunchApprovalList(event.missedPunchApprovalListRequest);
       yield MissedPunchApprovalListResponseState(response);
-
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
       print(stacktrace);
     } finally {
-      await Future.delayed(const Duration(milliseconds: 500), (){});
+      await Future.delayed(const Duration(milliseconds: 500), () {});
       baseBloc.emit(ShowProgressIndicatorState(false));
     }
   }
 
+  Stream<MissedPunchScreenStates> _mapMissedPunchApprovalSaveCallEventToState(
+      MissedPunchApprovalSaveRequestCallEvent event) async* {
+    try {
+      baseBloc.emit(ShowProgressIndicatorState(true));
 
+      MissedPunchApprovalSaveResponse response =
+          await userRepository.getMissedPunchApprovalSave(
+              event.pkID, event.missedPunchApprovalSaveRequest);
+      yield MissedPunchApprovalSaveResponseState(response);
+    } catch (error, stacktrace) {
+      baseBloc.emit(ApiCallFailureState(error));
+      print(stacktrace);
+    } finally {
+      await Future.delayed(const Duration(milliseconds: 500), () {});
+      baseBloc.emit(ShowProgressIndicatorState(false));
+    }
+  }
 }

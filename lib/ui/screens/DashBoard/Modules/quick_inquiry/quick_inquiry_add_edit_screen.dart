@@ -149,6 +149,7 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
   List<ContactModel> _contactsList = [];
 
   String Token;
+  bool emailValid;
 
   ///------------------------------------------------Inquiry Intialized___________________
 
@@ -184,7 +185,7 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
     _offlineCompanyData = SharedPrefHelper.instance.getCompanyData();
     CompanyID = _offlineCompanyData.details[0].pkId;
     LoginUserID = _offlineLoggedInData.details[0].userID;
-
+    emailValid = false;
     checkPermissionStatus();
     screenStatusBarColor = colorPrimary;
     _CustomerBloc = QuickInquiryBloc(baseBloc);
@@ -380,7 +381,7 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
                   children: [
                     CustomerName(),
                     SizedBox(height: Constant.SIZEBOXHEIGHT),
-                    CustomDropDown1("Category", "Source",
+                    CustomDropDown1("Category", "Lead Source *",
                         enable1: false,
                         enable2: false,
                         icon: Icon(Icons.arrow_drop_down),
@@ -867,7 +868,7 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
               children: [
                 Container(
                   margin: EdgeInsets.only(left: 10, right: 10),
-                  child: Text("Source",
+                  child: Text("Lead Source *",
                       style: TextStyle(
                           fontSize: 12,
                           color: colorPrimary,
@@ -1399,7 +1400,7 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
                               focusNode: PicCodeFocus,
                               controller: controllerForRight,
                               keyboardType: TextInputType.number,
-                              maxLength: 14,
+                              maxLength: 6,
                               decoration: InputDecoration(
                                 counterText: "",
                                 hintText: "Tap to enter PinCode",
@@ -1594,24 +1595,32 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
                   children: [
                     Expanded(
                       child: TextField(
-                          controller: edt_GST_Name,
-                          keyboardType: TextInputType.text,
-                          maxLength: 15,
-                          textInputAction: TextInputAction.next,
-                          decoration: InputDecoration(
-                            counterText: "",
-                            hintText: "Tap to enter Gst No.",
-                            labelStyle: TextStyle(
-                              color: Color(0xFF000000),
-                            ),
-                            border: InputBorder.none,
-                          ),
-                          style: TextStyle(
-                            fontSize: 15,
+                        controller: edt_GST_Name,
+                        keyboardType: TextInputType.text,
+                        maxLength: 15,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          counterText: "",
+                          hintText: "Tap to enter Gst No.",
+                          labelStyle: TextStyle(
                             color: Color(0xFF000000),
-                          ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-
                           ),
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Color(0xFF000000),
+                        ), // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                        onChanged: (value) {
+                          if (value.length == 15) {
+                            edt_PAN_Name.text =
+                                value.substring(2, value.length - 3);
+                          } else {
+                            edt_PAN_Name.text = "";
+                          }
+                        },
+                      ),
                     ),
                     Icon(
                       Icons.admin_panel_settings,
@@ -2230,7 +2239,9 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
     await getInquiryProductDetails();
 
     int nofollowupvalue = 1;
-
+    emailValid = RegExp(
+            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+        .hasMatch(edt_Email_Name.text);
     if (_isSwitched == false) {
       nofollowupvalue = 0;
     } else {
@@ -2255,103 +2266,131 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
     if (edt_Customer_Name.text != "") {
       if (edt_Category.text != "") {
         if (edt_Customer_Contact1_Name.text != "") {
-          if (edt_Country.text != "") {
-            if (edt_State.text != "") {
-              if (edt_City.text != "") {
-                if (edt_Source.text != '') {
-                  if (edt_Description.text != '') {
-                    if (_inquiryProductList.length != 0) {
-                      if (edt_FollowupNotes.text != "") {
-                        FollowupExist = true;
-                        showCommonDialogWithTwoOptions(context,
-                            "Are you sure you want to Save this Customer?",
-                            negativeButtonTitle: "No",
-                            positiveButtonTitle: "Yes",
-                            onTapOfPositiveButton: () {
-                          Navigator.of(context).pop();
-                          _CustomerBloc.add(CustomerAddEditCallEvent(
-                              CustomerAddEditApiRequest(
-                                  customerID: customerID.toString(),
-                                  customerName: edt_Customer_Name.text,
-                                  customerType: edt_Category.text,
-                                  address: edt_Address.text,
-                                  area: edt_Area.text,
-                                  pinCode: edt_Pincode.text,
-                                  gSTNo: edt_GST_Name.text,
-                                  pANNo: edt_PAN_Name.text,
-                                  contactNo1: edt_Customer_Contact1_Name.text,
-                                  contactNo2: edt_Customer_Contact2_Name.text,
-                                  emailAddress: edt_Email_Name.text,
-                                  websiteAddress: edt_Website_Name.text,
-                                  latitude: Latitude,
-                                  longitude: Longitude,
-                                  loginUserID: LoginUserID,
-                                  countryCode: edt_CountryID.text,
-                                  blockCustomer: nofollowupvalue.toString(),
-                                  customerSourceID: edt_sourceID.text,
-                                  companyId: CompanyID.toString(),
-                                  stateCode: edt_StateID.text,
-                                  cityCode: edt_CityID.text)));
-                        });
-                      } else {
-                        FollowupExist = false;
+          if (emailValid == true ||
+              edt_Email_Name.text.toString().trim() == "") {
+            if (edt_GST_Name.text.toString().trim() == "" ||
+                edt_GST_Name.text.toString().trim().length == 15) {
+              if (edt_Country.text != "") {
+                if (edt_State.text != "") {
+                  if (edt_City.text != "") {
+                    if (edt_Pincode.text.toString().trim() == "" ||
+                        edt_Pincode.text.toString().trim().length == 6) {
+                      if (edt_Source.text != '') {
+                        if (edt_Description.text != '') {
+                          if (_inquiryProductList.length != 0) {
+                            if (edt_FollowupNotes.text != "") {
+                              FollowupExist = true;
+                              showCommonDialogWithTwoOptions(context,
+                                  "Are you sure you want to Save this Customer?",
+                                  negativeButtonTitle: "No",
+                                  positiveButtonTitle: "Yes",
+                                  onTapOfPositiveButton: () {
+                                Navigator.of(context).pop();
+                                _CustomerBloc.add(CustomerAddEditCallEvent(
+                                    CustomerAddEditApiRequest(
+                                        customerID: customerID.toString(),
+                                        customerName: edt_Customer_Name.text,
+                                        customerType: edt_Category.text,
+                                        address: edt_Address.text,
+                                        area: edt_Area.text,
+                                        pinCode: edt_Pincode.text,
+                                        gSTNo: edt_GST_Name.text,
+                                        pANNo: edt_PAN_Name.text,
+                                        contactNo1:
+                                            edt_Customer_Contact1_Name.text,
+                                        contactNo2:
+                                            edt_Customer_Contact2_Name.text,
+                                        emailAddress: edt_Email_Name.text,
+                                        websiteAddress: edt_Website_Name.text,
+                                        latitude: Latitude,
+                                        longitude: Longitude,
+                                        loginUserID: LoginUserID,
+                                        countryCode: edt_CountryID.text,
+                                        blockCustomer:
+                                            nofollowupvalue.toString(),
+                                        customerSourceID: edt_sourceID.text,
+                                        companyId: CompanyID.toString(),
+                                        stateCode: edt_StateID.text,
+                                        cityCode: edt_CityID.text)));
+                              });
+                            } else {
+                              FollowupExist = false;
 
-                        showCommonDialogWithTwoOptions(context,
-                            "Are you sure you want to Save Quick Inquiry ?",
-                            negativeButtonTitle: "No",
-                            positiveButtonTitle: "Yes",
-                            onTapOfPositiveButton: () {
-                          Navigator.of(context).pop();
-                          _CustomerBloc.add(CustomerAddEditCallEvent(
-                              CustomerAddEditApiRequest(
-                                  customerID: customerID.toString(),
-                                  customerName: edt_Customer_Name.text,
-                                  customerType: edt_Category.text,
-                                  address: edt_Address.text,
-                                  area: edt_Area.text,
-                                  pinCode: edt_Pincode.text,
-                                  gSTNo: edt_GST_Name.text,
-                                  pANNo: edt_PAN_Name.text,
-                                  contactNo1: edt_Customer_Contact1_Name.text,
-                                  contactNo2: edt_Customer_Contact2_Name.text,
-                                  emailAddress: edt_Email_Name.text,
-                                  websiteAddress: edt_Website_Name.text,
-                                  latitude: Latitude,
-                                  longitude: Longitude,
-                                  loginUserID: LoginUserID,
-                                  countryCode: edt_CountryID.text,
-                                  blockCustomer: nofollowupvalue.toString(),
-                                  customerSourceID: edt_sourceID.text,
-                                  companyId: CompanyID.toString(),
-                                  stateCode: edt_StateID.text,
-                                  cityCode: edt_CityID.text)));
-                        });
+                              showCommonDialogWithTwoOptions(context,
+                                  "Are you sure you want to Save Quick Inquiry ?",
+                                  negativeButtonTitle: "No",
+                                  positiveButtonTitle: "Yes",
+                                  onTapOfPositiveButton: () {
+                                Navigator.of(context).pop();
+                                _CustomerBloc.add(CustomerAddEditCallEvent(
+                                    CustomerAddEditApiRequest(
+                                        customerID: customerID.toString(),
+                                        customerName: edt_Customer_Name.text,
+                                        customerType: edt_Category.text,
+                                        address: edt_Address.text,
+                                        area: edt_Area.text,
+                                        pinCode: edt_Pincode.text,
+                                        gSTNo: edt_GST_Name.text,
+                                        pANNo: edt_PAN_Name.text,
+                                        contactNo1:
+                                            edt_Customer_Contact1_Name.text,
+                                        contactNo2:
+                                            edt_Customer_Contact2_Name.text,
+                                        emailAddress: edt_Email_Name.text,
+                                        websiteAddress: edt_Website_Name.text,
+                                        latitude: Latitude,
+                                        longitude: Longitude,
+                                        loginUserID: LoginUserID,
+                                        countryCode: edt_CountryID.text,
+                                        blockCustomer:
+                                            nofollowupvalue.toString(),
+                                        customerSourceID: edt_sourceID.text,
+                                        companyId: CompanyID.toString(),
+                                        stateCode: edt_StateID.text,
+                                        cityCode: edt_CityID.text)));
+                              });
+                            }
+                          } else {
+                            showCommonDialogWithSingleOption(
+                                context, "Product Details are required!",
+                                positiveButtonTitle: "OK");
+                          }
+                        } else {
+                          showCommonDialogWithSingleOption(
+                              context, "Description is required!",
+                              positiveButtonTitle: "OK");
+                        }
+                      } else {
+                        showCommonDialogWithSingleOption(
+                            context, "Lead Source is required!",
+                            positiveButtonTitle: "OK");
                       }
                     } else {
                       showCommonDialogWithSingleOption(
-                          context, "Product Details are required!",
+                          context, "PinCode is not Valid !",
                           positiveButtonTitle: "OK");
                     }
                   } else {
                     showCommonDialogWithSingleOption(
-                        context, "Description is required!",
+                        context, "City is required!",
                         positiveButtonTitle: "OK");
                   }
                 } else {
                   showCommonDialogWithSingleOption(
-                      context, "Lead Source is required!",
+                      context, "State is required!",
                       positiveButtonTitle: "OK");
                 }
               } else {
-                showCommonDialogWithSingleOption(context, "City is required!",
+                showCommonDialogWithSingleOption(
+                    context, "Country is required!",
                     positiveButtonTitle: "OK");
               }
             } else {
-              showCommonDialogWithSingleOption(context, "State is required!",
+              showCommonDialogWithSingleOption(context, "GSTNo. is not Valid !",
                   positiveButtonTitle: "OK");
             }
           } else {
-            showCommonDialogWithSingleOption(context, "Country is required!",
+            showCommonDialogWithSingleOption(context, "Email is not Valid !",
                 positiveButtonTitle: "OK");
           }
         } else {
@@ -2671,12 +2710,13 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
     if (Denied == true) {
       // openAppSettings();
       is_LocationService_Permission = false;
-      showCommonDialogWithSingleOption(context,
+/*      showCommonDialogWithSingleOption(context,
           "Location permission is required , You have to click on OK button to Allow the location access !",
           positiveButtonTitle: "OK", onTapOfPositiveButton: () async {
         await openAppSettings();
         Navigator.of(context).pop();
-      });
+      });*/
+      await Permission.storage.request();
 
       // await Permission.location.request();
       // We didn't ask for permission yet or the permission has been denied before but not permanently.

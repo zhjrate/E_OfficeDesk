@@ -7,23 +7,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
-import 'package:soleoserp/blocs/other/bloc_modules/customer/customer_bloc.dart';
-import 'package:soleoserp/blocs/other/bloc_modules/quotation/quotation_bloc.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/salesbill/salesbill_bloc.dart';
-import 'package:soleoserp/models/api_requests/quotation_list_request.dart';
+import 'package:soleoserp/models/api_requests/SalesBill/sales_bill_search_by_id_request.dart';
 import 'package:soleoserp/models/api_requests/sales_bill_generate_pdf_request.dart';
 import 'package:soleoserp/models/api_requests/sales_bill_list_request.dart';
-import 'package:soleoserp/models/api_requests/search_quotation_list_by_number_request.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
-import 'package:soleoserp/models/api_responses/quotation_list_response.dart';
-import 'package:soleoserp/models/api_responses/sales_bill_generate_pdf_response.dart';
 import 'package:soleoserp/models/api_responses/sales_bill_list_response.dart';
 import 'package:soleoserp/models/api_responses/search_quotation_list_response.dart';
+import 'package:soleoserp/models/api_responses/search_sales_bill_search_response.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/dimen_resources.dart';
 import 'package:soleoserp/ui/res/image_resources.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/quotation/search_quotation_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sale_bill_list/search_sales_bill_sceen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sales_bill_add_edit/sale_bill_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
@@ -31,7 +28,6 @@ import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/general_utils.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 
 class SalesBillListScreen extends BaseStatefulWidget {
   static const routeName = '/SalesBillListScreen';
@@ -50,17 +46,18 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
   double sizeboxsize = 12;
   double _fontSize_Label = 9;
   double _fontSize_Title = 11;
-  int label_color = 0xFF504F4F;//0x66666666;
+  int label_color = 0xFF504F4F; //0x66666666;
   int title_color = 0xFF000000;
   SearchDetails _searchDetails;
+  SearchSalesBillListResponseSearchDetails _salesBillListResponseSearchDetails;
   int CompanyID = 0;
   String LoginUserID = "";
   CompanyDetailsResponse _offlineCompanyData;
   LoginUserDetialsResponse _offlineLoggedInData;
-  String SiteURL="";
-  String QTGEN="";
-  bool isLoading=true;
-  String Password="";
+  String SiteURL = "";
+  String QTGEN = "";
+  bool isLoading = true;
+  String Password = "";
 
   InAppWebViewController webViewController;
   InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
@@ -145,12 +142,18 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) =>
-      _QuotationBloc..add(SalesBillListCallEvent(_pageNo + 1,SalesBillListRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID))),
+      create: (BuildContext context) => _QuotationBloc
+        ..add(SalesBillListCallEvent(
+            _pageNo + 1,
+            SalesBillListRequest(
+                CompanyId: CompanyID.toString(), LoginUserID: LoginUserID))),
       child: BlocConsumer<SalesBillBloc, SalesBillStates>(
         builder: (BuildContext context, SalesBillStates state) {
           if (state is SalesBillListCallResponseState) {
             _onInquiryListCallSuccess(state);
+          }
+          if (state is SalesBillSearchByIDResponseState) {
+            _onSearchSalesBillResponse(state);
           }
           /*if (state is SearchQuotationListByNumberCallResponseState) {
             _onInquiryListByNumberCallSuccess(state);
@@ -158,9 +161,11 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
           return super.build(context);
         },
         buildWhen: (oldState, currentState) {
-          if (currentState is SalesBillListCallResponseState ) {
+          if (currentState is SalesBillListCallResponseState ||
+              currentState is SalesBillSearchByIDResponseState) {
             return true;
           }
+
           return false;
         },
         listener: (BuildContext context, SalesBillStates state) {
@@ -169,11 +174,9 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
           }
         },
         listenWhen: (oldState, currentState) {
-          if(currentState is SalesBillPDFGenerateResponseState)
-            {
-              return true;
-
-            }
+          if (currentState is SalesBillPDFGenerateResponseState) {
+            return true;
+          }
           return false;
         },
       ),
@@ -185,10 +188,10 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
-        appBar:  NewGradientAppBar(
+        appBar: NewGradientAppBar(
           title: Text('Sales Bill List'),
           gradient:
-          LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
+              LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
           actions: <Widget>[
             IconButton(
                 icon: Icon(
@@ -205,11 +208,15 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
         body: Container(
           child: Column(
             children: [
-
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    _QuotationBloc..add(SalesBillListCallEvent(1,SalesBillListRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID)));
+                    _QuotationBloc
+                      ..add(SalesBillListCallEvent(
+                          1,
+                          SalesBillListRequest(
+                              CompanyId: CompanyID.toString(),
+                              LoginUserID: LoginUserID)));
                   },
                   child: Container(
                     padding: EdgeInsets.only(
@@ -226,14 +233,14 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
                   ),
                 ),
               ),
-
             ],
           ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () {
             // Add your onPressed code here!
-
+            navigateTo(context, SalesBillAddEditScreen.routeName,
+                clearAllStack: true);
           },
           child: const Icon(Icons.add),
           backgroundColor: colorPrimary,
@@ -242,7 +249,6 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
             context: context, UserName: "KISHAN", RolCode: "Admin"),
       ),
     );
-
 
     return Column(
       children: [
@@ -275,12 +281,14 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          Text("Search Sales Bill",
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF000000),
+                  fontWeight: FontWeight
+                      .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-              "Search Quotation",
-              style:TextStyle(fontSize: 12,color: Color(0xFF000000),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-
-          ),
+              ),
           SizedBox(
             height: 5,
           ),
@@ -288,7 +296,7 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
             elevation: 5,
             color: colorLightGray,
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
               height: 60,
               padding: EdgeInsets.only(left: 20, right: 20),
@@ -297,11 +305,11 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
                 children: [
                   Expanded(
                     child: Text(
-                      _searchDetails == null
+                      _salesBillListResponseSearchDetails == null
                           ? "Tap to search quotation"
-                          : _searchDetails.custoemerName,
+                          : _salesBillListResponseSearchDetails.custoemerName,
                       style: baseTheme.textTheme.headline3.copyWith(
-                          color: _searchDetails == null
+                          color: _salesBillListResponseSearchDetails == null
                               ? colorGrayDark
                               : colorBlack),
                     ),
@@ -327,8 +335,8 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
         if (shouldPaginate(
-          scrollInfo,
-        ) &&
+              scrollInfo,
+            ) &&
             _searchDetails == null) {
           _onInquiryListPagination();
           return true;
@@ -348,8 +356,7 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
 
   ///builds row item view of inquiry list
   Widget _buildInquiryListItem(int index) {
-    return ExpantionCustomer(context,index);
-
+    return ExpantionCustomer(context, index);
   }
 
   ///builds inquiry row items title and value's common view
@@ -357,28 +364,36 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-            title,
-            style:TextStyle(fontSize: _fontSize_Label,color: Color(0xFF504F4F),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        ),
+        Text(title,
+            style: TextStyle(
+                fontSize: _fontSize_Label,
+                color: Color(0xFF504F4F),
+                fontWeight: FontWeight
+                    .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            ),
         SizedBox(
           height: 3,
         ),
-        Text(
-            value,
-            style:TextStyle(fontSize: _fontSize_Title,color: colorPrimary)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        )
+        Text(value,
+            style: TextStyle(
+                fontSize: _fontSize_Title,
+                color:
+                    colorPrimary) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            )
       ],
     );
   }
+
   Widget _buildLabelWithValueView(String title, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-            title,
-            style:TextStyle(fontSize: 12,color: Color(0xff030303))// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        ),
+        Text(title,
+            style: TextStyle(
+                fontSize: 12,
+                color: Color(
+                    0xff030303)) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            ),
         SizedBox(
           height: 5,
         ),
@@ -408,8 +423,13 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
   ///checks if already all records are arrive or not
   ///calls api with new page
   void _onInquiryListPagination() {
-    if (_quotationListResponse.details.length < _quotationListResponse.totalCount) {
-      _QuotationBloc..add(SalesBillListCallEvent(_pageNo + 1,SalesBillListRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID)));
+    if (_quotationListResponse.details.length <
+        _quotationListResponse.totalCount) {
+      _QuotationBloc
+        ..add(SalesBillListCallEvent(
+            _pageNo + 1,
+            SalesBillListRequest(
+                CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
     }
   }
 
@@ -418,20 +438,23 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
 
     return Container(
       padding: EdgeInsets.all(15),
-      child :  ExpansionTileCard(
-
+      child: ExpansionTileCard(
         initialElevation: 5.0,
         elevation: 5.0,
         elevationCurve: Curves.easeInOut,
         shadowColor: Color(0xFF504F4F),
         baseColor: Color(0xFFFCFCFC),
-        expandedColor: Color(0xFFC1E0FA),//Colors.deepOrange[50],ADD8E6
+        expandedColor: Color(0xFFC1E0FA), //Colors.deepOrange[50],ADD8E6
         leading: CircleAvatar(
-
             backgroundColor: Color(0xFF504F4F),
-            child: /*Image.asset(IC_USERNAME,height: 25,width: 25,)*/Image
-                .network("http://demo.sharvayainfotech.in/images/profile.png",
-              height: 35, fit: BoxFit.fill, width: 35,)),        /* title: Text("Customer",style:TextStyle(fontSize: 12,color: Color(0xFF504F4F),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            child: /*Image.asset(IC_USERNAME,height: 25,width: 25,)*/ Image
+                .network(
+              "http://demo.sharvayainfotech.in/images/profile.png",
+              height: 35,
+              fit: BoxFit.fill,
+              width: 35,
+            )),
+        /* title: Text("Customer",style:TextStyle(fontSize: 12,color: Color(0xFF504F4F),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
       ),*/
         /* title:  Row(
             children:<Widget>[
@@ -445,13 +468,17 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
               ),),)
             ]
         ),*/
-        title: Text(model.customerName,style: TextStyle(
-            color: Colors.black
-        ),),
-        subtitle: Text(model.invoiceNo,style: TextStyle(
-          color: Color(0xFF504F4F),
-          fontSize: _fontSize_Title,
-        ),),
+        title: Text(
+          model.customerName,
+          style: TextStyle(color: Colors.black),
+        ),
+        subtitle: Text(
+          model.invoiceNo,
+          style: TextStyle(
+            color: Color(0xFF504F4F),
+            fontSize: _fontSize_Title,
+          ),
+        ),
         children: <Widget>[
           Divider(
             thickness: 1.0,
@@ -464,129 +491,119 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
                 horizontal: 16.0,
                 vertical: 8.0,
               ),
-
-
               child: Container(
-                padding: EdgeInsets.only(left: 10, right: 10, top: 25, bottom: 25),
+                padding:
+                    EdgeInsets.only(left: 10, right: 10, top: 25, bottom: 25),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _buildTitleWithValueView(
+                                "Invoice Date",
+                                model.createdDate.getFormattedDate(
+                                        fromFormat: "yyyy-MM-ddTHH:mm:ss",
+                                        toFormat: "dd/MM/yyyy") ??
+                                    "-"),
+                          ),
+                          Expanded(
+                            child: _buildTitleWithValueView(
+                                "Invoice #", model.invoiceNo ?? "-"),
+                          ),
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: <Widget>[
+                                GestureDetector(
+                                  onTap: () async {
+                                    await _showMyDialog(model);
 
-                      Expanded(
-                        child: _buildTitleWithValueView(
-                            "Invoice Date",
-                            model.createdDate.getFormattedDate(
-                                fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                toFormat: "dd/MM/yyyy") ??
-                                "-"),
-                      ),
-
-                      Expanded(
-                        child: _buildTitleWithValueView(
-                            "Invoice #", model.invoiceNo ?? "-"),
-                      ),
-                      Row(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.end,
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () async {
-
-                                await _showMyDialog(model);
-
-                                /* var progesCount23;
+                                    /* var progesCount23;
                                webViewController.getProgress().whenComplete(() async =>  {
                                  progesCount23 = await webViewController.getProgress(),
                                  print("PAgeLoaded" + progesCount23.toString())
                                });*/
 
-                                /*  await _makePhoneCall(
+                                    /*  await _makePhoneCall(
                                         model.contactNo1);*/
 
-                                // baseBloc.emit(ShowProgressIndicatorState(true));
-                                /* setState(() {
+                                    // baseBloc.emit(ShowProgressIndicatorState(true));
+                                    /* setState(() {
                                   urlRequest = URLRequest(url: Uri.parse(SiteURL+"/Quotation.aspx?MobilePdf=yes&userid="+LoginUserID+"&password="+Password+"&pQuotID="+model.pkID.toString()));
 
 
                                 });*/
 
-
-                                // await Future.delayed(const Duration(milliseconds: 500), (){});
-                                // baseBloc.emit(ShowProgressIndicatorState(false));
-                                //_QuotationBloc.add(QuotationPDFGenerateCallEvent(QuotationPDFGenerateRequest(CompanyId: CompanyID.toString(),QuotationNo: model.quotationNo)));
-
-                              },
-                              child: Container(
-
-                                child: Image.asset(
-                                  PDF_ICON,
-                                  width: 48,
-                                  height: 48,
+                                    // await Future.delayed(const Duration(milliseconds: 500), (){});
+                                    // baseBloc.emit(ShowProgressIndicatorState(false));
+                                    //_QuotationBloc.add(QuotationPDFGenerateCallEvent(QuotationPDFGenerateRequest(CompanyId: CompanyID.toString(),QuotationNo: model.quotationNo)));
+                                  },
+                                  child: Container(
+                                    child: Image.asset(
+                                      PDF_ICON,
+                                      width: 48,
+                                      height: 48,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-
-                          ])
-                    ]),
+                              ])
+                        ]),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
-                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-                      model.inquiryNo!=""?Expanded(
-                        child: _buildTitleWithValueView(
-                            "Lead #", model.inquiryNo ?? "-"),
-                      ) : Container(),
-                      model.quotationNo!=""?Expanded(
-                        child: _buildTitleWithValueView(
-                            "Quot.#",
-                            model.quotationNo??"-"),
-                      ): Container(),
-
-                      model.orderNo!=""?Expanded(
-                        child: _buildTitleWithValueView(
-                            "SO.#", model.orderNo ?? "-"),
-                      ):Container(),
-                    ]),
-
+                    Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          model.inquiryNo != ""
+                              ? Expanded(
+                                  child: _buildTitleWithValueView(
+                                      "Lead #", model.inquiryNo ?? "-"),
+                                )
+                              : Container(),
+                          model.quotationNo != ""
+                              ? Expanded(
+                                  child: _buildTitleWithValueView(
+                                      "Quot.#", model.quotationNo ?? "-"),
+                                )
+                              : Container(),
+                          model.orderNo != ""
+                              ? Expanded(
+                                  child: _buildTitleWithValueView(
+                                      "SO.#", model.orderNo ?? "-"),
+                                )
+                              : Container(),
+                        ]),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
                     Row(children: [
-
-                      model.supplierRef!=""?Expanded(
-                        child: _buildTitleWithValueView(
-                            "Supplier Ref	", model.supplierRef ?? "-"),
-                      ):Container(),
-                      model.gSTNO!=""?Expanded(
-                        child: _buildTitleWithValueView(
-                            "GST #", model.gSTNO ?? "-"),
-                      ):Container(),
+                      model.supplierRef != ""
+                          ? Expanded(
+                              child: _buildTitleWithValueView(
+                                  "Supplier Ref	", model.supplierRef ?? "-"),
+                            )
+                          : Container(),
+                      model.gSTNO != ""
+                          ? Expanded(
+                              child: _buildTitleWithValueView(
+                                  "GST #", model.gSTNO ?? "-"),
+                            )
+                          : Container(),
                     ]),
-                    model.supplierRef==""&&model.gSTNO==""? Container() : SizedBox(
-                      height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
-                    ),
-
-
+                    model.supplierRef == "" && model.gSTNO == ""
+                        ? Container()
+                        : SizedBox(
+                            height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
+                          ),
                     Row(children: [
                       Expanded(
-                        child: _buildTitleWithValueView("BasicAmt.", model.basicAmt.toString() ?? "-"),
+                        child: _buildTitleWithValueView(
+                            "BasicAmt.", model.basicAmt.toString() ?? "-"),
                       ),
                       Expanded(
-                        child: _buildTitleWithValueView("DiscountAmt.", model.discountAmt.toString() ?? "-"),
-                      ),
-                    ]),
-                    SizedBox(
-                      height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
-                    ),
-
-                    Row(children: [
-                      Expanded(
-                        child: _buildTitleWithValueView("TaxAmt.", model.taxAmt.toString() ?? "-"),
-                      ),
-                      Expanded(
-                        child: _buildTitleWithValueView("ROffAmt.", model.rOffAmt.toString() ?? "-"),
+                        child: _buildTitleWithValueView("DiscountAmt.",
+                            model.discountAmt.toString() ?? "-"),
                       ),
                     ]),
                     SizedBox(
@@ -594,22 +611,33 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
                     ),
                     Row(children: [
                       Expanded(
-                        child: _buildTitleWithValueView("NetAmt.", model.netAmt.toString() ?? "-"),
+                        child: _buildTitleWithValueView(
+                            "TaxAmt.", model.taxAmt.toString() ?? "-"),
                       ),
                       Expanded(
-                        child: _buildTitleWithValueView("Created by.", model.createdBy.toString() ?? "-"),
+                        child: _buildTitleWithValueView(
+                            "ROffAmt.", model.rOffAmt.toString() ?? "-"),
                       ),
                     ]),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
-
-
+                    Row(children: [
+                      Expanded(
+                        child: _buildTitleWithValueView(
+                            "NetAmt.", model.netAmt.toString() ?? "-"),
+                      ),
+                      Expanded(
+                        child: _buildTitleWithValueView(
+                            "Created by.", model.createdBy.toString() ?? "-"),
+                      ),
+                    ]),
+                    SizedBox(
+                      height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
+                    ),
                   ],
                 ),
               ),
-
-
             ),
           ),
           ButtonBar(
@@ -621,21 +649,25 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0)),
                   onPressed: () {
-
-
+                    _onTaptoEditQuotation(model);
                   },
                   child: Column(
                     children: <Widget>[
-                      Icon(Icons.edit,color: Colors.black,),
+                      Icon(
+                        Icons.edit,
+                        color: Colors.black,
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2.0),
                       ),
-                      Text('Edit',style: TextStyle(color: Colors.black),),
+                      Text(
+                        'Edit',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ],
                   ),
                 ),
                 FlatButton(
-
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0)),
                   onPressed: () {
@@ -644,17 +676,36 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
                   },
                   child: Column(
                     children: <Widget>[
-                      Icon(Icons.delete,color: Colors.black,),
+                      Icon(
+                        Icons.delete,
+                        color: Colors.black,
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2.0),
                       ),
-                      Text('Delete',style: TextStyle(color: Colors.black),),
+                      Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ],
                   ),
                 ),
               ]),
         ],
-      ),);
+      ),
+    );
+  }
+
+  void _onTaptoEditQuotation(SaleBillDetails model) {
+    navigateTo(context, SalesBillAddEditScreen.routeName,
+            arguments: AddUpdateSaleBillScreenArguments(model))
+        .then((value) {
+      _QuotationBloc
+        ..add(SalesBillListCallEvent(
+            1,
+            SalesBillListRequest(
+                CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
+    });
   }
 
   Future<bool> _onBackPressed() {
@@ -663,17 +714,19 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
 
   ///navigates to search list screen
   Future<void> _onTapOfSearchView() async {
-  /*  navigateTo(context, SearchQuotationScreen.routeName).then((value) {
+    navigateTo(context, SearchSalesBillScreen.routeName).then((value) {
       if (value != null) {
-        _searchDetails = value;
-        _QuotationBloc.add(SearchQuotationListByNumberCallEvent(_searchDetails.value,
-            SearchQuotationListByNumberRequest(CompanyId: CompanyID.toString(),QuotationNo: _searchDetails.quotationNo)));
+        _salesBillListResponseSearchDetails = value;
+        _QuotationBloc.add(SalesBillSearchByIdRequestCallEvent(
+            _salesBillListResponseSearchDetails.value,
+            SalesBillSearchByIdRequest(
+                CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
       }
-    });*/
+    });
   }
 
   ///updates data of inquiry list
- /* void _onInquiryListByNumberCallSuccess(
+  /* void _onInquiryListByNumberCallSuccess(
       SearchQuotationListByNumberCallResponseState state) {
     _quotationListResponse = state.response;
   }*/
@@ -683,47 +736,48 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context123) {
-
         return AlertDialog(
           title: Text('Do You want to Generate SaleBill ? '),
           content: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-
                 Visibility(
                   visible: true,
-                  child: GenerateQT(model,context123),
-
+                  child: GenerateQT(model, context123),
                 )
                 //GetCircular123(),
-
               ],
             ),
           ),
           actions: <Widget>[
             FlatButton(
-                onPressed: () => Navigator.of(context).pop(),//  We can return any object from here
+                onPressed: () => Navigator.of(context)
+                    .pop(), //  We can return any object from here
                 child: Text('NO')),
             /* prgresss!=100 ? CircularProgressIndicator() :*/ FlatButton(
                 onPressed: () => {
-                  Navigator.of(context).pop(),
-                  _QuotationBloc.add(SalesBillPDFGenerateCallEvent(SalesBillPDFGenerateRequest(CompanyId: CompanyID.toString(),InvoiceNo: model.invoiceNo)))
-
-                }, //  We can return any object from here
+                      Navigator.of(context).pop(),
+                      _QuotationBloc.add(SalesBillPDFGenerateCallEvent(
+                          SalesBillPDFGenerateRequest(
+                              CompanyId: CompanyID.toString(),
+                              InvoiceNo: model.invoiceNo)))
+                    }, //  We can return any object from here
                 child: Text('YES'))
           ],
-
-
         );
       },
     );
-
-
   }
 
   GenerateQT(SaleBillDetails model, BuildContext context123) {
-
-    print("DFrrt"+SiteURL+"/salesbill.aspx?MobilePdf=yes&userid="+LoginUserID+"&password="+Password+"&pQuotID="+model.pkID.toString());
+    print("DFrrt" +
+        SiteURL +
+        "/salesbill.aspx?MobilePdf=yes&userid=" +
+        LoginUserID +
+        "&password=" +
+        Password +
+        "&pQuotID=" +
+        model.pkID.toString());
     return Container(
       height: 200,
       child: Visibility(
@@ -731,7 +785,14 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
         child: InAppWebView(
           //                        webView.loadUrl(SiteURL+"/Quotation.aspx?MobilePdf=yes&userid="+userName123+"&password="+UserPassword+"&pQuotID="+contactListFiltered.get(position).getPkID() + "");
           // initialUrlRequest:urlRequest == null ? URLRequest(url: Uri.parse("http://122.169.111.101:3346/Default.aspx")) :urlRequest ,
-          initialUrlRequest : URLRequest(url: Uri.parse(SiteURL+"/salesbill.aspx?MobilePdf=yes&userid="+LoginUserID+"&password="+Password+"&pQuotID="+model.pkID.toString())),
+          initialUrlRequest: URLRequest(
+              url: Uri.parse(SiteURL +
+                  "/salesbill.aspx?MobilePdf=yes&userid=" +
+                  LoginUserID +
+                  "&password=" +
+                  Password +
+                  "&pQuotID=" +
+                  model.pkID.toString())),
           // initialFile: "assets/index.html",
           initialUserScripts: UnmodifiableListView<UserScript>([]),
           initialOptions: options,
@@ -739,7 +800,6 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
 
           onWebViewCreated: (controller) {
             webViewController = controller;
-
           },
 
           onLoadStart: (controller, url) {
@@ -753,8 +813,7 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
                 resources: resources,
                 action: PermissionRequestResponseAction.GRANT);
           },
-          shouldOverrideUrlLoading: (controller, navigationAction) async
-          {
+          shouldOverrideUrlLoading: (controller, navigationAction) async {
             var uri = navigationAction.request.url;
 
             if (![
@@ -772,19 +831,12 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
                   url,
                 );
 
-
                 // and cancel the request
                 return NavigationActionPolicy.CANCEL;
               }
-
-
             }
 
-
-
             return NavigationActionPolicy.ALLOW;
-
-
           },
           onLoadStop: (controller, url) async {
             pullToRefreshController.endRefreshing();
@@ -792,26 +844,19 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
             setState(() {
               this.url = url.toString();
               urlController.text = this.url;
-
             });
-
           },
           onLoadError: (controller, url, code, message) {
             pullToRefreshController.endRefreshing();
             isLoading = false;
-
           },
           onProgressChanged: (controller, progress) {
-
-
             if (progress == 100) {
-
               pullToRefreshController.endRefreshing();
               this.prgresss = progress;
               // _QuotationBloc.add(QuotationPDFGenerateCallEvent(QuotationPDFGenerateRequest(CompanyId: CompanyID.toString(),QuotationNo: model.quotationNo)));
 
             }
-
 
             //  EasyLoading.showProgress(progress / 100, status: 'Loading...');
 
@@ -829,19 +874,18 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
             });
           },
           onConsoleMessage: (controller, consoleMessage) {
-            print("LoadWeb"+consoleMessage.message.toString());
+            print("LoadWeb" + consoleMessage.message.toString());
           },
-
         ),
       ),
     );
   }
 
-  void _onGenerateSalesBillPDFCallSuccess(SalesBillPDFGenerateResponseState state) {
-
+  void _onGenerateSalesBillPDFCallSuccess(
+      SalesBillPDFGenerateResponseState state) {
     _launchURL(state.response.details[0].column1.toString());
-
   }
+
   _launchURL(String pdfURL) async {
     var url123 = pdfURL;
     if (await canLaunch(url123)) {
@@ -849,5 +893,9 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
     } else {
       throw 'Could not launch $url123';
     }
+  }
+
+  void _onSearchSalesBillResponse(SalesBillSearchByIDResponseState state) {
+    _quotationListResponse = state.response;
   }
 }

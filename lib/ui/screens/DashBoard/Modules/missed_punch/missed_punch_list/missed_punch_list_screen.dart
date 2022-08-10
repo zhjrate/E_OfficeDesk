@@ -4,30 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/missed_punch/missed_punch_bloc.dart';
-import 'package:soleoserp/blocs/other/bloc_modules/salesorder/salesorder_bloc.dart';
 import 'package:soleoserp/models/api_requests/bank_voucher_delete_request.dart';
 import 'package:soleoserp/models/api_requests/missed_punch_list_request.dart';
 import 'package:soleoserp/models/api_requests/missed_punch_search_by_id_request.dart';
-import 'package:soleoserp/models/api_requests/salesorder_list_request.dart';
-import 'package:soleoserp/models/api_requests/search_salesorder_list_by_number_request.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
 import 'package:soleoserp/models/api_responses/missed_punch_list_response.dart';
 import 'package:soleoserp/models/api_responses/missed_punch_search_by_name_response.dart';
-import 'package:soleoserp/models/api_responses/salesorder_list_response.dart';
-import 'package:soleoserp/models/api_responses/search_salesorder_list_response.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/dimen_resources.dart';
-import 'package:soleoserp/ui/res/image_resources.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/missed_punch/missed_punch_list/missed_punch_search_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/search_salesorder_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/general_utils.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
-
 
 class MissedPunchListScreen extends BaseStatefulWidget {
   static const routeName = '/MissedPunchListScreen';
@@ -46,7 +38,7 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
   double sizeboxsize = 12;
   double _fontSize_Label = 9;
   double _fontSize_Title = 11;
-  int label_color = 0xFF504F4F;//0x66666666;
+  int label_color = 0xFF504F4F; //0x66666666;
   int title_color = 0xFF000000;
   MissedPunchSearchDetails _searchDetails;
   int CompanyID = 0;
@@ -64,14 +56,16 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
     CompanyID = _offlineCompanyData.details[0].pkId;
     LoginUserID = _offlineLoggedInData.details[0].userID;
     _SalesOrderBloc = MissedPunchScreenBloc(baseBloc);
-
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) =>
-      _SalesOrderBloc..add(MissedPunchListCallEvent(1,MissedPunchListRequest(CompanyID: CompanyID.toString(),LoginUserID: LoginUserID))),
+      create: (BuildContext context) => _SalesOrderBloc
+        ..add(MissedPunchListCallEvent(
+            1,
+            MissedPunchListRequest(
+                CompanyID: CompanyID.toString(), LoginUserID: LoginUserID))),
       child: BlocConsumer<MissedPunchScreenBloc, MissedPunchScreenStates>(
         builder: (BuildContext context, MissedPunchScreenStates state) {
           if (state is MissedPunchListResponseState) {
@@ -89,8 +83,15 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
           }
           return false;
         },
-        listener: (BuildContext context, MissedPunchScreenStates state) {},
+        listener: (BuildContext context, MissedPunchScreenStates state) {
+          if (state is MissedPunchDeleteResponseState) {
+            _OndeleteResponse(state);
+          }
+        },
         listenWhen: (oldState, currentState) {
+          if (currentState is MissedPunchDeleteResponseState) {
+            return true;
+          }
           return false;
         },
       ),
@@ -102,10 +103,10 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
-        appBar:NewGradientAppBar(
+        appBar: NewGradientAppBar(
           title: Text('Missed Punch List'),
           gradient:
-          LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
+              LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
           actions: <Widget>[
             IconButton(
                 icon: Icon(
@@ -122,11 +123,15 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
         body: Container(
           child: Column(
             children: [
-
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    _SalesOrderBloc.add(MissedPunchListCallEvent(1,MissedPunchListRequest(CompanyID: CompanyID.toString(),LoginUserID: LoginUserID)));                },
+                    _SalesOrderBloc.add(MissedPunchListCallEvent(
+                        1,
+                        MissedPunchListRequest(
+                            CompanyID: CompanyID.toString(),
+                            LoginUserID: LoginUserID)));
+                  },
                   child: Container(
                     padding: EdgeInsets.only(
                       left: DEFAULT_SCREEN_LEFT_RIGHT_MARGIN2,
@@ -142,23 +147,21 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
                   ),
                 ),
               ),
-
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
+        /*     floatingActionButton: FloatingActionButton(
           onPressed: () {
             // Add your onPressed code here!
 
           },
           child: const Icon(Icons.add),
           backgroundColor: colorPrimary,
-        ),
+        ),*/
         drawer: build_Drawer(
             context: context, UserName: "KISHAN", RolCode: LoginUserID),
       ),
     );
-
 
     return Column(
       children: [
@@ -191,12 +194,14 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          Text("Search Employee",
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF000000),
+                  fontWeight: FontWeight
+                      .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-              "Search Employee",
-              style:TextStyle(fontSize: 12,color: Color(0xFF000000),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-
-          ),
+              ),
           SizedBox(
             height: 5,
           ),
@@ -204,7 +209,7 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
             elevation: 5,
             color: colorLightGray,
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
               height: 60,
               padding: EdgeInsets.only(left: 20, right: 20),
@@ -214,12 +219,11 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
                   Expanded(
                     child: Text(
                       _searchDetails == null
-                          ? "Tap to search Employee"
+                          ? _offlineLoggedInData.details[0].employeeName
                           : _searchDetails.label,
                       style: baseTheme.textTheme.headline3.copyWith(
-                          color: _searchDetails == null
-                              ? colorGrayDark
-                              : colorBlack),
+                          color:
+                              _searchDetails == null ? colorBlack : colorBlack),
                     ),
                   ),
                   Icon(
@@ -243,8 +247,8 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
         if (shouldPaginate(
-          scrollInfo,
-        ) &&
+              scrollInfo,
+            ) &&
             _searchDetails == null) {
           _onInquiryListPagination();
           return true;
@@ -264,8 +268,7 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
 
   ///builds row item view of inquiry list
   Widget _buildInquiryListItem(int index) {
-    return ExpantionCustomer(context,index);
-
+    return ExpantionCustomer(context, index);
   }
 
   ///builds inquiry row items title and value's common view
@@ -273,28 +276,36 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-            title,
-            style:TextStyle(fontSize: _fontSize_Label,color: Color(0xFF504F4F),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        ),
+        Text(title,
+            style: TextStyle(
+                fontSize: _fontSize_Label,
+                color: Color(0xFF504F4F),
+                fontWeight: FontWeight
+                    .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            ),
         SizedBox(
           height: 3,
         ),
-        Text(
-            value,
-            style:TextStyle(fontSize: _fontSize_Title,color: colorPrimary)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        )
+        Text(value,
+            style: TextStyle(
+                fontSize: _fontSize_Title,
+                color:
+                    colorPrimary) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            )
       ],
     );
   }
+
   Widget _buildLabelWithValueView(String title, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-            title,
-            style:TextStyle(fontSize: 12,color: Color(0xff030303))// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        ),
+        Text(title,
+            style: TextStyle(
+                fontSize: 12,
+                color: Color(
+                    0xff030303)) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            ),
         SizedBox(
           height: 5,
         ),
@@ -324,8 +335,14 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
   ///checks if already all records are arrive or not
   ///calls api with new page
   void _onInquiryListPagination() {
-    if (_SalesOrderListResponse.details.length < _SalesOrderListResponse.totalCount) {
-      _SalesOrderBloc..add(MissedPunchListCallEvent(_pageNo + 1,MissedPunchListRequest(CompanyID: CompanyID.toString(),LoginUserID: LoginUserID))) ;   }
+    if (_SalesOrderListResponse.details.length <
+        _SalesOrderListResponse.totalCount) {
+      _SalesOrderBloc
+        ..add(MissedPunchListCallEvent(
+            _pageNo + 1,
+            MissedPunchListRequest(
+                CompanyID: CompanyID.toString(), LoginUserID: LoginUserID)));
+    }
   }
 
   ExpantionCustomer(BuildContext context, int index) {
@@ -333,20 +350,23 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
 
     return Container(
       padding: EdgeInsets.all(15),
-      child :  ExpansionTileCard(
-
+      child: ExpansionTileCard(
         initialElevation: 5.0,
         elevation: 5.0,
         elevationCurve: Curves.easeInOut,
         shadowColor: Color(0xFF504F4F),
         baseColor: Color(0xFFFCFCFC),
-        expandedColor: Color(0xFFC1E0FA),//Colors.deepOrange[50],ADD8E6
+        expandedColor: Color(0xFFC1E0FA), //Colors.deepOrange[50],ADD8E6
         leading: CircleAvatar(
-
             backgroundColor: Color(0xFF504F4F),
-            child: /*Image.asset(IC_USERNAME,height: 25,width: 25,)*/Image
-                .network("http://demo.sharvayainfotech.in/images/profile.png",
-              height: 35, fit: BoxFit.fill, width: 35,)),             /* title: Text("Customer",style:TextStyle(fontSize: 12,color: Color(0xFF504F4F),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            child: /*Image.asset(IC_USERNAME,height: 25,width: 25,)*/ Image
+                .network(
+              "http://demo.sharvayainfotech.in/images/profile.png",
+              height: 35,
+              fit: BoxFit.fill,
+              width: 35,
+            )),
+        /* title: Text("Customer",style:TextStyle(fontSize: 12,color: Color(0xFF504F4F),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
       ),*/
         /*  title: Row(
             children:<Widget>[
@@ -360,13 +380,17 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
               ),),)
             ]
         ),*/
-        title: Text(model.employeeName,style: TextStyle(
-            color: Colors.black
-        ),),
-        subtitle: Text(model.approvalStatus,style: TextStyle(
-          color: Color(0xFF504F4F),
-          fontSize: _fontSize_Title,
-        ),),
+        title: Text(
+          model.employeeName,
+          style: TextStyle(color: Colors.black),
+        ),
+        subtitle: Text(
+          model.approvalStatus,
+          style: TextStyle(
+            color: Color(0xFF504F4F),
+            fontSize: _fontSize_Title,
+          ),
+        ),
         children: <Widget>[
           Divider(
             thickness: 1.0,
@@ -379,59 +403,53 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
                 horizontal: 16.0,
                 vertical: 8.0,
               ),
-
-
               child: Container(
-                padding: EdgeInsets.only(left: 10, right: 10, top: 25, bottom: 25),
+                padding:
+                    EdgeInsets.only(left: 10, right: 10, top: 25, bottom: 25),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-
-                      Expanded(
-                        child: _buildTitleWithValueView(
-                            "Time IN",
-                            model.timeIn.toString(),
-                      ),
-                      ),
-                  Expanded(
-                      child: _buildTitleWithValueView(
-                        "Time OUT",
-                        model.timeOut.toString(),
-                      ),
-                  )
-                    ]),
-
+                    Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _buildTitleWithValueView(
+                              "Time IN",
+                              model.timeIn.toString(),
+                            ),
+                          ),
+                          Expanded(
+                            child: _buildTitleWithValueView(
+                              "Time OUT",
+                              model.timeOut.toString(),
+                            ),
+                          )
+                        ]),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
                     Row(children: [
                       Expanded(
                         child: _buildTitleWithValueView(
-                            "Notes", model.notes??"-"),
+                            "Notes", model.notes ?? "-"),
                       ),
-
                     ]),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
                     Row(children: [
                       Expanded(
-                        child: _buildTitleWithValueView(
-                            "Missed Date", model.presenceDate.getFormattedDate(
-                        fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                        toFormat: "dd/MM/yyyy"))
-              ),
-
-
+                          child: _buildTitleWithValueView(
+                              "Missed Date",
+                              model.presenceDate.getFormattedDate(
+                                  fromFormat: "yyyy-MM-ddTHH:mm:ss",
+                                  toFormat: "dd/MM/yyyy"))),
                     ]),
-
                     Row(children: [
                       Expanded(
                         child: _buildTitleWithValueView(
-                            "Initiated By", model.createdBy??"-"),
+                            "Initiated By", model.createdBy ?? "-"),
                       ),
-
                     ]),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
@@ -439,7 +457,6 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
-
                     _buildTitleWithValueView(
                         "Created Date",
                         model.createdDate.getFormattedDate(
@@ -459,8 +476,6 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
                   ],
                 ),
               ),
-
-
             ),
           ),
           ButtonBar(
@@ -468,7 +483,7 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
               buttonHeight: 52.0,
               buttonMinWidth: 90.0,
               children: <Widget>[
-                FlatButton(
+                /*  FlatButton(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0)),
                   onPressed: () {
@@ -484,9 +499,8 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
                       Text('Edit',style: TextStyle(color: Colors.black),),
                     ],
                   ),
-                ),
+                ),*/
                 FlatButton(
-
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0)),
                   onPressed: () {
@@ -496,17 +510,24 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
                   },
                   child: Column(
                     children: <Widget>[
-                      Icon(Icons.delete,color: Colors.black,),
+                      Icon(
+                        Icons.delete,
+                        color: Colors.black,
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2.0),
                       ),
-                      Text('Delete',style: TextStyle(color: Colors.black),),
+                      Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ],
                   ),
                 ),
               ]),
         ],
-      ),);
+      ),
+    );
   }
 
   Future<bool> _onBackPressed() {
@@ -518,8 +539,10 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
     navigateTo(context, SearchMissedPunchScreen.routeName).then((value) {
       if (value != null) {
         _searchDetails = value;
-        _SalesOrderBloc.add(MissedPunchSearchByIDCallEvent(_searchDetails.pkID,
-            MissedPunchSearchByIDRequest(CompanyID: CompanyID.toString(),LoginUserID: LoginUserID)));
+        _SalesOrderBloc.add(MissedPunchSearchByIDCallEvent(
+            _searchDetails.pkID,
+            MissedPunchSearchByIDRequest(
+                CompanyID: CompanyID.toString(), LoginUserID: LoginUserID)));
       }
     });
   }
@@ -541,5 +564,15 @@ class _MissedPunchListScreenState extends BaseState<MissedPunchListScreen>
           pkID, BankVoucherDeleteRequest(CompanyID: CompanyID.toString())));
       // _CustomerBloc..add(CustomerListCallEvent(1,CustomerPaginationRequest(companyId: CompanyID,loginUserID: LoginUserID,CustomerID: "",ListMode: "L")));
     });
+  }
+
+  void _OndeleteResponse(MissedPunchDeleteResponseState state) {
+    navigateTo(context, MissedPunchListScreen.routeName, clearAllStack: true);
+    /* setState(() {
+      _SalesOrderBloc.add(MissedPunchSearchByIDCallEvent(
+          _searchDetails.pkID,
+          MissedPunchSearchByIDRequest(
+              CompanyID: CompanyID.toString(), LoginUserID: LoginUserID)));
+    });*/
   }
 }

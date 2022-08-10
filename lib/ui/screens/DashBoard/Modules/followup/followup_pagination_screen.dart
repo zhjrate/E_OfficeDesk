@@ -720,7 +720,7 @@ class _FollowupListScreenState extends BaseState<FollowupListScreen>
           //mainAxisSize: MainAxisSize.max,
           children: <Widget>[
             Text(
-              model.inquiryStatus,
+              model.inquiryStatusDesc,
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10),
             ),
             model.timeIn != "" || model.timeOut != ""

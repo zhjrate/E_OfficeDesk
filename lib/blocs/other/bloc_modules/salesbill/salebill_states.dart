@@ -26,6 +26,18 @@ class SalesBillPDFGenerateResponseState extends SalesBillStates {
   SalesBillPDFGenerateResponseState(this.response);
 }
 
+class SalesBillSearchByNameResponseState extends SalesBillStates {
+  final SalesBillSearchByNameResponse response;
+
+  SalesBillSearchByNameResponseState(this.response);
+}
+
+class SalesBillSearchByIDResponseState extends SalesBillStates {
+  final SalesBillListResponse response;
+
+  SalesBillSearchByIDResponseState(this.response);
+}
+
 /*
 
 class SearchQuotationListByNameCallResponseState extends QuotationStates {

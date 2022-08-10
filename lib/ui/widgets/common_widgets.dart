@@ -17,6 +17,7 @@ import 'package:soleoserp/ui/screens/DashBoard/Modules/Attend_Visit/Attend_Visit
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/complaint_pagination_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerList/customer_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Installation/installation_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/OfficeTODO/office_to_do.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/attendance/employee_attendance_list.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/bank_voucher/bank_voucher_list/bank_voucher_list_screen.dart';
@@ -34,6 +35,7 @@ import 'package:soleoserp/ui/screens/DashBoard/Modules/loan/loan_list/loan_list_
 import 'package:soleoserp/ui/screens/DashBoard/Modules/loan_approval/loan_approval_list/loan_approval_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/maintenance/maintenance_list/maintenance_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/missed_punch/missed_punch_list/missed_punch_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/missed_punch_approval/missed_punch_approval_list/missed_punch_approval_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/packing_checklist/packing_checklist_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/production_activity/production_activity_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/quick_followup/quick_followup_list/quick_followup_list_screen.dart';
@@ -1163,7 +1165,12 @@ makeDashboardItem(
               clearAllStack: true);
         } else if (title == "To-Do") {
           navigateTo(context, ToDoListScreen.routeName, clearAllStack: true);
-        } else if (title == "Quotation") {
+        } else if (title == "Office Task")
+          {
+            navigateTo(context, OfficeToDoScreen.routeName, clearAllStack: true);
+          }
+
+        else if (title == "Quotation") {
           navigateTo(context, QuotationListScreen.routeName,
               clearAllStack: true);
         } else if (title == "SalesOrder") {
@@ -1175,6 +1182,9 @@ makeDashboardItem(
         } else if (title == "BankVoucher") {
           navigateTo(context, BankVoucherListScreen.routeName,
               clearAllStack: true);
+        } else if (title == "CashVoucher") {
+          showCommonDialogWithSingleOption(context, "Coming Soon !",
+              positiveButtonTitle: "OK");
         } else if (title == "Complaint") {
           navigateTo(context, ComplaintPaginationListScreen.routeName,
               clearAllStack: true);
@@ -1207,6 +1217,9 @@ makeDashboardItem(
         } else if (title == "Missed Punch") {
           navigateTo(context, MissedPunchListScreen.routeName,
               clearAllStack: true);
+        } else if (title == "Missed Punch Approval") {
+          navigateTo(context, MissedPunchApprovalListScreen.routeName,
+              clearAllStack: true);
         } else if (title == "Salary Adv/Upad") {
           navigateTo(context, SalaryUpadListScreen.routeName,
               clearAllStack: true);
@@ -1234,6 +1247,15 @@ makeDashboardItem(
         } else if (title == "Tele Caller") {
           navigateTo(context, TeleCallerNewListScreen.routeName,
               clearAllStack: true);
+        } else if (title == "Purchase Order") {
+          showCommonDialogWithSingleOption(context, "Coming Soon !",
+              positiveButtonTitle: "OK");
+        } else if (title == "Purchase Order Approval") {
+          showCommonDialogWithSingleOption(context, "Coming Soon !",
+              positiveButtonTitle: "OK");
+        } else if (title == "Purchase Bill") {
+          showCommonDialogWithSingleOption(context, "Coming Soon !",
+              positiveButtonTitle: "OK");
         }
       },
       child: Center(
@@ -1309,11 +1331,32 @@ void getcurrentTimeInfo(BuildContext context) async {
   } else {
     return showCommonDialogWithSingleOption(
       context,
-      "Your Device DateTime is not correct as per current DateTime , Kindly Update Your Device Time to Access Attendance !",
+      "Your Device DateTime is not correct as per current DateTime , Kindly Update Your Device Time !",
       positiveButtonTitle: "OK", /*onTapOfPositiveButton: () {
 
       }*/
     );
+  }
+}
+
+void getcurrentTimeInfoFromMain(BuildContext context) async {
+  DateTime startDate = await NTP.now();
+  print('NTP DateTime: ${startDate} ${DateTime.now()}');
+
+  var now = startDate;
+  var formatter = new DateFormat('yyyy-MM-ddTHH:mm');
+  String currentday = formatter.format(now);
+  String PresentDate1 = formatter.format(DateTime.now());
+  print(
+      'NTP DateTime123456: ${DateTime.parse(currentday)} ${DateTime.parse(PresentDate1)}');
+
+  if (DateTime.parse(currentday) != DateTime.parse(PresentDate1)) {
+    //  navigateTo(context, AttendanceListScreen.routeName, clearAllStack: true);
+    return showCommonDialogWithSingleOption(context,
+        "Your Device DateTime is not correct as per current DateTime , Kindly Update Your Device Time !",
+        positiveButtonTitle: "OK", onTapOfPositiveButton: () {
+      navigateTo(context, HomeScreen.routeName, clearAllStack: true);
+    });
   }
 }
 
@@ -1404,68 +1447,7 @@ Widget build_Drawer({BuildContext context, String UserName, String RolCode}) {
           currentAccountPictureSize: const Size.square(85),
         ),
 
-        /* Container(
 
-            color: colorPrimary,
-
-            child: Row(
-              children: [
-              Expanded(
-                child: Card(
-                elevation: 5,
-                color: colorWhite,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                child: Container(
-
-                  padding: EdgeInsets.all(5),
-
-                  child: Image.network(
-
-
-                    SharedPrefHelper.instance
-                        .getCompanyData()
-                        .details[0]
-                        .siteURL +
-                        "images/CompanyLogo/CompanyLogo.png",
-                    height: 100,
-                    width: 100,
-                  ),
-
-                ),
-            ),
-              ),
-
-                Expanded(
-                child: Column(
-                  children: [
-                    Container(
-                      width: 50,
-                      height: 50,
-                      margin: EdgeInsets.only(left: 15),
-                      child: Text(
-                        SharedPrefHelper.instance.getLoginUserData().details[0].userID,
-                        style: TextStyle(color: Colors.white,fontSize: 10),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(left: 15),
-
-                      child: Text(
-                        SharedPrefHelper.instance
-                            .getLoginUserData()
-                            .details[0]
-                            .roleCode,
-                        style: TextStyle(color: Colors.white, fontSize: 10),
-                      ),
-                    ),
-                  ],
-                ),
-              )
-
-              ],
-            ),
-          ),*/
 
         Expanded(
           child: ListView(
@@ -1836,14 +1818,14 @@ getPurchaseList(List<ALL_Name_ID> Purchase, BuildContext context) {
               style: new TextStyle(fontSize: 15.0, color: colorPrimary)),
           onTap: () {
             if (Purchase[i].Name == "Purchase Order")
-              navigateTo(context, CustomerListScreen.routeName,
-                  clearAllStack: true);
+              showCommonDialogWithSingleOption(context, "Coming Soon !",
+                  positiveButtonTitle: "OK");
             if (Purchase[i].Name == "Purchase Order Approval")
-              navigateTo(context, CustomerListScreen.routeName,
-                  clearAllStack: true);
+              showCommonDialogWithSingleOption(context, "Coming Soon !",
+                  positiveButtonTitle: "OK");
             if (Purchase[i].Name == "Purchase Bill")
-              navigateTo(context, CustomerListScreen.routeName,
-                  clearAllStack: true);
+              showCommonDialogWithSingleOption(context, "Coming Soon !",
+                  positiveButtonTitle: "OK");
           });
     },
   );
@@ -1861,9 +1843,14 @@ getAccountList(List<ALL_Name_ID> AccountList, BuildContext context) {
               softWrap: true,
               style: new TextStyle(fontSize: 15.0, color: colorPrimary)),
           onTap: () {
-            if (HR[i].Name == "BankVoucher")
+            if (AccountList[i].Name == "BankVoucher")
               navigateTo(context, BankVoucherListScreen.routeName,
                   clearAllStack: true);
+            if (AccountList[i].Name == "CashVoucher")
+              showCommonDialogWithSingleOption(context, "Coming Soon !",
+                  positiveButtonTitle: "OK");
+            //showCommonDialogWithSingleOption(context, c)
+            //
           });
     },
   );
@@ -1887,9 +1874,8 @@ getHRList(List<ALL_Name_ID> HR, BuildContext context) {
             if (HR[i].Name == "Leave Approval")
               navigateTo(context, LeaveRequestApprovalListScreen.routeName,
                   clearAllStack: true);
-            if (HR[i].Name == "Attendance")
-              navigateTo(context, AttendanceListScreen.routeName,
-                  clearAllStack: true);
+            if (HR[i].Name == "Attendance") getcurrentTimeInfo(context);
+
             if (HR[i].Name == "Expense")
               navigateTo(context, ExpenseListScreen.routeName,
                   clearAllStack: true);
@@ -1901,7 +1887,7 @@ getHRList(List<ALL_Name_ID> HR, BuildContext context) {
               navigateTo(context, EmployeeListScreen.routeName,
                   clearAllStack: true);
             if (HR[i].Name == "Loan Approval")
-              navigateTo(context, BankVoucherListScreen.routeName,
+              navigateTo(context, LoanApprovalListScreen.routeName,
                   clearAllStack: true);
 
             if (HR[i].Name == "Missed Punch")
@@ -1909,11 +1895,9 @@ getHRList(List<ALL_Name_ID> HR, BuildContext context) {
                   clearAllStack: true);
 
             if (HR[i].Name == "Missed Punch Approval")
-              navigateTo(context, BankVoucherListScreen.routeName,
+              navigateTo(context, MissedPunchApprovalListScreen.routeName,
                   clearAllStack: true);
-            if (HR[i].Name == "Salary Adv/Upad")
-              navigateTo(context, BankVoucherListScreen.routeName,
-                  clearAllStack: true);
+
             if (HR[i].Name == "Loan Installments")
               navigateTo(context, LoanListScreen.routeName,
                   clearAllStack: true);
@@ -1936,7 +1920,12 @@ getOfficeList(List<ALL_Name_ID> HR, BuildContext context) {
     itemCount: HR.length,
     itemBuilder: (context, i) {
       return ListTile(
-          leading: Image.network(HR[i].Name1, height: 32, fit: BoxFit.fill),
+          leading: Container(
+              height: 32,
+              width: 32,
+              child: Image.network(
+                HR[i].Name1,
+              )),
           title: Text(HR[i].Name,
               softWrap: true,
               style: new TextStyle(fontSize: 15.0, color: colorPrimary)),

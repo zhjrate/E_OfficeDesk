@@ -1,4 +1,5 @@
-import 'package:expansion_tile_card/expansion_tile_card.dart';
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,16 +17,15 @@ import 'package:soleoserp/models/common/all_name_id_list.dart';
 import 'package:soleoserp/models/common/globals.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/complaint_pagination_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/digital_signature.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/search_customer_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/customer_add_edit.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/followup/followup_pagination_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
-import 'package:soleoserp/ui/widgets/common_input_text_filed.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
 import 'package:soleoserp/utils/General_Constants.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/general_utils.dart';
+import 'package:soleoserp/utils/image_full_screen.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
 
 class AddUpdateComplaintScreenArguments {
@@ -51,6 +51,8 @@ class ComplaintAddEditScreen extends BaseStatefulWidget {
 class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
     with BasicScreen, WidgetsBindingObserver, SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController edt_ComplanitID = TextEditingController();
+
   final TextEditingController edt_ComplanitDate = TextEditingController();
   final TextEditingController edt_ReverseComplanitDate =
       TextEditingController();
@@ -82,7 +84,6 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
   List<ALL_Name_ID> arr_ALL_Name_ID_For_LeadSource = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Type = [];
 
-
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
   ComplaintScreenBloc _complaintScreenBloc;
@@ -96,7 +97,9 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
   String LoginUserID = "";
   ComplaintDetails _editModel;
   int savepkID = 0;
-  String ComplaintNo="";
+  String ComplaintNo = "";
+
+  Uint8List data;
 
   @override
   void initState() {
@@ -112,12 +115,12 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
     FetchAssignTODetails(_offlineALLEmployeeListData);
     FetchTypeDetails();
 
-
     _isForUpdate = widget.arguments != null;
     if (_isForUpdate) {
       _editModel = widget.arguments.editModel;
       fillData();
     } else {
+      edt_ComplanitID.text = "";
       selectedDate = DateTime.now();
       edt_ComplanitDate.text = selectedDate.day.toString() +
           "-" +
@@ -241,7 +244,8 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
           return super.build(context);
         },
         listenWhen: (oldState, currentState) {
-          if (currentState is CustomerSourceCallEventResponseState || currentState is ComplaintSaveResponseState) {
+          if (currentState is CustomerSourceCallEventResponseState ||
+              currentState is ComplaintSaveResponseState) {
             return true;
           }
           return false;
@@ -280,18 +284,23 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        _isForUpdate == true
+                            ? _buildComplaintNo()
+                            : Container(),
+                        SizedBox(
+                          width: 20,
+                          height: 15,
+                        ),
                         _buildFollowupDate(),
                         SizedBox(
                           width: 20,
                           height: 15,
                         ),
-
                         _buildBankACSearchView(),
                         SizedBox(
                           width: 20,
                           height: 15,
                         ),
-
                         Container(
                           margin: EdgeInsets.only(left: 10, right: 10),
                           child: Text("Reference #",
@@ -309,7 +318,7 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
                             controller: edt_Referene,
                             minLines: 1,
                             maxLines: 2,
-                            keyboardType: TextInputType.number,
+                            keyboardType: TextInputType.text,
                             decoration: InputDecoration(
                                 contentPadding: EdgeInsets.all(10.0),
                                 hintText: 'Enter Reference #',
@@ -324,7 +333,6 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
                           width: 20,
                           height: 15,
                         ),
-
                         Container(
                           margin: EdgeInsets.only(left: 10, right: 10),
                           child: Text("Complaint Description *",
@@ -357,13 +365,11 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
                           width: 20,
                           height: 15,
                         ),
-
                         _buildNextFollowupDate(),
                         SizedBox(
                           width: 20,
                           height: 15,
                         ),
-
                         Container(
                           margin: EdgeInsets.only(left: 10, right: 10),
                           child: Text("Preferred Time",
@@ -478,13 +484,11 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
                           width: 20,
                           height: 15,
                         ),
-
                         _buildEmplyeeListView(),
                         SizedBox(
                           width: 20,
                           height: 15,
                         ),
-
                         showcustomdialogWithID1("Status",
                             enable1: false,
                             title: "Status",
@@ -493,140 +497,241 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
                             controllerForLeft: edt_satus,
                             controllerpkID: edt_satusID,
                             Custom_values1: arr_ALL_Name_ID_For_LeadSource),
-
                         CustomDropDown1("Type",
                             enable1: false,
                             title: "Type",
                             hintTextvalue: "Tap to Select Type",
                             icon: Icon(Icons.arrow_drop_down),
                             controllerForLeft: edt_Type,
-                            Custom_values1:
-                            arr_ALL_Name_ID_For_Type),
+                            Custom_values1: arr_ALL_Name_ID_For_Type),
                         SizedBox(
                           width: 20,
                           height: 15,
                         ),
-
+                        data != null
+                            ? Center(
+                                child: Container(
+                                  margin: EdgeInsets.all(10),
+                                  height: 100,
+                                  width: 100,
+                                  child: Center(
+                                    child: ImageFullScreenWrapperWidget(
+                                      child: Image.memory(data),
+                                      dark: true,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(),
+                        SizedBox(
+                          width: 20,
+                          height: 15,
+                        ),
                         getCommonButton(baseTheme, () {
-                          print("ComplaintDetails" + "ComplaintDate : " + edt_ComplanitDate.text + " ComplaintReverseDate : " + edt_ReverseComplanitDate.text
-                          +" CustomerName : " + edt_CustomerName.text + " Customer ID : " + edt_CustomerID.text + " Reference : " + edt_Referene.text +
-                          " ComplaintNotes : " + edt_ComplaintNotes.text + " SheduleDate : " + edt_SheduleDate.text + " ReverseSheduleDate : " + edt_ReverseSheduleDate.text +
-                           " FromTime : " + edt_FromTime.text + " ToTime : " + edt_ToTime.text + " AssignTo : " + edt_AssignTo.text + " AssignToID : " + edt_AssignToID.text +
-                           " Status : " + edt_satus.text + " StatusID : " + edt_satusID.text + " Type : " + edt_Type.text + ""
-                          );
+                          // showcustomdialogSignature(context1: context);
 
-                          if(edt_CustomerName.text!="")
-                            {
-
-                              if(edt_ComplaintNotes.text!="")
-                                {
-
-                                  if(edt_SheduleDate.text!="")
-                                    {
-
-                                      if(edt_AssignTo.text!="")
-                                        {
-
-                                          DateTime FbrazilianDate = new DateFormat("dd-MM-yyyy").parse(edt_ComplanitDate.text);
-                                          DateTime NbrazilianDate = new DateFormat("dd-MM-yyyy").parse(edt_SheduleDate.text);
-
-                                          if(FbrazilianDate.isBefore(NbrazilianDate))
-                                            {
-                                              showCommonDialogWithTwoOptions(
-                                                  context,
-                                                  "Are you sure you want to Save this Complaint Details ?",
-                                                  negativeButtonTitle: "No",
-                                                  positiveButtonTitle: "Yes",
-                                                  onTapOfPositiveButton: () {
-                                                    Navigator.of(context).pop();
-                                                    _complaintScreenBloc.add(ComplaintSaveCallEvent(savepkID, ComplaintSaveRequest(
-                                                        ComplaintDate:edt_ReverseComplanitDate.text,ComplaintNo: ComplaintNo,CustomerID: edt_CustomerID.text,ReferenceNo: edt_Referene.text==null?"":edt_Referene.text,
-                                                        ComplaintNotes: edt_ComplaintNotes.text,ComplaintType: edt_Type.text==null?"":edt_Type.text,ComplaintStatus: edt_satus.text==null ?"":edt_satus.text,
-                                                        EmployeeID: edt_AssignToID.text,
-                                                        PreferredDate: edt_ReverseSheduleDate.text,TimeFrom: edt_FromTime.text,TimeTo: edt_ToTime.text,LoginUserID: LoginUserID,CompanyId: CompanyID.toString()
-                                                    )));
-                                                  });
-                                            }
-                                          else{
-                                            if(FbrazilianDate.isAtSameMomentAs(NbrazilianDate))
-                                            {
-                                              showCommonDialogWithTwoOptions(
-                                                  context,
-                                                  "Are you sure you want to Save this Complaint Details ?",
-                                                  negativeButtonTitle: "No",
-                                                  positiveButtonTitle: "Yes",
-                                                  onTapOfPositiveButton: () {
-                                                    Navigator.of(context).pop();
-                                                    _complaintScreenBloc.add(ComplaintSaveCallEvent(savepkID, ComplaintSaveRequest(
-                                                        ComplaintDate:edt_ReverseComplanitDate.text,ComplaintNo: ComplaintNo,CustomerID: edt_CustomerID.text,ReferenceNo: edt_Referene.text==null?"":edt_Referene.text,
-                                                        ComplaintNotes: edt_ComplaintNotes.text,ComplaintType: edt_Type.text==null?"":edt_Type.text,ComplaintStatus: edt_satus.text==null ?"":edt_satus.text,
-                                                        EmployeeID: edt_AssignToID.text,
-                                                        PreferredDate: edt_ReverseSheduleDate.text,TimeFrom: edt_FromTime.text,TimeTo: edt_ToTime.text,LoginUserID: LoginUserID,CompanyId: CompanyID.toString()
-                                                    )));
-                                                  });
-                                            }
-                                            else{
-                                              showCommonDialogWithSingleOption(
-                                                  context, "Schedule Date Should be greater than Complaint Date !",
-                                                  positiveButtonTitle: "OK");
-                                            }
-                                          }
-
-                                        }
-                                      else
-                                        {
-                                          showCommonDialogWithSingleOption(
-                                              context, "Assign To is required !",
-                                              positiveButtonTitle: "OK");
-                                        }
-
-
-                                    }
-                                  else{
-                                    showCommonDialogWithSingleOption(
-                                        context, "Schedule Date is required !",
-                                        positiveButtonTitle: "OK");
-                                  }
-
-                                }
-                              else{
-                                showCommonDialogWithSingleOption(
-                                    context, "Complaint Notes is required !",
-                                    positiveButtonTitle: "OK");
-                              }
-
-
+                          navigateTo(context, MyDigitalSignature.routeName)
+                              .then((value) {
+                            if (value != null) {
+                              data = value;
+                              setState(() {});
                             }
-                          else{
+                          });
+                        }, "Add Signature", backGroundColor: colorPrimary),
+                        SizedBox(
+                          width: 20,
+                          height: 15,
+                        ),
+                        getCommonButton(baseTheme, () {
+                          print("ComplaintDetails" +
+                              "ComplaintDate : " +
+                              edt_ComplanitDate.text +
+                              " ComplaintReverseDate : " +
+                              edt_ReverseComplanitDate.text +
+                              " CustomerName : " +
+                              edt_CustomerName.text +
+                              " Customer ID : " +
+                              edt_CustomerID.text +
+                              " Reference : " +
+                              edt_Referene.text +
+                              " ComplaintNotes : " +
+                              edt_ComplaintNotes.text +
+                              " SheduleDate : " +
+                              edt_SheduleDate.text +
+                              " ReverseSheduleDate : " +
+                              edt_ReverseSheduleDate.text +
+                              " FromTime : " +
+                              edt_FromTime.text +
+                              " ToTime : " +
+                              edt_ToTime.text +
+                              " AssignTo : " +
+                              edt_AssignTo.text +
+                              " AssignToID : " +
+                              edt_AssignToID.text +
+                              " Status : " +
+                              edt_satus.text +
+                              " StatusID : " +
+                              edt_satusID.text +
+                              " Type : " +
+                              edt_Type.text +
+                              "");
+
+                          if (edt_CustomerName.text != "") {
+                            if (edt_ComplaintNotes.text != "") {
+                              if (edt_SheduleDate.text != "") {
+                                if (edt_AssignTo.text != "") {
+                                  DateTime FbrazilianDate =
+                                      new DateFormat("dd-MM-yyyy")
+                                          .parse(edt_ComplanitDate.text);
+                                  DateTime NbrazilianDate =
+                                      new DateFormat("dd-MM-yyyy")
+                                          .parse(edt_SheduleDate.text);
+
+                                  if (FbrazilianDate.isBefore(NbrazilianDate)) {
+                                    showCommonDialogWithTwoOptions(context,
+                                        "Are you sure you want to Save this Complaint Details ?",
+                                        negativeButtonTitle: "No",
+                                        positiveButtonTitle: "Yes",
+                                        onTapOfPositiveButton: () {
+                                      Navigator.of(context).pop();
+                                      _complaintScreenBloc.add(
+                                          ComplaintSaveCallEvent(
+                                              savepkID,
+                                              ComplaintSaveRequest(
+                                                  ComplaintDate:
+                                                      edt_ReverseComplanitDate
+                                                          .text,
+                                                  ComplaintNo: ComplaintNo,
+                                                  CustomerID: edt_CustomerID
+                                                      .text,
+                                                  ReferenceNo: edt_Referene
+                                                              .text ==
+                                                          null
+                                                      ? ""
+                                                      : edt_Referene.text,
+                                                  ComplaintNotes:
+                                                      edt_ComplaintNotes.text,
+                                                  ComplaintType: edt_Type
+                                                              .text ==
+                                                          null
+                                                      ? ""
+                                                      : edt_Type.text,
+                                                  ComplaintStatus:
+                                                      edt_satus.text == null
+                                                          ? ""
+                                                          : edt_satus.text,
+                                                  EmployeeID:
+                                                      edt_AssignToID.text,
+                                                  PreferredDate:
+                                                      edt_ReverseSheduleDate
+                                                          .text,
+                                                  TimeFrom: edt_FromTime.text,
+                                                  TimeTo: edt_ToTime.text,
+                                                  LoginUserID: LoginUserID,
+                                                  CompanyId:
+                                                      CompanyID.toString())));
+                                    });
+                                  } else {
+                                    if (FbrazilianDate.isAtSameMomentAs(
+                                        NbrazilianDate)) {
+                                      showCommonDialogWithTwoOptions(context,
+                                          "Are you sure you want to Save this Complaint Details ?",
+                                          negativeButtonTitle: "No",
+                                          positiveButtonTitle: "Yes",
+                                          onTapOfPositiveButton: () {
+                                        Navigator.of(context).pop();
+                                        _complaintScreenBloc
+                                            .add(ComplaintSaveCallEvent(
+                                                savepkID,
+                                                ComplaintSaveRequest(
+                                                    ComplaintDate:
+                                                        edt_ReverseComplanitDate
+                                                            .text,
+                                                    ComplaintNo: ComplaintNo,
+                                                    CustomerID: edt_CustomerID
+                                                        .text,
+                                                    ReferenceNo:
+                                                        edt_Referene.text == null
+                                                            ? ""
+                                                            : edt_Referene.text,
+                                                    ComplaintNotes:
+                                                        edt_ComplaintNotes.text,
+                                                    ComplaintType:
+                                                        edt_Type
+                                                                    .text ==
+                                                                null
+                                                            ? ""
+                                                            : edt_Type.text,
+                                                    ComplaintStatus:
+                                                        edt_satus.text == null
+                                                            ? ""
+                                                            : edt_satus.text,
+                                                    EmployeeID:
+                                                        edt_AssignToID.text,
+                                                    PreferredDate:
+                                                        edt_ReverseSheduleDate
+                                                            .text,
+                                                    TimeFrom: edt_FromTime.text,
+                                                    TimeTo: edt_ToTime.text,
+                                                    LoginUserID: LoginUserID,
+                                                    CompanyId:
+                                                        CompanyID.toString())));
+                                      });
+                                    } else {
+                                      showCommonDialogWithSingleOption(context,
+                                          "Schedule Date Should be greater than Complaint Date !",
+                                          positiveButtonTitle: "OK",
+                                          onTapOfPositiveButton: () {
+                                        Navigator.of(context).pop();
+                                      });
+                                    }
+                                  }
+                                } else {
+                                  showCommonDialogWithSingleOption(
+                                      context, "Assign To is required !",
+                                      onTapOfPositiveButton: () {
+                                    Navigator.of(context).pop();
+                                  });
+                                }
+                              } else {
+                                showCommonDialogWithSingleOption(
+                                    context, "Schedule Date is required !",
+                                    onTapOfPositiveButton: () {
+                                  Navigator.of(context).pop();
+                                });
+                              }
+                            } else {
+                              showCommonDialogWithSingleOption(
+                                  context, "Complaint Notes is required !",
+                                  onTapOfPositiveButton: () {
+                                Navigator.of(context).pop();
+                              });
+                            }
+                          } else {
                             showCommonDialogWithSingleOption(
                                 context, "Customer name is required !",
-                                positiveButtonTitle: "OK");
+                                onTapOfPositiveButton: () {
+                              Navigator.of(context).pop();
+                            });
                           }
-
-
-
-
-                        }, "Save",
-                            backGroundColor: colorPrimary),
+                        }, "Save", backGroundColor: colorPrimary),
                         SizedBox(
                           width: 20,
                           height: 15,
                         ),
-
                       ]))),
         ),
       ),
     );
   }
 
-
   Widget CustomDropDown1(String Category,
       {bool enable1,
-        Icon icon,
-        String title,
-        String hintTextvalue,
-        TextEditingController controllerForLeft,
-        List<ALL_Name_ID> Custom_values1}) {
+      Icon icon,
+      String title,
+      String hintTextvalue,
+      TextEditingController controllerForLeft,
+      List<ALL_Name_ID> Custom_values1}) {
     return Container(
       margin: EdgeInsets.only(top: 15, bottom: 15),
       child: Column(
@@ -637,90 +742,6 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
                 context1: context,
                 controller: controllerForLeft,
                 lable: "Select $Category"),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  margin: EdgeInsets.only(left: 10, right: 10),
-                  child: Text(title,
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: colorPrimary,
-                          fontWeight: FontWeight
-                              .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-
-                  ),
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Card(
-                  elevation: 5,
-                  color: colorLightGray,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Container(
-                    height: 60,
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    width: double.maxFinite,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextField(
-                              controller: controllerForLeft,
-                              enabled: false,
-                              decoration: InputDecoration(
-                                hintText: hintTextvalue,
-                                labelStyle: TextStyle(
-                                  color: Color(0xFF000000),
-                                ),
-                                border: InputBorder.none,
-                              ),
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Color(0xFF000000),
-                              ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-
-                          ),
-                        ),
-                        Icon(
-                          Icons.arrow_drop_down,
-                          color: colorGrayDark,
-                        )
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget showcustomdialogWithID1(String Category,
-      {bool enable1,
-      Icon icon,
-      String title,
-      String hintTextvalue,
-      TextEditingController controllerForLeft,
-      TextEditingController controller1,
-      TextEditingController controllerpkID,
-      List<ALL_Name_ID> Custom_values1}) {
-    return Container(
-      child: Column(
-        children: [
-          InkWell(
-            onTap:
-                () =>
-                    _complaintScreenBloc.add(CustomerSourceCallEvent(
-                        CustomerSourceRequest(
-                            pkID: "0",
-                            StatusCategory: "ComplaintStatus",
-                            companyId: CompanyID,
-                            LoginUserID: LoginUserID,
-                            SearchKey: ""))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -783,6 +804,87 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
     );
   }
 
+  Widget showcustomdialogWithID1(String Category,
+      {bool enable1,
+      Icon icon,
+      String title,
+      String hintTextvalue,
+      TextEditingController controllerForLeft,
+      TextEditingController controller1,
+      TextEditingController controllerpkID,
+      List<ALL_Name_ID> Custom_values1}) {
+    return Container(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => _complaintScreenBloc.add(CustomerSourceCallEvent(
+                CustomerSourceRequest(
+                    pkID: "0",
+                    StatusCategory: "ComplaintStatus",
+                    companyId: CompanyID,
+                    LoginUserID: LoginUserID,
+                    SearchKey: ""))),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(left: 10, right: 10),
+                  child: Text(title,
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: colorPrimary,
+                          fontWeight: FontWeight
+                              .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                      ),
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Card(
+                  elevation: 5,
+                  color: colorLightGray,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Container(
+                    height: 60,
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    width: double.maxFinite,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                              controller: controllerForLeft,
+                              enabled: false,
+                              decoration: InputDecoration(
+                                hintText: hintTextvalue,
+                                labelStyle: TextStyle(
+                                  color: Color(0xFF000000),
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF000000),
+                              ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                              ),
+                        ),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color: colorGrayDark,
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildEmplyeeListView() {
     return InkWell(
@@ -809,7 +911,7 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
                           .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
                   ),
-             /* Icon(
+              /* Icon(
                 Icons.filter_list_alt,
                 color: colorPrimary,
               ),*/
@@ -1079,6 +1181,57 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
     );
   }
 
+  Widget _buildComplaintNo() {
+    return InkWell(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.only(left: 10, right: 10),
+            child: Text("Complaint No",
+                style: TextStyle(
+                    fontSize: 12,
+                    color: colorPrimary,
+                    fontWeight: FontWeight
+                        .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                ),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Card(
+            elevation: 5,
+            color: colorLightGray,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Container(
+              height: 60,
+              padding: EdgeInsets.only(left: 20, right: 20),
+              width: double.maxFinite,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      edt_ComplanitID.text == null || edt_ComplanitID.text == ""
+                          ? "Complaint No."
+                          : edt_ComplanitID.text,
+                      style: baseTheme.textTheme.headline3.copyWith(
+                          color: edt_ComplanitID.text == null ||
+                                  edt_ComplanitID.text == ""
+                              ? colorGrayDark
+                              : colorBlack),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Future<void> _selectDate(
       BuildContext context, TextEditingController F_datecontroller) async {
     DateTime selectedDate = DateTime.now();
@@ -1197,14 +1350,6 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
         clearAllStack: true);
   }
 
-
-
-
-
-
-
-
-
   FetchAssignTODetails(ALL_EmployeeList_Response offlineALLEmployeeListData) {
     arr_ALL_Name_ID_For_AssignTo.clear();
     for (var i = 0; i < offlineALLEmployeeListData.details.length; i++) {
@@ -1217,11 +1362,7 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
     }
   }
 
-
-
-
   void fillData() {
-
     if (_editModel.complaintDate == "") {
       selectedDate = DateTime.now();
       edt_ComplanitDate.text = selectedDate.day.toString() +
@@ -1256,8 +1397,7 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
     } else {
       edt_SheduleDate.text = _editModel.preferredDate.getFormattedDate(
           fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
-      edt_ReverseSheduleDate.text = _editModel.preferredDate
-          .getFormattedDate(
+      edt_ReverseSheduleDate.text = _editModel.preferredDate.getFormattedDate(
           fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "yyyy-MM-dd");
     }
     savepkID = _editModel.pkID.toInt();
@@ -1266,64 +1406,52 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
     edt_Referene.text = _editModel.referenceNo;
     edt_ComplaintNotes.text = _editModel.complaintNotes;
 
-    if(_editModel.timeFrom=="")
-      {
-        TimeOfDay selectedTime1234 = TimeOfDay.now();
-        String AM_PM123 =
-        selectedTime1234.periodOffset.toString() == "12" ? "PM" : "AM";
-        String beforZeroHour123 = selectedTime1234.hourOfPeriod <= 9
-            ? "0" + selectedTime1234.hourOfPeriod.toString()
-            : selectedTime1234.hourOfPeriod.toString();
-        String beforZerominute123 = selectedTime1234.minute <= 9
-            ? "0" + selectedTime1234.minute.toString()
-            : selectedTime1234.minute.toString();
-        edt_FromTime.text = beforZeroHour123 +
-            ":" +
-            beforZerominute123 +
-            " " +
-            AM_PM123; //picked_s.periodOffset.toString();
+    if (_editModel.timeFrom == "") {
+      TimeOfDay selectedTime1234 = TimeOfDay.now();
+      String AM_PM123 =
+          selectedTime1234.periodOffset.toString() == "12" ? "PM" : "AM";
+      String beforZeroHour123 = selectedTime1234.hourOfPeriod <= 9
+          ? "0" + selectedTime1234.hourOfPeriod.toString()
+          : selectedTime1234.hourOfPeriod.toString();
+      String beforZerominute123 = selectedTime1234.minute <= 9
+          ? "0" + selectedTime1234.minute.toString()
+          : selectedTime1234.minute.toString();
+      edt_FromTime.text = beforZeroHour123 +
+          ":" +
+          beforZerominute123 +
+          " " +
+          AM_PM123; //picked_s.periodOffset.toString();
 
-
-      }
-    else{
+    } else {
       edt_FromTime.text = _editModel.timeFrom.getFormattedDate(
           fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "hh:mm a");
     }
-    if(_editModel.timeTo=="")
-      {
-        TimeOfDay selectedToTime =
-        TimeOfDay.fromDateTime(DateTime.now().add(Duration(hours: 1)));
-        String AM_PMToTime =
-        selectedToTime.periodOffset.toString() == "12" ? "PM" : "AM";
-        String beforZeroHourToTime = selectedToTime.hourOfPeriod <= 9
-            ? "0" + selectedToTime.hourOfPeriod.toString()
-            : selectedToTime.hourOfPeriod.toString();
-        String beforZerominuteToTime = selectedToTime.minute <= 9
-            ? "0" + selectedToTime.minute.toString()
-            : selectedToTime.minute.toString();
-        edt_ToTime.text = beforZeroHourToTime +
-            ":" +
-            beforZerominuteToTime +
-            " " +
-            AM_PMToTime;
-      }
-    else{
+    if (_editModel.timeTo == "") {
+      TimeOfDay selectedToTime =
+          TimeOfDay.fromDateTime(DateTime.now().add(Duration(hours: 1)));
+      String AM_PMToTime =
+          selectedToTime.periodOffset.toString() == "12" ? "PM" : "AM";
+      String beforZeroHourToTime = selectedToTime.hourOfPeriod <= 9
+          ? "0" + selectedToTime.hourOfPeriod.toString()
+          : selectedToTime.hourOfPeriod.toString();
+      String beforZerominuteToTime = selectedToTime.minute <= 9
+          ? "0" + selectedToTime.minute.toString()
+          : selectedToTime.minute.toString();
+      edt_ToTime.text =
+          beforZeroHourToTime + ":" + beforZerominuteToTime + " " + AM_PMToTime;
+    } else {
       edt_ToTime.text = _editModel.timeTo.getFormattedDate(
           fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "hh:mm a");
     }
 
-
     //selectedInTime =
-
-
-
-
 
     edt_AssignTo.text = _editModel.employeeName;
     edt_AssignToID.text = _editModel.employeeID.toString();
-    edt_satus.text = _editModel.complaintStatus=="0"?"":_editModel.complaintStatus;
+    edt_satus.text =
+        _editModel.complaintStatus == "0" ? "" : _editModel.complaintStatus;
     edt_Type.text = _editModel.complaintType;
-
+    edt_ComplanitID.text = _editModel.complaintNo;
   }
 
   void _onLeadSourceListTypeCallSuccess(
@@ -1362,13 +1490,12 @@ class _ComplaintAddEditScreenState extends BaseState<ComplaintAddEditScreen>
   }
 
   void _OnComplaintSaveResponseSucess(ComplaintSaveResponseState state) async {
-
-    String Msg="";
-    for(var i=0;i<state.complaintSaveResponse.details.length;i++)
-    {
-      print("SAveSucesss"+state.complaintSaveResponse.details[i].column2);
-      Msg = _isForUpdate == true ? "Complaint Updated Successfully" : "Complaint Added Successfully";
-
+    String Msg = "";
+    for (var i = 0; i < state.complaintSaveResponse.details.length; i++) {
+      print("SAveSucesss" + state.complaintSaveResponse.details[i].column2);
+      Msg = _isForUpdate == true
+          ? "Complaint Updated Successfully"
+          : "Complaint Added Successfully";
     }
     await showCommonDialogWithSingleOption(Globals.context, Msg,
         positiveButtonTitle: "OK");

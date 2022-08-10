@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:soleoserp/blocs/base/base_bloc.dart';
+import 'package:soleoserp/models/api_requests/Loan/loan_approval_save_request.dart';
 import 'package:soleoserp/models/api_requests/bank_voucher_delete_request.dart';
 import 'package:soleoserp/models/api_requests/employee_search_request.dart';
 import 'package:soleoserp/models/api_requests/loan_approval_list_request.dart';
 import 'package:soleoserp/models/api_requests/loan_list_request.dart';
 import 'package:soleoserp/models/api_requests/loan_search_request.dart';
+import 'package:soleoserp/models/api_responses/Loan/loan_approval_save_response.dart';
 import 'package:soleoserp/models/api_responses/bank_voucher_delete_response.dart';
 import 'package:soleoserp/models/api_responses/loan_list_response.dart';
 import 'package:soleoserp/repositories/repository.dart';
@@ -41,6 +43,11 @@ class LoanScreenBloc extends Bloc<LoanScreenEvents, LoanScreenStates> {
 
     }
 
+    if(event is LoanApprovalSaveRequestCallEvent)
+      {
+        yield* _mapLoanApprovalSaveCallEventToState(event);
+
+      }
   }
 
   Stream<LoanScreenStates> _mapBankVoucherListCallEventToState(
@@ -113,5 +120,23 @@ class LoanScreenBloc extends Bloc<LoanScreenEvents, LoanScreenStates> {
     }
   }
 
+
+  Stream<LoanScreenStates> _mapLoanApprovalSaveCallEventToState(
+      LoanApprovalSaveRequestCallEvent event) async* {
+    try {
+      baseBloc.emit(ShowProgressIndicatorState(true));
+
+      LoanApprovalSaveResponse response =
+      await userRepository.getLoanApprovalSAve(event.pkID,event.loanApprovalSaveRequest);
+      yield LoanApprovalSaveResponseState(response);
+
+    } catch (error, stacktrace) {
+      baseBloc.emit(ApiCallFailureState(error));
+      print(stacktrace);
+    } finally {
+      await Future.delayed(const Duration(milliseconds: 500), (){});
+      baseBloc.emit(ShowProgressIndicatorState(false));
+    }
+  }
 
 }

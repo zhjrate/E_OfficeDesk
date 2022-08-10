@@ -1,4 +1,3 @@
-import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -10,19 +9,16 @@ import 'package:soleoserp/models/api_requests/to_do_header_save_request.dart';
 import 'package:soleoserp/models/api_requests/to_do_save_sub_details_request.dart';
 import 'package:soleoserp/models/api_responses/all_employee_List_response.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
-import 'package:soleoserp/models/api_responses/follower_employee_list_response.dart';
+import 'package:soleoserp/models/api_responses/customer_label_value_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
 import 'package:soleoserp/models/api_responses/todo_list_response.dart';
 import 'package:soleoserp/models/common/all_name_id_list.dart';
 import 'package:soleoserp/models/common/globals.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/customer_add_edit.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_list_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_pagination_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/followup/followup_pagination_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_serach_customer_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
-import 'package:soleoserp/ui/widgets/common_input_text_filed.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
 import 'package:soleoserp/utils/General_Constants.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
@@ -99,6 +95,10 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
+  DateTime SeletedStartDate = DateTime.now();
+
+  DateTime SeletedDueDate = DateTime.now();
+  DateTime SeletedCompletionDate = DateTime.now();
 
 
 
@@ -116,6 +116,15 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
   bool _isForUpdate;
   ToDoDetails _editModel;
 
+  bool ISCHECKED = false;
+  SearchDetails _searchDetails;
+
+
+  final TextEditingController edt_CustomerName = TextEditingController();
+  final TextEditingController edt_CustomerpkID = TextEditingController();
+
+  bool IsForClient =false;
+
   void showWidgetCompletionDate(){
     setState(() {
       viewVisibleCompletionDate = true ;
@@ -125,6 +134,9 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
   void hideWidgetCompletionDate(){
     setState(() {
       viewVisibleCompletionDate = false ;
+      edt_CompletionDate.text = "";
+      edt_CompletionDateReverse.text="";
+      edt_CloserDetails.text = "";
     });
   }
 
@@ -185,6 +197,14 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
     _offlineFollowerEmployeeListData = SharedPrefHelper.instance.getALLEmployeeList();
     CompanyID = _offlineCompanyData.details[0].pkId;
     LoginUserID = _offlineLoggedInData.details[0].userID;
+
+    if(_offlineLoggedInData.details[0].serialKey.toUpperCase() == "SI08-SB94-MY45-RY15" || _offlineLoggedInData.details[0].serialKey.toUpperCase() == "TEST-0000-SI0F-0208"){
+      IsForClient = true;
+    }
+    else
+      {
+        IsForClient = false;
+      }
 
     _onFollowerEmployeeListByStatusCallSuccess(_offlineFollowerEmployeeListData);
 
@@ -257,7 +277,22 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
           AM_PM;
       edt_StartTimewith24Hours.text = selectedTime.hour.toString() + ":" + beforZerominute;
 
+      edt_Priority.text = "Low";
 
+      edt_CustomerName.text = "";
+      edt_CustomerpkID.text = "";
+
+     /* edt_CompletionDate.text = selectedDate.day.toString() +
+          "-" +
+          selectedDate.month.toString() +
+          "-" +
+          selectedDate.year.toString();
+
+      edt_CompletionDateReverse.text = selectedDate.year.toString() +
+          "-" +
+          selectedDate.month.toString() +
+          "-" +
+          selectedDate.day.toString();*/
     }
   }
 
@@ -386,6 +421,8 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
 
   @override
   Widget buildBody(BuildContext context) {
+    getcurrentTimeInfoFromMain(context);
+
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
@@ -465,9 +502,33 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
                             controllerpkID: edt_CategoryID,
                             Custom_values1: arr_ALL_Name_ID_For_Category),
 
+                        Visibility(
+                          visible: false,
+                          child: Card(
+                           // elevation:10.00,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15.0),
+                            ),
+                            color: colorLightGray,
+                            child: CheckboxListTile(
+                              value: ISCHECKED == null ? false : ISCHECKED,
+                              onChanged: (value) {
+                                setState(
+                                      () {
+                                    ISCHECKED = value;
+                                   // arrinquiryShareModel[index] = model;
+                                  },
+                                );
+                              },
+                              title: Text("Reminder",style: TextStyle(color: colorPrimary),),
+                             // contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                            ),
+                          ),
+                        ),
+
                         CustomDropDown1("Priority",
                             enable1: false,
-                            title: "Priority *",
+                            title: "Priority ",
                             hintTextvalue: "Tap to Select Priority",
                             icon: Icon(Icons.arrow_drop_down),
                             controllerForLeft: edt_Priority,
@@ -524,43 +585,14 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
                           height: 30,
                         ),
                         _buildDueTime(),
-                       /* FifthRow(
-                          "DueDate *",
-                          "Due Time",
-                          enable1: false,
-                          enable2: false,
-                          icon: Icon(Icons.calendar_today_outlined),
-                          icon2: Icon(Icons.lock_clock),
-                          controllerForLeft: edt_DueDate,
-                          controllerForRight: edt_DueTime,
-                        ),*/
-                        SizedBox(
-                          width: 20,
-                          height: 30,
-                        ),
-                       /* SixthRow(
-                          "Transfer To",
-                          enable1: false,
-                          icon: Icon(Icons.arrow_drop_down),
-                          controllerForLeft: edt_TransferTo,
-                          Custom_values1: arr_ALL_Name_ID_For_TransferTo,
-                        ),
-                        SizedBox(
-                          width: 20,
-                          height: 30,
-                        ),
-                  SeventhRow(
-                    "Re-Assign To",
-                    enable1: false,
-                    icon: Icon(Icons.arrow_drop_down),
-                    controllerForLeft: edt_ReAssignTo,
-                    Custom_values1: arr_ALL_Name_ID_For_AssignTo,
-                  ),
-                        SizedBox(
-                          width: 20,
-                          height: 30,
-                        ),*/
 
+                        IsForClient==true? Container(
+                            margin: EdgeInsets.only(top: 30),
+                            child: _buildSearchView()) : Container(),
+                        SizedBox(
+                          width: 20,
+                          height: 30,
+                        ),
                         GestureDetector(
                           onTap: () => showcustomdialogWithOnlyName(
                               values: arr_ALL_Name_ID_For_TransferTo,
@@ -640,7 +672,7 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
                           children: [
                             Container(
                               margin: EdgeInsets.only(left: 10, right: 10),
-                              child: Text("Completion Date",
+                              child: Text("Actual Completion",
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: colorPrimary,
@@ -668,7 +700,7 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
                                           controller: edt_CompletionDate,
                                           enabled: false,
                                           decoration: InputDecoration(
-                                            hintText: "Completion Date",
+                                            hintText: "DD-MM-YYYY",
                                             labelStyle: TextStyle(
                                               color: Color(0xFF000000),
                                             ),
@@ -713,7 +745,7 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
                                 children: [
                                   Container(
                                     margin: EdgeInsets.only(left: 10, right: 10),
-                                    child: Text("Re-Assign To",
+                                    child: Text("Transfer To",
                                         style: TextStyle(
                                             fontSize: 12,
                                             color: colorPrimary,
@@ -741,7 +773,7 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
                                                 controller: edt_ReAssignTo,
                                                 enabled: false,
                                                 decoration: InputDecoration(
-                                                  hintText: "Select Assign To",
+                                                  hintText: "Select Transfer To",
                                                   labelStyle: TextStyle(
                                                     color: Color(0xFF000000),
                                                   ),
@@ -774,7 +806,7 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
 
                         Container(
                           margin: EdgeInsets.only(left: 10, right: 10),
-                          child: Text("Closing Remarks",
+                          child: Text("Closing Remarks *",
                               style: TextStyle(
                                   fontSize: 12,
                                   color: colorPrimary,
@@ -808,6 +840,121 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
 
 
 
+
+
+
+
+                          bool  ISclosingRemerks = false;
+                          bool  ISCompletion = false;
+                          bool ISAssignTo = true;
+
+                          if(edt_CompletionDate.text!="")
+                            {
+                              if(edt_CloserDetails.text !="")
+                                {
+                                  ISclosingRemerks = true;
+                                  ISCompletion = true;
+
+                                }
+                              else
+                                {
+                                  ISclosingRemerks = false;
+
+                                }
+                            }
+                          else
+                            {
+                              ISclosingRemerks = true;
+                            //  ISCompletion = true;
+
+                              if(edt_CloserDetails.text !="")
+                              {
+                                ISCompletion = false;
+                              }
+                              else
+                              {
+                                ISCompletion = true;
+                              }
+                            }
+
+                          if(edt_TransferTo.text=="Add Activity")
+                            {
+
+                              if(edt_CloserDetails.text !="")
+                              {
+                                ISclosingRemerks = true;
+                                ISCompletion = true;
+
+                              }
+                              else
+                              {
+                                ISclosingRemerks = false;
+                              }
+                            }
+                          if(edt_TransferTo.text=="Add Activity")
+                          {
+
+                            if(edt_CloserDetails.text !="")
+                            {
+                              ISclosingRemerks = true;
+                              ISCompletion = true;
+
+                            }
+                            else
+                            {
+                              ISclosingRemerks = false;
+                            }
+                          }
+
+                          if(edt_TransferTo.text == "Re-Assign Task")
+                            {
+
+                              if(edt_CloserDetails.text !="")
+                              {
+                                ISclosingRemerks = true;
+                                ISCompletion = true;
+
+                              }
+                              else
+                              {
+                                ISclosingRemerks = false;
+                              }
+
+                              if(edt_ReAssignTo.text !=""){
+                                ISAssignTo=true;
+                              }
+                              else
+                                {
+                                  ISAssignTo=false;
+
+                                }
+
+                             /* if(edt_ReAssignTo.text !="")
+                              {
+                                if(edt_CloserDetails.text !="")
+                                {
+                                  ISclosingRemerks = true;
+                                  ISCompletion = true;
+
+                                }
+                                else
+                                {
+                                  ISclosingRemerks = false;
+                                }
+                              }
+                              else
+                                {
+                                  ISclosingRemerks = true;
+                                  ISCompletion = true;
+
+                                }*/
+                            }
+
+
+
+
+                          //edt_CompletionDate.text!="" && edt_CloserDetails.text !=""?true:false;
+
                           DateTime SbrazilianDate = new DateFormat("dd-MM-yyyy").parse(edt_StartDate.text);
                           DateTime DbrazilianDate = new DateFormat("dd-MM-yyyy").parse(edt_DueDate.text);
 
@@ -818,8 +965,8 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
                             {
                               if(edt_Category.text.toString()!=""){
 
-                                if(edt_Priority.text.toString()!="")
-                                  {
+                               /* if(edt_Priority.text.toString()!="")
+                                  {*/
 
                                     if(edt_EmployeeName.text.toString()!="")
                                       {
@@ -827,121 +974,158 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
                                         if(edt_DueDate.text.toString()!="")
                                           {
 
-                                             if(SbrazilianDate.isBefore(DbrazilianDate))
-                                            {
+                                            if(ISclosingRemerks==true)
+                                              {
 
 
-
-                                              if(edt_CompletionDate.text!=""){
-
-
-                                                DateTime CbrazilianDate = new DateFormat("dd-MM-yyyy").parse(edt_CompletionDate.text);
-
-                                                if(SbrazilianDate.isBefore(CbrazilianDate))
+                                                if(ISCompletion==true)
                                                   {
-                                                    showCommonDialogWithTwoOptions(context,
-                                                        "Are you sure you want to Save ToDo Details ?",
-                                                        negativeButtonTitle: "No",
-                                                        positiveButtonTitle: "Yes",
-                                                        onTapOfPositiveButton: () {
-                                                          Navigator.of(context).pop();
 
-                                                          _toDoBloc.add(ToDoSaveHeaderEvent(pkID, ToDoHeaderSaveRequest(Priority: edt_Priority.text,
-                                                              TaskDescription: edt_TaskDetails.text,Location: edt_Location.text,TaskCategoryID: edt_CategoryID.text,
-                                                              StartDate: edt_StartDateReverse.text + " "+ edt_StartTimewith24Hours.text ,DueDate: edt_DueDateReverse.text +" " +edt_DueTimeDatewith24Hours.text,
-                                                              CompletionDate: edt_CompletionDateReverse.text==null?"":edt_CompletionDateReverse.text,
-                                                              LoginUserID: LoginUserID,EmployeeID: edt_EmployeeID.text,Reminder: "",ReminderMonth: "",Latitude: "",
-                                                              Longitude: "",ClosingRemarks: edt_CloserDetails.text==null?"":edt_CloserDetails.text,
-                                                              CompanyId: CompanyID.toString()
 
-                                                          )));
-                                                        });
+                                                    if(ISAssignTo==true)
+                                                      {
+                                                        if(SbrazilianDate.isBefore(DbrazilianDate))
+                                                        {
+
+
+
+                                                          if(edt_CompletionDate.text!=""){
+
+
+                                                            DateTime CbrazilianDate = new DateFormat("dd-MM-yyyy").parse(edt_CompletionDate.text);
+
+                                                            print("DueDateddf" + "Completion Date : "+CbrazilianDate.getFormattedDate("dd-mm-yyyy") + " StartDate : " + SbrazilianDate.getFormattedDate("dd-mm-yyyy"));
+
+                                                            if(SbrazilianDate.isBefore(CbrazilianDate))
+                                                           // if(CbrazilianDate.isBefore(SbrazilianDate))
+                                                            {
+                                                              showCommonDialogWithTwoOptions(context,
+                                                                  "Are you sure you want to Save ToDo Details ?",
+                                                                  negativeButtonTitle: "No",
+                                                                  positiveButtonTitle: "Yes",
+                                                                  onTapOfPositiveButton: () {
+                                                                    Navigator.of(context).pop();
+
+                                                                    _toDoBloc.add(ToDoSaveHeaderEvent(pkID, ToDoHeaderSaveRequest(Priority: edt_Priority.text,
+                                                                        TaskDescription: edt_TaskDetails.text,Location: edt_Location.text,TaskCategoryID: edt_CategoryID.text,
+                                                                        StartDate: edt_StartDateReverse.text + " "+ edt_StartTimewith24Hours.text ,DueDate: edt_DueDateReverse.text +" " +edt_DueTimeDatewith24Hours.text,
+                                                                        CompletionDate: edt_CompletionDateReverse.text==null?"":edt_CompletionDateReverse.text,
+                                                                        LoginUserID: LoginUserID,EmployeeID: edt_EmployeeID.text,Reminder: ISCHECKED==true ? "1":"0",ReminderMonth: "",Latitude: "",
+                                                                        Longitude: "",ClosingRemarks: edt_CloserDetails.text==null?"":edt_CloserDetails.text,
+                                                                        CompanyId: CompanyID.toString()
+
+                                                                    )));
+                                                                  });
+                                                            }
+                                                            else{
+
+                                                              if(SbrazilianDate.isAtSameMomentAs(DbrazilianDate))
+                                                              {
+                                                                showCommonDialogWithTwoOptions(context,
+                                                                    "Are you sure you want to Save ToDo Details ?",
+                                                                    negativeButtonTitle: "No",
+                                                                    positiveButtonTitle: "Yes",
+                                                                    onTapOfPositiveButton: () {
+                                                                      Navigator.of(context).pop();
+
+                                                                      _toDoBloc.add(ToDoSaveHeaderEvent(pkID, ToDoHeaderSaveRequest(Priority: edt_Priority.text,
+                                                                          TaskDescription: edt_TaskDetails.text,Location: edt_Location.text,TaskCategoryID: edt_CategoryID.text,
+                                                                          StartDate: edt_StartDateReverse.text + " "+ edt_StartTimewith24Hours.text ,DueDate: edt_DueDateReverse.text +" " +edt_DueTimeDatewith24Hours.text,
+                                                                          CompletionDate: edt_CompletionDateReverse.text==null?"":edt_CompletionDateReverse.text,
+                                                                          LoginUserID: LoginUserID,EmployeeID: edt_EmployeeID.text,Reminder: ISCHECKED==true ? "1":"0",ReminderMonth: "",  Latitude: SharedPrefHelper.instance.getLatitude(),
+                                                                          Longitude: SharedPrefHelper.instance.getLongitude(),ClosingRemarks: edt_CloserDetails.text==null?"":edt_CloserDetails.text,
+                                                                          CompanyId: CompanyID.toString()
+
+                                                                      )));
+                                                                    });
+                                                              }
+
+
+                                                              showCommonDialogWithSingleOption(
+                                                                  context, "Completion Date Should be greater than Start Date !",
+                                                                  positiveButtonTitle: "OK");
+                                                            }
+                                                          }
+                                                          else{
+
+
+                                                            showCommonDialogWithTwoOptions(context,
+                                                                "Are you sure you want to Save ToDo Details ?",
+                                                                negativeButtonTitle: "No",
+                                                                positiveButtonTitle: "Yes",
+                                                                onTapOfPositiveButton: () {
+                                                                  Navigator.of(context).pop();
+
+                                                                  _toDoBloc.add(ToDoSaveHeaderEvent(pkID, ToDoHeaderSaveRequest(Priority: edt_Priority.text,
+                                                                      TaskDescription: edt_TaskDetails.text,Location: edt_Location.text,TaskCategoryID: edt_CategoryID.text,
+                                                                      StartDate: edt_StartDateReverse.text + " "+ edt_StartTimewith24Hours.text ,DueDate: edt_DueDateReverse.text +" " +edt_DueTimeDatewith24Hours.text,
+                                                                      CompletionDate: edt_CompletionDateReverse.text==null?"":edt_CompletionDateReverse.text,
+                                                                      LoginUserID: LoginUserID,EmployeeID: edt_EmployeeID.text,Reminder: ISCHECKED==true ? "1":"0",ReminderMonth: "", Latitude: SharedPrefHelper.instance.getLatitude(),
+                                                                      Longitude: SharedPrefHelper.instance.getLongitude(),ClosingRemarks: edt_CloserDetails.text==null?"":edt_CloserDetails.text,
+                                                                      CompanyId: CompanyID.toString()
+
+                                                                  )));
+                                                                });
+                                                          }
+
+                                                        }
+                                                        else{
+                                                          // print("DatesRemoveSymobles"+ " False : " +"SDate : " +SDate +" DDate : " +DDate );
+
+                                                          if(SbrazilianDate.isAtSameMomentAs(DbrazilianDate))
+                                                          {
+                                                            showCommonDialogWithTwoOptions(context,
+                                                                "Are you sure you want to Save ToDo Details ?",
+                                                                negativeButtonTitle: "No",
+                                                                positiveButtonTitle: "Yes",
+                                                                onTapOfPositiveButton: () {
+                                                                  Navigator.of(context).pop();
+
+                                                                  _toDoBloc.add(ToDoSaveHeaderEvent(pkID, ToDoHeaderSaveRequest(Priority: edt_Priority.text,
+                                                                      TaskDescription: edt_TaskDetails.text,Location: edt_Location.text,TaskCategoryID: edt_CategoryID.text,
+                                                                      StartDate: edt_StartDateReverse.text + " "+ edt_StartTimewith24Hours.text ,DueDate: edt_DueDateReverse.text +" " +edt_DueTimeDatewith24Hours.text,
+                                                                      CompletionDate: edt_CompletionDateReverse.text==null?"":edt_CompletionDateReverse.text,
+                                                                      LoginUserID: LoginUserID,EmployeeID: edt_EmployeeID.text,Reminder: ISCHECKED==true ? "1":"0",ReminderMonth: "", Latitude: SharedPrefHelper.instance.getLatitude(),
+                                                                      Longitude: SharedPrefHelper.instance.getLongitude(),ClosingRemarks: edt_CloserDetails.text==null?"":edt_CloserDetails.text,
+                                                                      CompanyId: CompanyID.toString()
+
+                                                                  )));
+                                                                });
+                                                          }
+                                                          else
+                                                          {
+                                                            showCommonDialogWithSingleOption(
+                                                                context, "Due Date Should be greater than Start Date !",
+                                                                positiveButtonTitle: "OK");
+                                                          }
+
+
+
+                                                        }
+                                                      }
+                                                    else
+                                                      {
+                                                        showCommonDialogWithSingleOption(
+                                                            context, "Re-Assign To is Required !",
+                                                            positiveButtonTitle: "OK");
+                                                      }
+
                                                   }
-                                                else{
-
-                                                  if(SbrazilianDate.isAtSameMomentAs(DbrazilianDate))
-                                                    {
-                                                      showCommonDialogWithTwoOptions(context,
-                                                          "Are you sure you want to Save ToDo Details ?",
-                                                          negativeButtonTitle: "No",
-                                                          positiveButtonTitle: "Yes",
-                                                          onTapOfPositiveButton: () {
-                                                            Navigator.of(context).pop();
-
-                                                            _toDoBloc.add(ToDoSaveHeaderEvent(pkID, ToDoHeaderSaveRequest(Priority: edt_Priority.text,
-                                                                TaskDescription: edt_TaskDetails.text,Location: edt_Location.text,TaskCategoryID: edt_CategoryID.text,
-                                                                StartDate: edt_StartDateReverse.text + " "+ edt_StartTimewith24Hours.text ,DueDate: edt_DueDateReverse.text +" " +edt_DueTimeDatewith24Hours.text,
-                                                                CompletionDate: edt_CompletionDateReverse.text==null?"":edt_CompletionDateReverse.text,
-                                                                LoginUserID: LoginUserID,EmployeeID: edt_EmployeeID.text,Reminder: "",ReminderMonth: "",  Latitude: SharedPrefHelper.instance.getLatitude(),
-                                                                Longitude: SharedPrefHelper.instance.getLongitude(),ClosingRemarks: edt_CloserDetails.text==null?"":edt_CloserDetails.text,
-                                                                CompanyId: CompanyID.toString()
-
-                                                            )));
-                                                          });
-                                                    }
-
-
-                                                    showCommonDialogWithSingleOption(
-                                                      context, "Completion Date Should be greater than Start Date !",
+                                                else
+                                                {
+                                                  showCommonDialogWithSingleOption(
+                                                      context, "Completion Date is Required !",
                                                       positiveButtonTitle: "OK");
                                                 }
+
                                               }
-                                              else{
-
-
-                                                showCommonDialogWithTwoOptions(context,
-                                                    "Are you sure you want to Save ToDo Details ?",
-                                                    negativeButtonTitle: "No",
-                                                    positiveButtonTitle: "Yes",
-                                                    onTapOfPositiveButton: () {
-                                                      Navigator.of(context).pop();
-
-                                                      _toDoBloc.add(ToDoSaveHeaderEvent(pkID, ToDoHeaderSaveRequest(Priority: edt_Priority.text,
-                                                          TaskDescription: edt_TaskDetails.text,Location: edt_Location.text,TaskCategoryID: edt_CategoryID.text,
-                                                          StartDate: edt_StartDateReverse.text + " "+ edt_StartTimewith24Hours.text ,DueDate: edt_DueDateReverse.text +" " +edt_DueTimeDatewith24Hours.text,
-                                                          CompletionDate: edt_CompletionDateReverse.text==null?"":edt_CompletionDateReverse.text,
-                                                          LoginUserID: LoginUserID,EmployeeID: edt_EmployeeID.text,Reminder: "",ReminderMonth: "", Latitude: SharedPrefHelper.instance.getLatitude(),
-                                                          Longitude: SharedPrefHelper.instance.getLongitude(),ClosingRemarks: edt_CloserDetails.text==null?"":edt_CloserDetails.text,
-                                                          CompanyId: CompanyID.toString()
-
-                                                      )));
-                                                    });
+                                            else
+                                              {
+                                                showCommonDialogWithSingleOption(
+                                                    context, "Closing Remarks is Required !",
+                                                    positiveButtonTitle: "OK");
                                               }
 
-                                            }
-                                            else{
-                                             // print("DatesRemoveSymobles"+ " False : " +"SDate : " +SDate +" DDate : " +DDate );
-
-                                               if(SbrazilianDate.isAtSameMomentAs(DbrazilianDate))
-                                               {
-                                                 showCommonDialogWithTwoOptions(context,
-                                                     "Are you sure you want to Save ToDo Details ?",
-                                                     negativeButtonTitle: "No",
-                                                     positiveButtonTitle: "Yes",
-                                                     onTapOfPositiveButton: () {
-                                                       Navigator.of(context).pop();
-
-                                                       _toDoBloc.add(ToDoSaveHeaderEvent(pkID, ToDoHeaderSaveRequest(Priority: edt_Priority.text,
-                                                           TaskDescription: edt_TaskDetails.text,Location: edt_Location.text,TaskCategoryID: edt_CategoryID.text,
-                                                           StartDate: edt_StartDateReverse.text + " "+ edt_StartTimewith24Hours.text ,DueDate: edt_DueDateReverse.text +" " +edt_DueTimeDatewith24Hours.text,
-                                                           CompletionDate: edt_CompletionDateReverse.text==null?"":edt_CompletionDateReverse.text,
-                                                           LoginUserID: LoginUserID,EmployeeID: edt_EmployeeID.text,Reminder: "",ReminderMonth: "", Latitude: SharedPrefHelper.instance.getLatitude(),
-                                                           Longitude: SharedPrefHelper.instance.getLongitude(),ClosingRemarks: edt_CloserDetails.text==null?"":edt_CloserDetails.text,
-                                                           CompanyId: CompanyID.toString()
-
-                                                       )));
-                                                     });
-                                               }
-                                               else
-                                               {
-                                               showCommonDialogWithSingleOption(
-                                               context, "Due Date Should be greater than Start Date !",
-                                               positiveButtonTitle: "OK");
-                                               }
-
-
-
-                                            }
 
 
 
@@ -960,13 +1144,13 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
                                           positiveButtonTitle: "OK");
                                     }
 
-                                  }
-                                else{
+                               //   }
+                               /* else{
                                   showCommonDialogWithSingleOption(
                                       context, "Priority is Required !",
                                       positiveButtonTitle: "OK");
                                 }
-
+*/
                               }
                               else{
                                 showCommonDialogWithSingleOption(
@@ -1403,14 +1587,19 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
 
   Future<void> _selectCompletionDate(
       BuildContext context, TextEditingController F_datecontroller) async {
+
+    DateTime selectedDate = DateTime.now();
+
     final DateTime picked = await showDatePicker(
+        currentDate: SeletedCompletionDate,
         context: context,
         initialDate: selectedDate,
-        firstDate: DateTime(2015, 8),
-        lastDate: DateTime(2101));
+        firstDate:SeletedStartDate,
+        lastDate: selectedDate);
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
+        SeletedCompletionDate = picked;
         edt_CompletionDate.text = selectedDate.day.toString() +
             "-" +
             selectedDate.month.toString() +
@@ -2046,6 +2235,7 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
   Widget _buildDueDate() {
     return InkWell(
       onTap: () {
+
         _selectDueDate(context, edt_DueDate);
       },
       child: Column(
@@ -2166,6 +2356,7 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
     DateTime selectedDate = DateTime.now();
 
     final DateTime picked = await showDatePicker(
+        currentDate: SeletedStartDate,
         context: context,
         initialDate: selectedDate,
         firstDate:selectedDate,
@@ -2173,7 +2364,7 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
-
+        SeletedStartDate = picked;
 
         String AddZero = selectedDate.month <=9 ? "0"+selectedDate.month.toString() : selectedDate.month.toString();
 
@@ -2232,6 +2423,7 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
     DateTime selectedDate = DateTime.now();
 
     final DateTime picked = await showDatePicker(
+        currentDate: SeletedDueDate,
         context: context,
         initialDate: selectedDate,
         firstDate:selectedDate,
@@ -2239,6 +2431,7 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
+        SeletedDueDate = picked;
 
         String AddZero = selectedDate.month <=9 ? "0"+selectedDate.month.toString() : selectedDate.month.toString();
 
@@ -2353,41 +2546,227 @@ class _ToDoAddEditScreenScreenState extends BaseState<ToDoAddEditScreen>
     edt_Priority.text = editModel.priority;
     edt_EmployeeName.text = editModel.employeeName;
     edt_EmployeeID.text = editModel.employeeID.toString();
-    edt_StartDate.text = editModel.startDate
-        .getFormattedDate(
-        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
-    edt_StartDateReverse.text = editModel.startDate
-        .getFormattedDate(
-        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "yyyy-MM-dd");
-    edt_DueDate.text = editModel.dueDate
-        .getFormattedDate(
-        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
-    edt_DueDateReverse.text  =editModel.dueDate
-        .getFormattedDate(
-        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "yyyy-MM-dd");
+
+    if(editModel.startDate!="" && editModel.startDate !="1900-01-01T00:00:00")
+      {
+        SeletedStartDate = DateTime.parse(editModel.startDate);
+        edt_StartDate.text = editModel.startDate
+            .getFormattedDate(
+            fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
+        edt_StartDateReverse.text = editModel.startDate
+            .getFormattedDate(
+            fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "yyyy-MM-dd");
+        edt_StartTime.text= editModel.startDate
+            .getFormattedDate(
+            fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "h:mm a");
+        edt_StartTimewith24Hours.text = editModel.startDate
+            .getFormattedDate(
+            fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "H:mm a");
+      }
+    else
+      {
+        edt_StartDate.text = selectedDate.day.toString() +
+            "-" +
+            selectedDate.month.toString() +
+            "-" +
+            selectedDate.year.toString();
+        edt_StartDateReverse.text = selectedDate.year.toString() +
+            "-" +
+            selectedDate.month.toString() +
+            "-" +
+            selectedDate.day.toString();
+        TimeOfDay selectedTime = TimeOfDay.now();
+
+        String AM_PM = selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
+        String beforZeroHour = selectedTime.hourOfPeriod <= 9
+            ? "0" + selectedTime.hourOfPeriod.toString()
+            : selectedTime.hourOfPeriod.toString();
+        String beforZerominute = selectedTime.minute <= 9
+            ? "0" + selectedTime.minute.toString()
+            : selectedTime.minute.toString();
+        edt_StartTime.text = beforZeroHour +
+            ":" +
+            beforZerominute +
+            " " +
+            AM_PM;
+        edt_StartTimewith24Hours.text = selectedTime.hour.toString() + ":" + beforZerominute;
+      }
+
+
+    if(editModel.dueDate !="" || editModel.dueDate != "1900-01-01T00:00:00")
+      {
+        SeletedDueDate = DateTime.parse(editModel.dueDate);
+        edt_DueDate.text = editModel.dueDate
+            .getFormattedDate(
+            fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
+        edt_DueDateReverse.text  =editModel.dueDate
+            .getFormattedDate(
+            fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "yyyy-MM-dd");
+        edt_DueTime.text= editModel.dueDate
+            .getFormattedDate(
+            fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "h:mm a");
+        edt_DueTimeDatewith24Hours.text = editModel.dueDate
+            .getFormattedDate(
+            fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "H:mm a");
+      }
+    else
+      {
+
+        edt_DueDate.text = SeletedDueDate.day.toString() +
+            "-" +
+            SeletedDueDate.month.toString() +
+            "-" +
+            SeletedDueDate.year.toString();
+        edt_DueDateReverse.text = SeletedDueDate.year.toString() +
+            "-" +
+            SeletedDueDate.month.toString() +
+            "-" +
+            SeletedDueDate.day.toString();
+        TimeOfDay selectedTime = TimeOfDay.now();
+
+        String AM_PM = selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
+        String beforZeroHour = selectedTime.hourOfPeriod <= 9
+            ? "0" + selectedTime.hourOfPeriod.toString()
+            : selectedTime.hourOfPeriod.toString();
+        String beforZerominute = selectedTime.minute <= 9
+            ? "0" + selectedTime.minute.toString()
+            : selectedTime.minute.toString();
+
+        edt_DueTime.text = beforZeroHour +
+            ":" +
+            beforZerominute +
+            " " +
+            AM_PM;
+        edt_DueTimeDatewith24Hours.text = selectedTime.hour.toString() + ":" + beforZerominute;
+
+      }
+   //
+
 
    /* edt_StartTime.text = editModel.startDate
         .getFormattedDate(
         fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "HH:mm");*/
 
-    edt_StartTime.text= editModel.startDate
-        .getFormattedDate(
-        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "h:mm a");
 
-    edt_DueTime.text= editModel.dueDate
-        .getFormattedDate(
-        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "h:mm a");
 
-    edt_StartTimewith24Hours.text = editModel.startDate
-        .getFormattedDate(
-        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "H:mm a");
-    edt_DueTimeDatewith24Hours.text = editModel.dueDate
-        .getFormattedDate(
-        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "H:mm a");
+
+
+
+
+
+    if(editModel.completionDate != "1900-01-01T00:00:00" && editModel.completionDate!="")
+      {
+        edt_CompletionDate.text = editModel.completionDate
+            .getFormattedDate(
+            fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
+        edt_CompletionDateReverse.text = editModel.completionDate
+            .getFormattedDate(
+            fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "yyyy-MM-dd");
+
+
+        SeletedCompletionDate= DateTime.parse(editModel.completionDate);
+
+
+      }
+    else
+      {
+        edt_CompletionDate.text = "";
+        edt_CompletionDateReverse.text = "";
+      }
+
+  // SeletedStartDate = DateTime.parse(editModel.startDate);
+
+ //  SeletedDueDate = DateTime.parse(editModel.dueDate);
 
 
     edt_CloserDetails.text = editModel.closingRemarks;
+
+    edt_Location.text = editModel.location;
+
+    ISCHECKED = editModel.reminder;
   }
+
+
+  Widget _buildSearchView() {
+    return InkWell(
+      onTap: () {
+        _onTapOfSearchView();
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            margin: EdgeInsets.only(left: 10, right: 10),
+            child: Text("Search Customer ",
+                style: TextStyle(
+                    fontSize: 12,
+                    color: colorPrimary,
+                    fontWeight: FontWeight
+                        .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+            ),
+          ),
+          SizedBox(
+            height: 5,
+          ),
+          Card(
+            elevation: 5,
+            color: colorLightGray,
+            shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Container(
+              height: 60,
+              padding: EdgeInsets.only(left: 20, right: 20),
+              width: double.maxFinite,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                        controller: edt_CustomerName,
+                        enabled: false,
+                        decoration: InputDecoration(
+                          hintText: "Tap to search customer",
+                          labelStyle: TextStyle(
+                            color: Color(0xFF000000),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Color(0xFF000000),
+                        ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                    ),
+                  ),
+                  Icon(
+                    Icons.search,
+                    color: colorGrayDark,
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> _onTapOfSearchView() async {
+    if (_isForUpdate == false) {
+      navigateTo(context, SearchTODOCustomerScreen.routeName).then((value) {
+        if (value != null) {
+          _searchDetails = value;
+          edt_CustomerpkID.text = _searchDetails.value.toString();
+          edt_CustomerName.text = _searchDetails.label.toString();
+
+
+        }
+
+      });
+    }
+  }
+
+
 }
 /* if(edt_TransferTo.text =="Complete Task")
     {

@@ -7,7 +7,6 @@ import 'package:soleoserp/blocs/other/bloc_modules/complaint/complaint_bloc.dart
 import 'package:soleoserp/models/api_requests/complaint_delete_request.dart';
 import 'package:soleoserp/models/api_requests/complaint_list_request.dart';
 import 'package:soleoserp/models/api_requests/complaint_search_by_Id_request.dart';
-import 'package:soleoserp/models/api_responses/bank_voucher_search_by_name_response.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/complaint_list_response.dart';
 import 'package:soleoserp/models/api_responses/complaint_search_response.dart';
@@ -23,10 +22,6 @@ import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/general_utils.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
 
-
-
-
-
 class ComplaintPaginationListScreen extends BaseStatefulWidget {
   static const routeName = '/ComplaintPaginationListScreen';
 
@@ -34,14 +29,14 @@ class ComplaintPaginationListScreen extends BaseStatefulWidget {
   _ComplaintPaginationListScreenState createState() =>
       _ComplaintPaginationListScreenState();
 }
+
 /*class JosKeys {
   static final cardA = GlobalKey<ExpansionTileCardState>();
   static final refreshKey  = GlobalKey<RefreshIndicatorState>();
 }*/
 class _ComplaintPaginationListScreenState
     extends BaseState<ComplaintPaginationListScreen>
-    with BasicScreen, WidgetsBindingObserver ,SingleTickerProviderStateMixin {
-
+    with BasicScreen, WidgetsBindingObserver, SingleTickerProviderStateMixin {
   ComplaintScreenBloc _complaintScreenBloc;
   CompanyDetailsResponse _offlineCompanyData;
   LoginUserDetialsResponse _offlineLoggedInData;
@@ -66,7 +61,6 @@ class _ComplaintPaginationListScreenState
     CompanyID = _offlineCompanyData.details[0].pkId;
     LoginUserID = _offlineLoggedInData.details[0].userID;
     _complaintScreenBloc = ComplaintScreenBloc(baseBloc);
-
   }
 
   ///listener to multiple states of bloc to handles api responses
@@ -92,7 +86,10 @@ class _ComplaintPaginationListScreenState
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (BuildContext context) => _complaintScreenBloc
-          ..add(ComplaintListCallEvent(1,ComplaintListRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID))),
+        ..add(ComplaintListCallEvent(
+            1,
+            ComplaintListRequest(
+                CompanyId: CompanyID.toString(), LoginUserID: LoginUserID))),
       child: BlocConsumer<ComplaintScreenBloc, ComplaintScreenStates>(
         builder: (BuildContext context, ComplaintScreenStates state) {
           //handle states
@@ -106,7 +103,8 @@ class _ComplaintPaginationListScreenState
         },
         buildWhen: (oldState, currentState) {
           //return true for state for which builder method should be called
-          if (currentState is ComplaintListResponseState || currentState is ComplaintSearchByIDResponseState) {
+          if (currentState is ComplaintListResponseState ||
+              currentState is ComplaintSearchByIDResponseState) {
             return true;
           }
           return false;
@@ -131,14 +129,13 @@ class _ComplaintPaginationListScreenState
 
   @override
   Widget buildBody(BuildContext context) {
-
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
         appBar: NewGradientAppBar(
           title: Text('Complaint List'),
           gradient:
-          LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
+              LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
           actions: <Widget>[
             IconButton(
                 icon: Icon(
@@ -158,7 +155,11 @@ class _ComplaintPaginationListScreenState
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    _complaintScreenBloc.add(ComplaintListCallEvent(1,ComplaintListRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID)));
+                    _complaintScreenBloc.add(ComplaintListCallEvent(
+                        1,
+                        ComplaintListRequest(
+                            CompanyId: CompanyID.toString(),
+                            LoginUserID: LoginUserID)));
                   },
                   child: Container(
                     padding: EdgeInsets.only(
@@ -192,11 +193,8 @@ class _ComplaintPaginationListScreenState
     );
   }
 
-
-
   Future<bool> _onBackPressed() {
-    navigateTo(context, HomeScreen.routeName,clearAllStack: true);
-
+    navigateTo(context, HomeScreen.routeName, clearAllStack: true);
   }
 
   void _onGetListCallSuccess(ComplaintListResponseState state) {
@@ -207,14 +205,14 @@ class _ComplaintPaginationListScreenState
       //checking if new data is arrived
       if (state.newPage == 1) {
         //resetting search
-       // _searchDetails = null;
+        // _searchDetails = null;
         _inquiryListResponse = state.complaintListResponse;
       } else {
-        _inquiryListResponse.details.addAll(state.complaintListResponse.details);
+        _inquiryListResponse.details
+            .addAll(state.complaintListResponse.details);
       }
       _pageNo = state.newPage;
     }
-
   }
 
   Widget _buildSearchView() {
@@ -234,7 +232,7 @@ class _ComplaintPaginationListScreenState
                     fontWeight: FontWeight
                         .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-            ),
+                ),
           ),
           SizedBox(
             height: 5,
@@ -243,7 +241,7 @@ class _ComplaintPaginationListScreenState
             elevation: 5,
             color: Color(0xffE0E0E0),
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             child: Container(
               height: 60,
               padding: EdgeInsets.only(left: 20, right: 20),
@@ -279,15 +277,13 @@ class _ComplaintPaginationListScreenState
     navigateTo(context, SearchComplaintScreen.routeName).then((value) {
       if (value != null) {
         _searchDetails = value;
-        _complaintScreenBloc.add(ComplaintSearchByIDCallEvent(_searchDetails.pkID,
+        _complaintScreenBloc.add(ComplaintSearchByIDCallEvent(
+            _searchDetails.pkID,
             ComplaintSearchByIDRequest(
-                CompanyId: CompanyID.toString(),
-                LoginUserID: LoginUserID)));
-
+                CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
       }
     });
   }
-
 
   Widget _buildInquiryList() {
     if (_inquiryListResponse == null) {
@@ -296,8 +292,8 @@ class _ComplaintPaginationListScreenState
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
         if (shouldPaginate(
-          scrollInfo,
-        ) &&
+              scrollInfo,
+            ) &&
             _searchDetails == null) {
           _onInquiryListPagination();
           return true;
@@ -322,7 +318,10 @@ class _ComplaintPaginationListScreenState
   }
 
   void _onInquiryListPagination() {
-    _complaintScreenBloc.add(ComplaintListCallEvent(_pageNo + 1,ComplaintListRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID)));
+    _complaintScreenBloc.add(ComplaintListCallEvent(
+        _pageNo + 1,
+        ComplaintListRequest(
+            CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
   }
 
   ExpantionCustomer(BuildContext context, int index) {
@@ -340,8 +339,7 @@ class _ComplaintPaginationListScreenState
           expandedColor: Color(0xFFC1E0FA),
           leading: CircleAvatar(
               backgroundColor: Color(0xFF504F4F),
-              child: Image
-                  .network(
+              child: Image.network(
                 "http://demo.sharvayainfotech.in/images/profile.png",
                 height: 35,
                 fit: BoxFit.fill,
@@ -352,7 +350,6 @@ class _ComplaintPaginationListScreenState
             style: TextStyle(color: Colors.black),
           ),
           subtitle: GestureDetector(
-
             child: Text(
               model.complaintNo,
               style: TextStyle(
@@ -366,295 +363,272 @@ class _ComplaintPaginationListScreenState
               thickness: 1.0,
               height: 1.0,
             ),
-
             Container(
                 margin: EdgeInsets.all(20),
-
                 child: Container(
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-
-
-                        Expanded(
-                          flex: 1,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Expanded(
+                      flex: 1,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Complaint Notes ",
-                                                style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model.complaintNotes == ""
-                                                    ? "N/A"
-                                                    : model.complaintNotes,
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-                                  ]),
-                              SizedBox(
-                                height: sizeboxsize,
-                              ),
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Ref.#",
-                                                style: TextStyle(
-                                                    fontStyle:
-                                                    FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model
-                                                    .referenceNo ==
-                                                    null
-                                                    ? "N/A"
-                                                    : model.referenceNo,
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-                                  ]),
-                              SizedBox(
-                                height: sizeboxsize,
-                              ),
-
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Assign From",
-                                                style: TextStyle(
-                                                    fontStyle:
-                                                    FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model
-                                                    .createdBy ==
-                                                    null
-                                                    ? "N/A"
-                                                    : model.createdBy,
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Assign To",
-                                                style: TextStyle(
-                                                    fontStyle:
-                                                    FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model
-                                                    .employeeName ==
-                                                    null
-                                                    ? "N/A"
-                                                    : model.employeeName,
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-                                  ]),
-                              SizedBox(
-                                height: sizeboxsize,
-                              ),
-
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Status",
-                                                style: TextStyle(
-                                                    fontStyle:
-                                                    FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model
-                                                    .complaintStatus ==
-                                                    null
-                                                    ? "N/A"
-                                                    : model.complaintStatus,
-                                                style: TextStyle(
-                                                    color:  model
-                                                        .complaintStatus == "Open"?colorGreenDark : colorRedDark,
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Sch.Time",
-                                                style: TextStyle(
-                                                    fontStyle:
-                                                    FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                               model.timeFrom +" - "+ model.timeTo ,
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-
-                                  ]),
-                              SizedBox(
-                                height: sizeboxsize,
-                              ),
-
-                              Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Schedule Date",
-                                                style: TextStyle(
-                                                    fontStyle:
-                                                    FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model
-                                                    .preferredDate ==
-                                                    null
-                                                    ? "N/A"
-                                                    : model.preferredDate.getFormattedDate(
-                                                    fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                                    toFormat: "dd-MM-yyyy") ??
-                                                    "-",
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-
-                                    Expanded(
-                                        flex: 1,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: <Widget>[
-                                            Text("Complaint Date",
-                                                style: TextStyle(
-                                                    fontStyle:
-                                                    FontStyle.italic,
-                                                    color: Color(label_color),
-                                                    fontSize: _fontSize_Label,
-                                                    letterSpacing: .3)),
-                                            SizedBox(
-                                              width: 5,
-                                            ),
-                                            Text(
-                                                model
-                                                    .complaintDate ==
-                                                    null
-                                                    ? "N/A"
-                                                    : model.complaintDate.getFormattedDate(
-                                                    fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                                    toFormat: "dd-MM-yyyy") ??
-                                                    "-",
-                                                style: TextStyle(
-                                                    color: Color(title_color),
-                                                    fontSize: _fontSize_Title,
-                                                    letterSpacing: .3)),
-                                          ],
-                                        )),
-                                  ]),
-                              SizedBox(
-                                height: sizeboxsize,
-                              ),
-                            ],
+                                      children: <Widget>[
+                                        Text("Complaint Notes ",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                            model.complaintNotes == ""
+                                                ? "N/A"
+                                                : model.complaintNotes,
+                                            style: TextStyle(
+                                                color: Color(title_color),
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
+                                      ],
+                                    )),
+                              ]),
+                          SizedBox(
+                            height: sizeboxsize,
                           ),
-                        ),
-                      ],
-                    ))),
-
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text("Ref.#",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                            model.referenceNo == null
+                                                ? "N/A"
+                                                : model.referenceNo,
+                                            style: TextStyle(
+                                                color: Color(title_color),
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
+                                      ],
+                                    )),
+                              ]),
+                          SizedBox(
+                            height: sizeboxsize,
+                          ),
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text("Assign From",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                            model.createdBy == null
+                                                ? "N/A"
+                                                : model.createdBy,
+                                            style: TextStyle(
+                                                color: Color(title_color),
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
+                                      ],
+                                    )),
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text("Assign To",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                            model.employeeName == null
+                                                ? "N/A"
+                                                : model.employeeName,
+                                            style: TextStyle(
+                                                color: Color(title_color),
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
+                                      ],
+                                    )),
+                              ]),
+                          SizedBox(
+                            height: sizeboxsize,
+                          ),
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text("Status",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                            model.complaintStatus == null
+                                                ? "N/A"
+                                                : model.complaintStatus,
+                                            style: TextStyle(
+                                                color: model.complaintStatus ==
+                                                        "Open"
+                                                    ? colorGreenDark
+                                                    : colorRedDark,
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
+                                      ],
+                                    )),
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text("Sch.Time",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                            model.timeFrom +
+                                                " - " +
+                                                model.timeTo,
+                                            style: TextStyle(
+                                                color: Color(title_color),
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
+                                      ],
+                                    )),
+                              ]),
+                          SizedBox(
+                            height: sizeboxsize,
+                          ),
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text("Schedule Date",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                            model.preferredDate == null
+                                                ? "N/A"
+                                                : model.preferredDate
+                                                        .getFormattedDate(
+                                                            fromFormat:
+                                                                "yyyy-MM-ddTHH:mm:ss",
+                                                            toFormat:
+                                                                "dd-MM-yyyy") ??
+                                                    "-",
+                                            style: TextStyle(
+                                                color: Color(title_color),
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
+                                      ],
+                                    )),
+                                Expanded(
+                                    flex: 1,
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text("Complaint Date",
+                                            style: TextStyle(
+                                                fontStyle: FontStyle.italic,
+                                                color: Color(label_color),
+                                                fontSize: _fontSize_Label,
+                                                letterSpacing: .3)),
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Text(
+                                            model.complaintDate == null
+                                                ? "N/A"
+                                                : model.complaintDate
+                                                        .getFormattedDate(
+                                                            fromFormat:
+                                                                "yyyy-MM-ddTHH:mm:ss",
+                                                            toFormat:
+                                                                "dd-MM-yyyy") ??
+                                                    "-",
+                                            style: TextStyle(
+                                                color: Color(title_color),
+                                                fontSize: _fontSize_Title,
+                                                letterSpacing: .3)),
+                                      ],
+                                    )),
+                              ]),
+                          SizedBox(
+                            height: sizeboxsize,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ))),
             ButtonBar(
                 alignment: MainAxisAlignment.center,
                 buttonHeight: 52.0,
@@ -682,32 +656,30 @@ class _ComplaintPaginationListScreenState
                       ],
                     ),
                   ),
-
                   isDeleteVisible == true
-                      ?  FlatButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(4.0)),
-                    onPressed: () {
-                      _onTapOfDeleteInquiry(model.pkID);
-                    },
-                    child: Column(
-                      children: <Widget>[
-                        Icon(
-                          Icons.delete,
-                          color: colorPrimary,
-                        ),
-                        Padding(
-                          padding:
-                          const EdgeInsets.symmetric(vertical: 2.0),
-                        ),
-                        Text(
-                          'Delete',
-                          style: TextStyle(color: colorPrimary),
-                        ),
-                      ],
-                    ),
-                  )
-
+                      ? FlatButton(
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0)),
+                          onPressed: () {
+                            _onTapOfDeleteInquiry(model.pkID);
+                          },
+                          child: Column(
+                            children: <Widget>[
+                              Icon(
+                                Icons.delete,
+                                color: colorPrimary,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 2.0),
+                              ),
+                              Text(
+                                'Delete',
+                                style: TextStyle(color: colorPrimary),
+                              ),
+                            ],
+                          ),
+                        )
                       : Container(),
                 ]),
           ],
@@ -719,30 +691,34 @@ class _ComplaintPaginationListScreenState
         state.complaintDeleteResponse.details[0].column1.toString() +
         "");
     //baseBloc.refreshScreen();
-    navigateTo(context, ComplaintPaginationListScreen.routeName, clearAllStack: true);
+    navigateTo(context, ComplaintPaginationListScreen.routeName,
+        clearAllStack: true);
   }
 
   void _onTapOfDeleteInquiry(int pkID) {
-
-    _complaintScreenBloc.add(ComplaintDeleteCallEvent(pkID, ComplaintDeleteRequest(CompanyId: CompanyID.toString())));
-  }
-
-  void _onSearchByIDCallSuccess(ComplaintSearchByIDResponseState state) {
-
-    _inquiryListResponse = state.complaintSearchByIDResponse;
-
-  }
-
-  void _onTapOfEditCustomer(ComplaintDetails detail) {
-
-    navigateTo(context, ComplaintAddEditScreen.routeName,
-
-        arguments: AddUpdateComplaintScreenArguments(detail))
-        .then((value) {
-      //_leaveRequestScreenBloc.add(LeaveRequestCallEvent(1,LeaveRequestListAPIRequest(EmployeeID: edt_FollowupEmployeeUserID.text,ApprovalStatus:edt_FollowupStatus.text,Month: "",Year: "",CompanyId: CompanyID )));
-      _complaintScreenBloc.add(ComplaintListCallEvent(1,ComplaintListRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID)));
-
+    showCommonDialogWithTwoOptions(
+        context, "Are you sure you want to Delete Complaint Details ?",
+        negativeButtonTitle: "No",
+        positiveButtonTitle: "Yes", onTapOfPositiveButton: () {
+      Navigator.of(context).pop();
+      _complaintScreenBloc.add(ComplaintDeleteCallEvent(
+          pkID, ComplaintDeleteRequest(CompanyId: CompanyID.toString())));
     });
   }
 
+  void _onSearchByIDCallSuccess(ComplaintSearchByIDResponseState state) {
+    _inquiryListResponse = state.complaintSearchByIDResponse;
+  }
+
+  void _onTapOfEditCustomer(ComplaintDetails detail) {
+    navigateTo(context, ComplaintAddEditScreen.routeName,
+            arguments: AddUpdateComplaintScreenArguments(detail))
+        .then((value) {
+      //_leaveRequestScreenBloc.add(LeaveRequestCallEvent(1,LeaveRequestListAPIRequest(EmployeeID: edt_FollowupEmployeeUserID.text,ApprovalStatus:edt_FollowupStatus.text,Month: "",Year: "",CompanyId: CompanyID )));
+      _complaintScreenBloc.add(ComplaintListCallEvent(
+          1,
+          ComplaintListRequest(
+              CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
+    });
+  }
 }

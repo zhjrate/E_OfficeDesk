@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/todo/todo_bloc.dart';
+import 'package:soleoserp/models/api_requests/ToDo_request/to_do_delete_request.dart';
 import 'package:soleoserp/models/api_requests/to_do_header_save_request.dart';
 import 'package:soleoserp/models/api_requests/todo_list_request.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
@@ -136,10 +137,15 @@ class _ToDoListScreenState extends BaseState<ToDoListScreen>
           if (state is ToDoSaveHeaderState) {
             _OnSaveToDoHeaderResponse(state);
           }
+
+          if (state is ToDoDeleteResponseState) {
+            _OnDeleteTodoResponse(state);
+          }
           return super.build(context);
         },
         listenWhen: (oldState, currentState) {
-          if (currentState is ToDoSaveHeaderState) {
+          if (currentState is ToDoSaveHeaderState ||
+              currentState is ToDoDeleteResponseState) {
             return true;
           }
           return false;
@@ -150,6 +156,7 @@ class _ToDoListScreenState extends BaseState<ToDoListScreen>
 
   @override
   Widget buildBody(BuildContext context) {
+    getcurrentTimeInfoFromMain(context);
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
@@ -759,6 +766,15 @@ class _ToDoListScreenState extends BaseState<ToDoListScreen>
                   onPressed: () {
                     //  cardA.currentState?.collapse();
                     //new ExpansionTileCardState().collapse();
+
+                    showCommonDialogWithTwoOptions(context,
+                        "Are you sure you want to Delete This Details ?",
+                        negativeButtonTitle: "No",
+                        positiveButtonTitle: "Yes", onTapOfPositiveButton: () {
+                      Navigator.of(context).pop();
+                      _ToDoBloc.add(ToDoDeleteEvent(model.pkID,
+                          ToDoDeleteRequest(CompanyId: CompanyID.toString())));
+                    });
                   },
                   child: Column(
                     children: <Widget>[
@@ -1161,5 +1177,19 @@ class _ToDoListScreenState extends BaseState<ToDoListScreen>
           PageSize: 10000)));
       Navigator.pop(context);
     });
+  }
+
+  void _OnDeleteTodoResponse(ToDoDeleteResponseState state) {
+    print("DeleteAPIResponse" +
+        "DeleteMsg : " +
+        state.toDoDeleteResponse.details[0].column1);
+
+    _ToDoBloc.add(ToDoListCallEvent(ToDoListApiRequest(
+        CompanyId: CompanyID.toString(),
+        LoginUserID: edt_EmployeeUserName.text,
+        TaskStatus: edt_FollowupStatus.text,
+        EmployeeID: edt_FollowupEmployeeUserID.text,
+        PageNo: 1,
+        PageSize: 10000)));
   }
 }

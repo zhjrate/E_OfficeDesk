@@ -20,6 +20,7 @@ import 'package:soleoserp/models/api_responses/search_salesorder_list_response.d
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/dimen_resources.dart';
 import 'package:soleoserp/ui/res/image_resources.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/SaleOrder_manan_design/sales_order_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/search_salesorder_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
@@ -47,15 +48,15 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
   double sizeboxsize = 12;
   double _fontSize_Label = 9;
   double _fontSize_Title = 11;
-  int label_color = 0xFF504F4F;//0x66666666;
+  int label_color = 0xFF504F4F; //0x66666666;
   int title_color = 0xFF000000;
   SearchDetails _searchDetails;
   int CompanyID = 0;
   String LoginUserID = "";
   CompanyDetailsResponse _offlineCompanyData;
   LoginUserDetialsResponse _offlineLoggedInData;
-  String SiteURL="";
-  String Password="";
+  String SiteURL = "";
+  String Password = "";
   InAppWebViewController webViewController;
   InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
       crossPlatform: InAppWebViewOptions(
@@ -73,7 +74,7 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
   ContextMenu contextMenu;
   final urlController = TextEditingController();
   String url = "";
-  bool isLoading=true;
+  bool isLoading = true;
   int prgresss = 0;
   double progress = 0;
 
@@ -131,17 +132,19 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
     CompanyID = _offlineCompanyData.details[0].pkId;
     LoginUserID = _offlineLoggedInData.details[0].userID;
     SiteURL = _offlineCompanyData.details[0].siteURL;
-    Password= _offlineLoggedInData.details[0].userPassword;
+    Password = _offlineLoggedInData.details[0].userPassword;
     _SalesOrderBloc = SalesOrderBloc(baseBloc);
     baseBloc.emit(ShowProgressIndicatorState(true));
-
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (BuildContext context) =>
-      _SalesOrderBloc..add(SalesOrderListCallEvent(_pageNo + 1,SalesOrderListApiRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID))),
+      create: (BuildContext context) => _SalesOrderBloc
+        ..add(SalesOrderListCallEvent(
+            _pageNo + 1,
+            SalesOrderListApiRequest(
+                CompanyId: CompanyID.toString(), LoginUserID: LoginUserID))),
       child: BlocConsumer<SalesOrderBloc, SalesOrderStates>(
         builder: (BuildContext context, SalesOrderStates state) {
           if (state is SalesOrderListCallResponseState) {
@@ -160,11 +163,9 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
           return false;
         },
         listener: (BuildContext context, SalesOrderStates state) {
-
           if (state is SalesOrderPDFGenerateResponseState) {
             _onGenerateQuotationPDFCallSuccess(state);
           }
-
         },
         listenWhen: (oldState, currentState) {
           if (currentState is SalesOrderPDFGenerateResponseState) {
@@ -182,10 +183,10 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
-        appBar:NewGradientAppBar(
+        appBar: NewGradientAppBar(
           title: Text('SalesOrder List'),
           gradient:
-          LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
+              LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
           actions: <Widget>[
             IconButton(
                 icon: Icon(
@@ -202,11 +203,14 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
         body: Container(
           child: Column(
             children: [
-
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    _SalesOrderBloc.add(SalesOrderListCallEvent(1,SalesOrderListApiRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID)));
+                    _SalesOrderBloc.add(SalesOrderListCallEvent(
+                        1,
+                        SalesOrderListApiRequest(
+                            CompanyId: CompanyID.toString(),
+                            LoginUserID: LoginUserID)));
                   },
                   child: Container(
                     padding: EdgeInsets.only(
@@ -223,7 +227,6 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
                   ),
                 ),
               ),
-
             ],
           ),
         ),
@@ -231,6 +234,7 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
           onPressed: () {
             // Add your onPressed code here!
 
+            navigateTo(context, SaleOrderNewAddEditScreen.routeName);
           },
           child: const Icon(Icons.add),
           backgroundColor: colorPrimary,
@@ -239,7 +243,6 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
             context: context, UserName: "KISHAN", RolCode: LoginUserID),
       ),
     );
-
 
     return Column(
       children: [
@@ -272,12 +275,14 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          Text("Search SalesOrder",
+              style: TextStyle(
+                  fontSize: 12,
+                  color: Color(0xFF000000),
+                  fontWeight: FontWeight
+                      .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-              "Search SalesOrder",
-              style:TextStyle(fontSize: 12,color: Color(0xFF000000),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-
-          ),
+              ),
           SizedBox(
             height: 5,
           ),
@@ -285,7 +290,7 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
             elevation: 5,
             color: colorLightGray,
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
               height: 60,
               padding: EdgeInsets.only(left: 20, right: 20),
@@ -324,8 +329,8 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
     return NotificationListener<ScrollNotification>(
       onNotification: (scrollInfo) {
         if (shouldPaginate(
-          scrollInfo,
-        ) &&
+              scrollInfo,
+            ) &&
             _searchDetails == null) {
           _onInquiryListPagination();
           return true;
@@ -345,8 +350,7 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
 
   ///builds row item view of inquiry list
   Widget _buildInquiryListItem(int index) {
-    return ExpantionCustomer(context,index);
-
+    return ExpantionCustomer(context, index);
   }
 
   ///builds inquiry row items title and value's common view
@@ -354,28 +358,36 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-            title,
-            style:TextStyle(fontSize: _fontSize_Label,color: Color(0xFF504F4F),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        ),
+        Text(title,
+            style: TextStyle(
+                fontSize: _fontSize_Label,
+                color: Color(0xFF504F4F),
+                fontWeight: FontWeight
+                    .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            ),
         SizedBox(
           height: 3,
         ),
-        Text(
-            value,
-            style:TextStyle(fontSize: _fontSize_Title,color: colorPrimary)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        )
+        Text(value,
+            style: TextStyle(
+                fontSize: _fontSize_Title,
+                color:
+                    colorPrimary) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            )
       ],
     );
   }
+
   Widget _buildLabelWithValueView(String title, String value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-            title,
-            style:TextStyle(fontSize: 12,color: Color(0xff030303))// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        ),
+        Text(title,
+            style: TextStyle(
+                fontSize: 12,
+                color: Color(
+                    0xff030303)) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            ),
         SizedBox(
           height: 5,
         ),
@@ -405,8 +417,12 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
   ///checks if already all records are arrive or not
   ///calls api with new page
   void _onInquiryListPagination() {
-    if (_SalesOrderListResponse.details.length < _SalesOrderListResponse.totalCount) {
-      _SalesOrderBloc.add(SalesOrderListCallEvent(_pageNo + 1,SalesOrderListApiRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID)));
+    if (_SalesOrderListResponse.details.length <
+        _SalesOrderListResponse.totalCount) {
+      _SalesOrderBloc.add(SalesOrderListCallEvent(
+          _pageNo + 1,
+          SalesOrderListApiRequest(
+              CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
     }
   }
 
@@ -415,22 +431,25 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
 
     return Container(
       padding: EdgeInsets.all(15),
-      child :  ExpansionTileCard(
-
+      child: ExpansionTileCard(
         initialElevation: 5.0,
         elevation: 5.0,
         elevationCurve: Curves.easeInOut,
         shadowColor: Color(0xFF504F4F),
         baseColor: Color(0xFFFCFCFC),
-        expandedColor: Color(0xFFC1E0FA),//Colors.deepOrange[50],ADD8E6
+        expandedColor: Color(0xFFC1E0FA), //Colors.deepOrange[50],ADD8E6
         leading: CircleAvatar(
-
             backgroundColor: Color(0xFF504F4F),
-            child: /*Image.asset(IC_USERNAME,height: 25,width: 25,)*/Image
-                .network("http://demo.sharvayainfotech.in/images/profile.png",
-              height: 35, fit: BoxFit.fill, width: 35,)),             /* title: Text("Customer",style:TextStyle(fontSize: 12,color: Color(0xFF504F4F),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            child: /*Image.asset(IC_USERNAME,height: 25,width: 25,)*/ Image
+                .network(
+              "http://demo.sharvayainfotech.in/images/profile.png",
+              height: 35,
+              fit: BoxFit.fill,
+              width: 35,
+            )),
+        /* title: Text("Customer",style:TextStyle(fontSize: 12,color: Color(0xFF504F4F),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
       ),*/
-      /*  title: Row(
+        /*  title: Row(
             children:<Widget>[
               Expanded(
                 child: Text(model.customerName,style: TextStyle(
@@ -442,13 +461,17 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
               ),),)
             ]
         ),*/
-        title: Text(model.customerName,style: TextStyle(
-            color: Colors.black
-        ),),
-        subtitle: Text(model.orderNo,style: TextStyle(
-          color: Color(0xFF504F4F),
-          fontSize: _fontSize_Title,
-        ),),
+        title: Text(
+          model.customerName,
+          style: TextStyle(color: Colors.black),
+        ),
+        subtitle: Text(
+          model.orderNo,
+          style: TextStyle(
+            color: Color(0xFF504F4F),
+            fontSize: _fontSize_Title,
+          ),
+        ),
         children: <Widget>[
           Divider(
             thickness: 1.0,
@@ -461,81 +484,72 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
                 horizontal: 16.0,
                 vertical: 8.0,
               ),
-
-
               child: Container(
-                padding: EdgeInsets.only(left: 10, right: 10, top: 25, bottom: 25),
+                padding:
+                    EdgeInsets.only(left: 10, right: 10, top: 25, bottom: 25),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: _buildTitleWithValueView(
+                                "Order Date",
+                                model.orderDate.getFormattedDate(
+                                        fromFormat: "yyyy-MM-ddTHH:mm:ss",
+                                        toFormat: "dd/MM/yyyy") ??
+                                    "-"),
+                          ),
+                          Expanded(
+                            child: _buildTitleWithValueView(
+                                "Order #", model.orderNo ?? "-"),
+                          ),
+                          Row(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: <Widget>[
+                                GestureDetector(
+                                  onTap: () async {
+                                    await _showMyDialog(model);
 
-                      Expanded(
-                        child: _buildTitleWithValueView(
-                            "Order Date",
-                            model.orderDate.getFormattedDate(
-                                fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                toFormat: "dd/MM/yyyy") ??
-                                "-"),
-                      ),
-
-                      Expanded(
-                        child: _buildTitleWithValueView(
-                            "Order #", model.orderNo ?? "-"),
-                      ),
-                      Row(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.end,
-                          children: <Widget>[
-                            GestureDetector(
-                              onTap: () async {
-
-                                await _showMyDialog(model);
-
-                                /* var progesCount23;
+                                    /* var progesCount23;
                                webViewController.getProgress().whenComplete(() async =>  {
                                  progesCount23 = await webViewController.getProgress(),
                                  print("PAgeLoaded" + progesCount23.toString())
                                });*/
 
-                                /*  await _makePhoneCall(
+                                    /*  await _makePhoneCall(
                                         model.contactNo1);*/
 
-                                // baseBloc.emit(ShowProgressIndicatorState(true));
-                                /* setState(() {
+                                    // baseBloc.emit(ShowProgressIndicatorState(true));
+                                    /* setState(() {
                                   urlRequest = URLRequest(url: Uri.parse(SiteURL+"/Quotation.aspx?MobilePdf=yes&userid="+LoginUserID+"&password="+Password+"&pQuotID="+model.pkID.toString()));
 
 
                                 });*/
 
-
-                                // await Future.delayed(const Duration(milliseconds: 500), (){});
-                                // baseBloc.emit(ShowProgressIndicatorState(false));
-                                //_QuotationBloc.add(QuotationPDFGenerateCallEvent(QuotationPDFGenerateRequest(CompanyId: CompanyID.toString(),QuotationNo: model.quotationNo)));
-
-                              },
-                              child: Container(
-
-                                child: Image.asset(
-                                  PDF_ICON,
-                                  width: 48,
-                                  height: 48,
+                                    // await Future.delayed(const Duration(milliseconds: 500), (){});
+                                    // baseBloc.emit(ShowProgressIndicatorState(false));
+                                    //_QuotationBloc.add(QuotationPDFGenerateCallEvent(QuotationPDFGenerateRequest(CompanyId: CompanyID.toString(),QuotationNo: model.quotationNo)));
+                                  },
+                                  child: Container(
+                                    child: Image.asset(
+                                      PDF_ICON,
+                                      width: 48,
+                                      height: 48,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-
-                          ])
-                    ]),
-
+                              ])
+                        ]),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
                     Row(children: [
                       Expanded(
                         child: _buildTitleWithValueView(
-                            "Quot.#", model.quotationNo??"-"),
+                            "Quot.#", model.quotationNo ?? "-"),
                       ),
-
                     ]),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
@@ -543,7 +557,7 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
                     Row(children: [
                       Expanded(
                         child: _buildTitleWithValueView(
-                            "Lead.#", model.inquiryNo??"-"),
+                            "Lead.#", model.inquiryNo ?? "-"),
                       ),
                       Expanded(
                         child: _buildTitleWithValueView(
@@ -554,23 +568,27 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
                     _buildTitleWithValueView(
-                        "Project Name", /*model.referenceName ?? "-" */ model.projectName == "" || model.projectName == null ? '-' : model.projectName),
+                        "Project Name",
+                        /*model.referenceName ?? "-" */ model.projectName ==
+                                    "" ||
+                                model.projectName == null
+                            ? '-'
+                            : model.projectName),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
-
                     Row(children: [
                       Expanded(
-                        child: _buildTitleWithValueView("Order Amount.", model.orderAmount.toString() ?? "-"),
+                        child: _buildTitleWithValueView("Order Amount.",
+                            model.orderAmount.toString() ?? "-"),
                       ),
-                     /* Expanded(
+                      /* Expanded(
                         child: _buildTitleWithValueView("NetAmt.", model.netAmt.toString() ?? "-"),
                       ),*/
                     ]),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
-
                     _buildTitleWithValueView("Sales Exec.", model.createdBy),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
@@ -594,8 +612,6 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
                   ],
                 ),
               ),
-
-
             ),
           ),
           ButtonBar(
@@ -606,22 +622,24 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
                 FlatButton(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0)),
-                  onPressed: () {
-
-
-                  },
+                  onPressed: () {},
                   child: Column(
                     children: <Widget>[
-                      Icon(Icons.edit,color: Colors.black,),
+                      Icon(
+                        Icons.edit,
+                        color: Colors.black,
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2.0),
                       ),
-                      Text('Edit',style: TextStyle(color: Colors.black),),
+                      Text(
+                        'Edit',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ],
                   ),
                 ),
                 FlatButton(
-
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0)),
                   onPressed: () {
@@ -630,17 +648,24 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
                   },
                   child: Column(
                     children: <Widget>[
-                      Icon(Icons.delete,color: Colors.black,),
+                      Icon(
+                        Icons.delete,
+                        color: Colors.black,
+                      ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 2.0),
                       ),
-                      Text('Delete',style: TextStyle(color: Colors.black),),
+                      Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.black),
+                      ),
                     ],
                   ),
                 ),
               ]),
         ],
-      ),);
+      ),
+    );
   }
 
   Future<bool> _onBackPressed() {
@@ -652,8 +677,13 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
     navigateTo(context, SearchSalesOrderScreen.routeName).then((value) {
       if (value != null) {
         _searchDetails = value;
-        _SalesOrderBloc.add(SearchSalesOrderListByNumberCallEvent(_searchDetails.value,
-            SearchSalesOrderListByNumberRequest(CompanyId: CompanyID.toString(),OrderNo: _searchDetails.salesOrderNo,pkID: "",LoginUserID: LoginUserID)));
+        _SalesOrderBloc.add(SearchSalesOrderListByNumberCallEvent(
+            _searchDetails.value,
+            SearchSalesOrderListByNumberRequest(
+                CompanyId: CompanyID.toString(),
+                OrderNo: _searchDetails.salesOrderNo,
+                pkID: "",
+                LoginUserID: LoginUserID)));
       }
     });
   }
@@ -669,48 +699,48 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
       context: context,
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context123) {
-
         return AlertDialog(
           title: Text('Do You want to Generate SaleOrder ? '),
           content: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-
                 Visibility(
                   visible: true,
-                  child: GenerateQT(model,context123),
-
+                  child: GenerateQT(model, context123),
                 )
                 //GetCircular123(),
-
               ],
             ),
           ),
           actions: <Widget>[
             FlatButton(
-                onPressed: () => Navigator.of(context).pop(),//  We can return any object from here
+                onPressed: () => Navigator.of(context)
+                    .pop(), //  We can return any object from here
                 child: Text('NO')),
             /* prgresss!=100 ? CircularProgressIndicator() :*/ FlatButton(
                 onPressed: () => {
-                  Navigator.of(context).pop(),
-                  _SalesOrderBloc.add(SalesOrderPDFGenerateCallEvent(SalesOrderPDFGenerateRequest(CompanyId: CompanyID.toString(),OrderNo: model.orderNo)))
-
-                }, //  We can return any object from here
+                      Navigator.of(context).pop(),
+                      _SalesOrderBloc.add(SalesOrderPDFGenerateCallEvent(
+                          SalesOrderPDFGenerateRequest(
+                              CompanyId: CompanyID.toString(),
+                              OrderNo: model.orderNo)))
+                    }, //  We can return any object from here
                 child: Text('YES'))
           ],
-
-
         );
       },
     );
-
-
   }
 
-
   GenerateQT(SalesOrderDetails model, BuildContext context123) {
-
-    print("Servrg" + SiteURL+"SalesOrder.aspx?MobilePdf=yes&userid="+LoginUserID+"&password="+Password+"&pQuotID="+model.pkID.toString());
+    print("Servrg" +
+        SiteURL +
+        "SalesOrder.aspx?MobilePdf=yes&userid=" +
+        LoginUserID +
+        "&password=" +
+        Password +
+        "&pQuotID=" +
+        model.pkID.toString());
     return Container(
       height: 200,
       child: Visibility(
@@ -718,7 +748,14 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
         child: InAppWebView(
           //                        webView.loadUrl(SiteURL+"/Quotation.aspx?MobilePdf=yes&userid="+userName123+"&password="+UserPassword+"&pQuotID="+contactListFiltered.get(position).getPkID() + "");
           // initialUrlRequest:urlRequest == null ? URLRequest(url: Uri.parse("http://122.169.111.101:3346/Default.aspx")) :urlRequest ,
-          initialUrlRequest : URLRequest(url: Uri.parse(SiteURL+"/SalesOrder.aspx?MobilePdf=yes&userid="+LoginUserID+"&password="+Password+"&pQuotID="+model.pkID.toString())),
+          initialUrlRequest: URLRequest(
+              url: Uri.parse(SiteURL +
+                  "/SalesOrder.aspx?MobilePdf=yes&userid=" +
+                  LoginUserID +
+                  "&password=" +
+                  Password +
+                  "&pQuotID=" +
+                  model.pkID.toString())),
           // initialFile: "assets/index.html",
           initialUserScripts: UnmodifiableListView<UserScript>([]),
           initialOptions: options,
@@ -726,7 +763,6 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
 
           onWebViewCreated: (controller) {
             webViewController = controller;
-
           },
 
           onLoadStart: (controller, url) {
@@ -740,8 +776,7 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
                 resources: resources,
                 action: PermissionRequestResponseAction.GRANT);
           },
-          shouldOverrideUrlLoading: (controller, navigationAction) async
-          {
+          shouldOverrideUrlLoading: (controller, navigationAction) async {
             var uri = navigationAction.request.url;
 
             if (![
@@ -759,19 +794,12 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
                   url,
                 );
 
-
                 // and cancel the request
                 return NavigationActionPolicy.CANCEL;
               }
-
-
             }
 
-
-
             return NavigationActionPolicy.ALLOW;
-
-
           },
           onLoadStop: (controller, url) async {
             pullToRefreshController.endRefreshing();
@@ -779,26 +807,19 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
             setState(() {
               this.url = url.toString();
               urlController.text = this.url;
-
             });
-
           },
           onLoadError: (controller, url, code, message) {
             pullToRefreshController.endRefreshing();
             isLoading = false;
-
           },
           onProgressChanged: (controller, progress) {
-
-
             if (progress == 100) {
-
               pullToRefreshController.endRefreshing();
               this.prgresss = progress;
               // _QuotationBloc.add(QuotationPDFGenerateCallEvent(QuotationPDFGenerateRequest(CompanyId: CompanyID.toString(),QuotationNo: model.quotationNo)));
 
             }
-
 
             //  EasyLoading.showProgress(progress / 100, status: 'Loading...');
 
@@ -816,20 +837,17 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
             });
           },
           onConsoleMessage: (controller, consoleMessage) {
-            print("LoadWeb"+consoleMessage.message.toString());
+            print("LoadWeb" + consoleMessage.message.toString());
           },
-
         ),
       ),
     );
   }
 
-  void _onGenerateQuotationPDFCallSuccess(SalesOrderPDFGenerateResponseState state) {
-
+  void _onGenerateQuotationPDFCallSuccess(
+      SalesOrderPDFGenerateResponseState state) {
     _launchURL(state.response.details[0].column1.toString());
-
   }
-
 
   _launchURL(String pdfURL) async {
     var url123 = pdfURL;

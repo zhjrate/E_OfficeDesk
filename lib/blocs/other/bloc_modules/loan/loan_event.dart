@@ -38,3 +38,11 @@ class LoanApprovalListCallEvent extends LoanScreenEvents {
 
   LoanApprovalListCallEvent(this.loanApprovalListRequest);
 }
+class LoanApprovalSaveRequestCallEvent extends LoanScreenEvents {
+
+  int pkID;
+  final LoanApprovalSaveRequest loanApprovalSaveRequest;
+
+  LoanApprovalSaveRequestCallEvent(this.pkID,this.loanApprovalSaveRequest);
+}
+

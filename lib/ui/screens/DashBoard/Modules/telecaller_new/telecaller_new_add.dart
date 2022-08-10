@@ -2,6 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart' as geolocator; // or whatever name you want
+import 'package:http/http.dart' as http;
+import 'package:location/location.dart';
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:soleoserp/blocs/base/base_bloc.dart';
@@ -12,7 +16,6 @@ import 'package:soleoserp/models/api_requests/country_list_request.dart';
 import 'package:soleoserp/models/api_requests/customer_source_list_request.dart';
 import 'package:soleoserp/models/api_requests/state_list_request.dart';
 import 'package:soleoserp/models/api_requests/swastick_telecaller_request/new_telecaller_save_request.dart';
-
 import 'package:soleoserp/models/api_responses/all_employee_List_response.dart';
 import 'package:soleoserp/models/api_responses/city_api_response.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
@@ -21,7 +24,6 @@ import 'package:soleoserp/models/api_responses/inquiry_product_search_response.d
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
 import 'package:soleoserp/models/api_responses/state_list_response.dart';
 import 'package:soleoserp/models/api_responses/swastik_telecaller_response/telecaller_new_pagination_response.dart';
-import 'package:soleoserp/models/api_responses/telecaller_list_response.dart';
 import 'package:soleoserp/models/common/all_name_id_list.dart';
 import 'package:soleoserp/models/common/globals.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
@@ -38,11 +40,6 @@ import 'package:soleoserp/utils/General_Constants.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/general_utils.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:intl/intl.dart';
-import 'package:location/location.dart';
-import 'package:geolocator/geolocator.dart' as geolocator; // or whatever name you want
-import 'package:http/http.dart' as http;
 
 
 
@@ -4243,7 +4240,9 @@ class _TeleCallerAddEditNewScreenState
     if (Denied==true) {
       // openAppSettings();
       is_LocationService_Permission=false;
-      showCommonDialogWithSingleOption(
+      await Permission.storage.request();
+
+      /*showCommonDialogWithSingleOption(
           context, "Location permission is required , You have to click on OK button to Allow the location access !",
           positiveButtonTitle: "OK",
           onTapOfPositiveButton: () async {
@@ -4252,7 +4251,7 @@ class _TeleCallerAddEditNewScreenState
 
           }
 
-      );
+      );*/
 
       // await Permission.location.request();
       // We didn't ask for permission yet or the permission has been denied before but not permanently.

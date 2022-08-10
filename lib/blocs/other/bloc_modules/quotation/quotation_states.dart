@@ -133,3 +133,9 @@ class QuotationBankDropDownResponseState extends QuotationStates {
 
   QuotationBankDropDownResponseState(this.response);
 }
+
+class SearchCustomerListByNumberCallResponseState extends QuotationStates {
+  final CustomerDetailsResponse response;
+
+  SearchCustomerListByNumberCallResponseState(this.response);
+}

@@ -248,7 +248,7 @@ class _SalaryUpadListScreenState extends BaseState<SalaryUpadListScreen>
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
+        /*  floatingActionButton: FloatingActionButton(
           onPressed: () async {
             // Add your onPressed code here!
             await _onTapOfDeleteALLContact();
@@ -256,7 +256,7 @@ class _SalaryUpadListScreenState extends BaseState<SalaryUpadListScreen>
           },
           child: const Icon(Icons.add),
           backgroundColor: colorPrimary,
-        ),
+        ),*/
         drawer: build_Drawer(
             context: context, UserName: "KISHAN", RolCode: "Admin"),
       ),
@@ -638,7 +638,7 @@ class _SalaryUpadListScreenState extends BaseState<SalaryUpadListScreen>
                 buttonHeight: 52.0,
                 buttonMinWidth: 90.0,
                 children: <Widget>[
-                  FlatButton(
+                  /* FlatButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4.0)),
                     onPressed: () {
@@ -659,7 +659,7 @@ class _SalaryUpadListScreenState extends BaseState<SalaryUpadListScreen>
                         ),
                       ],
                     ),
-                  ),
+                  ),*/
                   isDeleteVisible == true
                       ? FlatButton(
                           shape: RoundedRectangleBorder(

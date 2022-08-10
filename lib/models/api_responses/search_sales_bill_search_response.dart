@@ -1,5 +1,5 @@
 class SearchSalesBillListResponse {
-  List<SearchDetails> details;
+  List<SearchSalesBillListResponseSearchDetails> details;
   int totalCount;
 
   SearchSalesBillListResponse({this.details, this.totalCount});
@@ -8,7 +8,7 @@ class SearchSalesBillListResponse {
     if (json['details'] != null) {
       details = [];
       json['details'].forEach((v) {
-        details.add(new SearchDetails.fromJson(v));
+        details.add(new SearchSalesBillListResponseSearchDetails.fromJson(v));
       });
     }
     totalCount = json['TotalCount'];
@@ -24,19 +24,19 @@ class SearchSalesBillListResponse {
   }
 }
 
-class SearchDetails {
+class SearchSalesBillListResponseSearchDetails {
   String custoemerName;
   String invoiceNo;
   String quotationNo;
   int value;
 
-  SearchDetails(
+  SearchSalesBillListResponseSearchDetails(
       {this.custoemerName, this.invoiceNo, this.quotationNo, this.value});
 
-  SearchDetails.fromJson(Map<String, dynamic> json) {
+  SearchSalesBillListResponseSearchDetails.fromJson(Map<String, dynamic> json) {
     custoemerName = json['CustomerName'];
     invoiceNo = json['InvoiceNo'];
-    quotationNo = json['QuotationNo'];
+    quotationNo = json['QuotationNo'] == null ? "" : json['QuotationNo'];
     value = json['value'];
   }
 

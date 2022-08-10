@@ -1,7 +1,5 @@
 part of 'loan_bloc.dart';
 
-
-
 abstract class LoanScreenStates extends BaseStates {
   const LoanScreenStates();
 }
@@ -11,11 +9,10 @@ abstract class LoanScreenStates extends BaseStates {
 class LoanScreenInitialState extends LoanScreenStates {}
 
 class LoanListResponseState extends LoanScreenStates {
-
   final LoanListResponse loanListResponse;
   final int newPage;
 
-  LoanListResponseState(this.newPage,this.loanListResponse);
+  LoanListResponseState(this.newPage, this.loanListResponse);
 }
 
 class LoanSearchResponseState extends LoanScreenStates {
@@ -34,4 +31,10 @@ class LoanApprovalListResponseState extends LoanScreenStates {
   final LoanListResponse employeeListResponse;
 
   LoanApprovalListResponseState(this.employeeListResponse);
+}
+
+class LoanApprovalSaveResponseState extends LoanScreenStates {
+  final LoanApprovalSaveResponse loanApprovalSaveResponse;
+
+  LoanApprovalSaveResponseState(this.loanApprovalSaveResponse);
 }

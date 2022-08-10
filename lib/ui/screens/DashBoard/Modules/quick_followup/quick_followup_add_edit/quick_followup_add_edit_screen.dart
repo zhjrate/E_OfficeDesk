@@ -2661,12 +2661,13 @@ class _QuickFollowUpAddEditScreenScreenState
     if (Denied == true) {
       // openAppSettings();
       is_LocationService_Permission = false;
-      showCommonDialogWithSingleOption(context,
+      /*showCommonDialogWithSingleOption(context,
           "Location permission is required , You have to click on OK button to Allow the location access !",
           positiveButtonTitle: "OK", onTapOfPositiveButton: () async {
         await openAppSettings();
         Navigator.of(context).pop();
-      });
+      });*/
+      await Permission.storage.request();
 
       // await Permission.location.request();
       // We didn't ask for permission yet or the permission has been denied before but not permanently.

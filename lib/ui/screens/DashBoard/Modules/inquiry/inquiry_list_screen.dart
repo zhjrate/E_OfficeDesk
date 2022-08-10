@@ -18,6 +18,7 @@ import 'package:soleoserp/models/api_responses/customer_details_api_response.dar
 import 'package:soleoserp/models/api_responses/follower_employee_list_response.dart';
 import 'package:soleoserp/models/api_responses/followup_filter_list_response.dart';
 import 'package:soleoserp/models/api_responses/inquiry_list_reponse.dart';
+import 'package:soleoserp/models/api_responses/inquiry_no_to_product_response.dart';
 import 'package:soleoserp/models/api_responses/inquiry_share_emp_list_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
 import 'package:soleoserp/models/api_responses/search_inquiry_list_response.dart';
@@ -26,9 +27,10 @@ import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/dimen_resources.dart';
 import 'package:soleoserp/ui/res/image_resources.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerList/customer_list_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/followup/followup_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/followup/followup_history_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_add_edit.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_fillter/FollowupFromInquiry.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_product_shortcut_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_share_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/search_inquiry_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
@@ -70,6 +72,7 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
   int _pageNo = 0;
   InquiryListResponse _inquiryListResponse;
   bool expanded = true;
+  var color = Color(0xFFFCFCFC);
 
   double sizeboxsize = 12;
   double _fontSize_Label = 9;
@@ -89,6 +92,8 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
   FollowerEmployeeListResponse _offlineFollowerEmployeeListData;
 
   List<InquirySharedEmpDetails> arr_Inquiry_Share_Emp_List = [];
+
+  double DEFAULT_HEIGHT_BETWEEN_WIDGET = 10.0;
 
   String INQ = "";
   CustomerDetails customerDetails = CustomerDetails();
@@ -157,6 +162,10 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
           if (state is SearchCustomerListByNumberCallResponseState) {
             _ONOnlyCustomerDetails(state);
           }
+
+          if (state is InquiryNotoProductResponseState) {
+            _OnInquiryNoToProductListResponse(state);
+          }
           return super.build(context);
         },
         listenWhen: (oldState, currentState) {
@@ -164,7 +173,8 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
               currentState is FollowupHistoryListResponseState ||
               currentState is InquiryShareResponseState ||
               currentState is InquiryShareEmpListResponseState ||
-              currentState is SearchCustomerListByNumberCallResponseState) {
+              currentState is SearchCustomerListByNumberCallResponseState ||
+              currentState is InquiryNotoProductResponseState) {
             return true;
           }
           return false;
@@ -219,12 +229,13 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                     ),
                     child: Column(
                       children: [
-                        _offlineLoggedInData.details[0].serialKey
+                        /* _offlineLoggedInData.details[0].serialKey
                                     .toString()
                                     .toLowerCase() ==
                                 "dol2-6uh7-ph03-in5h"
                             ? Container()
-                            : _buildSearchView(),
+                            :*/
+                        _buildSearchView(),
                         Expanded(child: _buildInquiryList())
                       ],
                     ),
@@ -234,7 +245,7 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
             ],
           ),
         ),
-        floatingActionButton: _offlineLoggedInData.details[0].serialKey
+        floatingActionButton: /*_offlineLoggedInData.details[0].serialKey
                     .toString()
                     .toLowerCase() ==
                 "dol2-6uh7-ph03-in5h"
@@ -260,17 +271,17 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                   heroTag: "fab2",
                   backgroundColor: colorPrimary,
                 ),
-              ])
-            : FloatingActionButton(
-                onPressed: () async {
-                  await _onTapOfDeleteALLProduct();
+              ]) : */
+            FloatingActionButton(
+          onPressed: () async {
+            await _onTapOfDeleteALLProduct();
 
-                  navigateTo(context, InquiryAddEditScreen.routeName);
-                },
-                child: Icon(Icons.add),
-                heroTag: "fab2",
-                backgroundColor: colorPrimary,
-              ),
+            navigateTo(context, InquiryAddEditScreen.routeName);
+          },
+          child: Icon(Icons.add),
+          heroTag: "fab2",
+          backgroundColor: colorPrimary,
+        ),
 
         /*FloatingActionButton(
           onPressed: () async {
@@ -380,25 +391,65 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
   ///builds row item view of inquiry list
   Widget _buildInquiryListItem(int index) {
     return ExpantionCustomer(context, index);
+    /*return Theme(
+      data: ThemeData(
+        //brightness: Brightness.dark,
+        primaryColor: Colors.black87,
+        accentColor: Colors.black87,
+        dividerColor: Colors.transparent,
+      ),
+      child: ExpansionTile(
+        //backgroundColor: Colors.amberAccent,
+        trailing: isExpanded //assets/collapse_arrow.png
+            ? Icon(Icons.arrow_circle_down_rounded)
+            : Icon(Icons.arrow_circle_up),
+        onExpansionChanged: (bool expanding) =>
+            setState(() => isExpanded = expanding),
+        title: Container(
+          decoration: BoxDecoration(
+              border:
+                  Border.all(width: 1, color: Color.fromRGBO(121, 85, 72, 1)),
+              gradient: LinearGradient(
+                  begin: FractionalOffset.bottomCenter,
+                  end: FractionalOffset.topCenter,
+                  // stops: [0.1, 1.0],
+                  // tileMode: TileMode.clamp,
+
+                  colors: [
+                    isExpanded
+                        ? Color.fromRGBO(255, 255, 255, 100)
+                        : Color.fromRGBO(197, 181, 176, 1),
+                    Color.fromRGBO(197, 181, 176, 1) //closed solid
+                  ])),
+          child: Text(
+            'Header',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
+        children: <Widget>[Text("Helleoooo")],
+      ),
+    );*/
   }
 
   ///builds inquiry row items title and value's common view
   Widget _buildTitleWithValueView(
-      String title, String value, String InquirySource) {
+      String title, String value, String InquirySource, InquiryDetails model) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title,
             style: TextStyle(
                 fontSize: _fontSize_Label,
-                color: Color(label_color),
+                color: model.InquirySourceName == "India Mart"
+                    ? Color(label_color)
+                    : Color(label_color),
                 fontStyle: FontStyle
                     .italic) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
             ),
         SizedBox(
           height: 3,
         ),
-        ColorCombination(value, InquirySource),
+        ColorCombination(value, InquirySource, model),
         /*InquirySource == "Close - Success"
             ? Text(value,
                 style: TextStyle(
@@ -470,11 +521,17 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
       padding: EdgeInsets.all(15),
       child: ExpansionTileCard(
         initialElevation: 5.0,
+
         elevation: 5.0,
         elevationCurve: Curves.easeInOut,
         shadowColor: Color(0xFF504F4F),
-        baseColor: Color(0xFFFCFCFC),
-        expandedColor: Color(0xFFC1E0FA),
+        baseColor: model.InquirySourceName == "India Mart"
+            ? Color(0xFFFAF6C3)
+            : Color(0xFFFCFCFC),
+        expandedColor: model.InquirySourceName == "India Mart"
+            ? Color(0xFFFAF6C3)
+            : Color(0xFFC1E0FA),
+
         //Colors.deepOrange[50],ADD8E6
         leading: CircleAvatar(
             backgroundColor: Color(0xFF504F4F),
@@ -488,12 +545,17 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
 
         title: Text(
           model.customerName,
-          style: TextStyle(color: Color(0xFF8A2CE2)), //8A2CE2)),
+          style: TextStyle(
+              color: model.InquirySourceName == "India Mart"
+                  ? Color(0xFF8A2CE2)
+                  : Color(0xFF8A2CE2)), //8A2CE2)),
         ),
         subtitle: Text(
           model.inquiryNo,
           style: TextStyle(
-            color: Color(0xFF8A2CE2),
+            color: model.InquirySourceName == "India Mart"
+                ? Color(0xFF8A2CE2)
+                : Color(0xFF8A2CE2),
             fontSize: _fontSize_Title,
           ),
         ),
@@ -570,7 +632,6 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                                       Navigator.pop(context);
 
                                       _launchWhatsAppBuz(model.ContactNo);
-
                                     });
                               },
                               child: Container(
@@ -758,8 +819,11 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: _buildTitleWithValueView("Lead #",
-                                model.inquiryNo ?? "-", model.inquiryStatus),
+                            child: _buildTitleWithValueView(
+                                "Lead #",
+                                model.inquiryNo ?? "-",
+                                model.inquiryStatus,
+                                model),
                           ),
                           Expanded(
                             child: _buildTitleWithValueView(
@@ -768,7 +832,8 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                                         fromFormat: "yyyy-MM-ddTHH:mm:ss",
                                         toFormat: "dd-MM-yyyy") ??
                                     "-",
-                                model.inquiryStatus),
+                                model.inquiryStatus,
+                                model),
                           ),
                         ]),
                     SizedBox(
@@ -779,11 +844,15 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                         child: _buildTitleWithValueView(
                             "Source",
                             model.InquirySourceName ?? "-",
-                            model.inquiryStatus),
+                            model.inquiryStatus,
+                            model),
                       ),
                       Expanded(
-                        child: _buildTitleWithValueView("Status",
-                            model.inquiryStatus ?? "-", model.inquiryStatus),
+                        child: _buildTitleWithValueView(
+                            "Status",
+                            model.inquiryStatus ?? "-",
+                            model.inquiryStatus,
+                            model),
                       ),
                     ]),
                     SizedBox(
@@ -795,7 +864,8 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                         model.referenceName == "" || model.referenceName == null
                             ? '-'
                             : model.referenceName,
-                        model.inquiryStatus),
+                        model.inquiryStatus,
+                        model),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
@@ -808,7 +878,8 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                                           fromFormat: "yyyy-MM-ddTHH:mm:ss",
                                           toFormat: "dd-MM-yyyy") ??
                                       "-",
-                                  model.inquiryStatus))
+                                  model.inquiryStatus,
+                                  model))
                           : Container(),
                       Expanded(
                         child: _buildTitleWithValueView(
@@ -816,24 +887,34 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                             model.createdDate.getFormattedDate(
                                 fromFormat: "yyyy-MM-ddTHH:mm:ss",
                                 toFormat: "dd-MM-yyyy"),
-                            model.inquiryStatus),
+                            model.inquiryStatus,
+                            model),
                       ),
                     ]),
                     SizedBox(
                       height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                     ),
-                    _buildTitleWithValueView(
-                        "Created by", model.createdBy, model.inquiryStatus),
+                    _buildTitleWithValueView("Created by", model.createdBy,
+                        model.inquiryStatus, model),
+                    SizedBox(
+                      height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
+                    ),
+                    getCommonButton(baseTheme, () {
+                      MoveToProductHistoryPage(
+                          model.inquiryNo, model.customerID.toString());
+                    }, "View Product", width: 600),
                   ],
                 ),
               ),
             ),
           ),
-          ButtonBar(
-              alignment: MainAxisAlignment.center,
-              buttonHeight: 52.0,
-              buttonMinWidth: 90.0,
+          ButtonBar(alignment: MainAxisAlignment.center, buttonHeight: 52.0,
+              // buttonMinWidth: 90.0,
               children: <Widget>[
+                /*_inquiryBloc.add(InquiryNotoProductCallEvent(
+          InquiryNoToProductListRequest(
+              InquiryNo: InquiryNo, CompanyId: CompanyID.toString())));*/
+
                 FlatButton(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0)),
@@ -974,7 +1055,8 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
     await OfflineDbHelper.getInstance().deleteALLInquiryProduct();
   }
 
-  Widget ColorCombination(String value, String inquirySource) {
+  Widget ColorCombination(
+      String value, String inquirySource, InquiryDetails model) {
     if (inquirySource == "Close - Success") {
       return Text(value,
           style: TextStyle(
@@ -988,7 +1070,11 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
               TextStyle(fontSize: _fontSize_Title, color: Color(0xFF0E0EFF)));
     } else {
       return Text(value,
-          style: TextStyle(fontSize: _fontSize_Title, color: colorGrayDark));
+          style: TextStyle(
+              fontSize: _fontSize_Title,
+              color: model.InquirySourceName == "India Mart"
+                  ? colorGrayDark
+                  : colorGrayDark));
     }
   }
 
@@ -1011,6 +1097,12 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
   Future<void> MoveTofollowupHistoryPage(String inquiryNo, String CustomerID) {
     navigateTo(context, FollowupHistoryScreen.routeName,
             arguments: FollowupHistoryScreenArguments(inquiryNo, CustomerID))
+        .then((value) {});
+  }
+
+  Future<void> MoveToProductHistoryPage(String inquiryNo, String CustomerID) {
+    navigateTo(context, ProductHistoryScreen.routeName,
+            arguments: ProductHistoryScreenArguments(inquiryNo, CustomerID))
         .then((value) {});
   }
 
@@ -1055,10 +1147,18 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
         followupHistoryDetails.FollowUpImage = "";
       }
 
-      navigateTo(context, FollowUpAddEditScreen.routeName,
-              arguments:
-                  AddUpdateFollowupScreenArguments(followupHistoryDetails))
-          .then((value) {});
+      navigateTo(context, FollowUpFromInquiryAddEditScreen.routeName,
+              arguments: AddUpdateFollowupFromInquiryScreenArguments(
+                  followupHistoryDetails))
+          .then((value) {
+        _inquiryBloc
+          ..add(InquiryListCallEvent(
+              1,
+              InquiryListApiRequest(
+                  CompanyId: CompanyID.toString(),
+                  LoginUserID: LoginUserID.toString(),
+                  PkId: "")));
+      });
     } else {
       if (state.inquiryDetails != 0) {
         followupHistoryDetails = FilterDetails();
@@ -1085,9 +1185,9 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
         followupHistoryDetails.preferredTime = "";
         followupHistoryDetails.FollowUpImage = "";
 
-        navigateTo(context, FollowUpAddEditScreen.routeName,
-                arguments:
-                    AddUpdateFollowupScreenArguments(followupHistoryDetails))
+        navigateTo(context, FollowUpFromInquiryAddEditScreen.routeName,
+                arguments: AddUpdateFollowupFromInquiryScreenArguments(
+                    followupHistoryDetails))
             .then((value) {});
       }
 
@@ -1681,8 +1781,10 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                                                                   () {
                                                                 Navigator.pop(
                                                                     context);
-                                                                share(customerDetails123
-                                                                    .contactNo1);
+                                                                _launchWhatsAppBuz(
+                                                                    customerDetails123
+                                                                        .contactNo1);
+
                                                                 //onButtonTap(Share.whatsapp_business,model);
                                                               });
                                                         },
@@ -1985,6 +2087,157 @@ class _InquiryListScreenState extends BaseState<InquiryListScreen>
                         ))),
                   ],
                 )),
+          ],
+        );
+      },
+    );
+  }
+
+  void _OnInquiryNoToProductListResponse(
+      InquiryNotoProductResponseState state) {
+    List<InquiryProductDetails> arr_ProductListArray = [];
+
+    for (var i = 0; i < state.inquiryNoToProductResponse.details.length; i++) {
+      /* String LoginUserID="abc";
+    String CompanyId="0";
+    String InquiryNo="0";*/
+
+      InquiryProductDetails inquiryProductDetails = InquiryProductDetails();
+
+      inquiryProductDetails.productName =
+          state.inquiryNoToProductResponse.details[i].productName;
+
+      inquiryProductDetails.quantity =
+          state.inquiryNoToProductResponse.details[i].quantity;
+      inquiryProductDetails.unitPrice =
+          state.inquiryNoToProductResponse.details[i].unitPrice;
+      //double totamnt = double.parse(Quantity) * double.parse(UnitPrice);
+      // String TotalAmount = totamnt.toString();
+      arr_ProductListArray.add(inquiryProductDetails);
+    }
+
+    showcustomdialogWithOnlyName(
+        values: arr_ProductListArray,
+        context1: context,
+        lable: "Product Details");
+  }
+
+  showcustomdialogWithOnlyName(
+      {List<InquiryProductDetails> values,
+      BuildContext context1,
+      String lable}) async {
+    await showDialog(
+      barrierDismissible: false,
+      context: context1,
+      builder: (BuildContext context123) {
+        return SimpleDialog(
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(32.0))),
+          title: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: colorPrimary, //                   <--- border color
+                ),
+                borderRadius: BorderRadius.all(Radius.circular(
+                        15.0) //                 <--- border radius here
+                    ),
+              ),
+              child: Container(
+                  padding: EdgeInsets.all(10),
+                  child: Text(
+                    lable,
+                    style: TextStyle(
+                        color: colorPrimary, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ))),
+          children: [
+            SizedBox(
+                width: MediaQuery.of(context123).size.width,
+                child: Column(
+                  children: [
+                    SingleChildScrollView(
+                        physics: ScrollPhysics(),
+                        child: Column(children: <Widget>[
+                          ListView.builder(
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemBuilder: (ctx, index) {
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.of(context1).pop();
+                                  //controller.text = values[index].Name;
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(
+                                      left: 25, top: 10, bottom: 10, right: 10),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: colorPrimary), //Change color
+                                        width: 10.0,
+                                        height: 10.0,
+                                        margin: const EdgeInsets.symmetric(
+                                            horizontal: 1.5),
+                                      ),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text(
+                                        values[index].productName,
+                                        style: TextStyle(color: colorPrimary),
+                                      ),
+                                      SizedBox(
+                                        width: 15,
+                                      ),
+                                      Text(
+                                        values[index]
+                                            .quantity
+                                            .toStringAsFixed(2),
+                                        style: TextStyle(color: colorPrimary),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+
+                              /* return SimpleDialogOption(
+                              onPressed: () => {
+                                controller.text = values[index].Name,
+                                controller2.text = values[index].Name1,
+                              Navigator.of(context1).pop(),
+
+
+                            },
+                              child: Text(values[index].Name),
+                            );*/
+                            },
+                            itemCount: values.length,
+                          ),
+                        ])),
+                  ],
+                )),
+            /*Center(
+            child: Container(
+              padding: EdgeInsets.all(3.0),
+              decoration: BoxDecoration(
+                  color: Color(0xFFF27442),
+                  borderRadius: BorderRadius.all(Radius.circular(
+                      5.0) //                 <--- border radius here
+                  ),
+                  shape: BoxShape.rectangle,
+                  border: Border.all(color: Color(0xFFF27442))),
+              //color: Color(0xFFF27442),
+              child: GestureDetector(
+                child: Text(
+                  "Close",
+                  style: TextStyle(color: Color(0xFFFFFFFF)),
+                ),
+                onTap: () => Navigator.pop(context),
+              ),
+            ),
+          ),*/
           ],
         );
       },

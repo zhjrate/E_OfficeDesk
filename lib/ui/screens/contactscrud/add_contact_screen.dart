@@ -8,7 +8,6 @@ import 'package:soleoserp/models/common/all_name_id_list.dart';
 import 'package:soleoserp/models/common/contact_model.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
-import 'package:soleoserp/ui/screens/contactscrud/contacts_list_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
 import 'package:soleoserp/utils/general_utils.dart';
 import 'package:soleoserp/utils/offline_db_helper.dart';
@@ -48,6 +47,8 @@ class _AddContactScreenState extends BaseState<AddContactScreen>
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Designation = [];
   bool emailValid;
 
+  bool IsConforomedtoExitScreen;
+
   @override
   void initState() {
     super.initState();
@@ -55,6 +56,8 @@ class _AddContactScreenState extends BaseState<AddContactScreen>
     _offlineLoggedInData = SharedPrefHelper.instance.getLoginUserData();
     _offlineCompanyData = SharedPrefHelper.instance.getCompanyData();
     emailValid = false;
+    IsConforomedtoExitScreen = false;
+
     // _offlineCustomerDesignationData =  SharedPrefHelper.instance.getCustomerDesignationData();
     // _onDesignationCallSuccess(_offlineCustomerDesignationData);
     if (widget.arguments != null) {
@@ -178,22 +181,22 @@ class _AddContactScreenState extends BaseState<AddContactScreen>
     );
   }
 
-  _onTapOfAdd() async {
-    if (_emailController.text != "") {
+  _onTapOfAdd() {
+    if (_emailController.text.toString().trim() != "") {
       emailValid = RegExp(
               r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
           .hasMatch(_emailController.text);
     } else {
-      emailValid = false;
+      emailValid = true;
     }
 
     if (_formKey.currentState.validate()) {
       if (emailValid == true) {
-        if (isForUpdate) {
-          showCommonDialogWithTwoOptions(context,
-              "Are you sure you want to Update Addition Contact Details ?",
-              negativeButtonTitle: "No",
-              positiveButtonTitle: "Yes", onTapOfPositiveButton: () async {
+        showCommonDialogWithTwoOptions(
+            context, "Are you sure you want to Save Contact Details ?",
+            negativeButtonTitle: "No",
+            positiveButtonTitle: "Yes", onTapOfPositiveButton: () async {
+          if (isForUpdate) {
             await OfflineDbHelper.getInstance().updateContact(ContactModel(
                 "0",
                 "0",
@@ -204,25 +207,8 @@ class _AddContactScreenState extends BaseState<AddContactScreen>
                 _mobileController.text.toString().trim(),
                 _emailController.text.toString().trim(),
                 "admin",
-                id: widget.arguments.model.id
-
-                /* _nameController.text.toString().trim(),
-            _mobileController.text.toString().trim(),
-            _emailController.text.toString().trim(),
-            _designationController.text.toString().trim(),
-            _designationCode.text.toString().trim(),
-            id: widget.arguments.model.id*/
-                // "1","51506","Name","5","10032","ABC","7802365954","ABC.com","admin", id: widget.arguments.model.id
-                ));
-
-            navigateTo(context, ContactsListScreen.routeName,
-                clearAllStack: true);
-          });
-        } else {
-          showCommonDialogWithTwoOptions(context,
-              "Are you sure you want to Add Addition Contact Details ?",
-              negativeButtonTitle: "No",
-              positiveButtonTitle: "Yes", onTapOfPositiveButton: () async {
+                id: widget.arguments.model.id));
+          } else {
             await OfflineDbHelper.getInstance().insertContact(ContactModel(
                 "0",
                 "0",
@@ -233,10 +219,10 @@ class _AddContactScreenState extends BaseState<AddContactScreen>
                 _mobileController.text.toString().trim(),
                 _emailController.text.toString().trim(),
                 "admin"));
-            navigateTo(context, ContactsListScreen.routeName,
-                clearAllStack: true);
-          });
-        }
+          }
+          Navigator.of(context).pop();
+          Navigator.of(context).pop();
+        });
       } else {
         showCommonDialogWithSingleOption(context, "Enter valid email !",
             positiveButtonTitle: "OK");
@@ -334,44 +320,6 @@ class _AddContactScreenState extends BaseState<AddContactScreen>
                     ),
                   ),
                 ),
-                /* Card(
-                  elevation: 5,
-                  color: colorLightGray,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15)),
-                  child: Container(
-                    height: 60,
-                    padding: EdgeInsets.only(left: 20, right: 20,top: 3),
-                    width: double.maxFinite,
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-
-                              controller: _designationCode,
-                              enabled: false,
-                              decoration: InputDecoration(
-                                hintText: "Tap to select designationCode",
-                                labelStyle: TextStyle(
-                                  color: Color(0xFF000000),
-                                ),
-                                border: InputBorder.none,
-                              ),
-                              style: TextStyle(
-                                fontSize: 15,
-                                color: Color(0xFF000000),
-                              ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-
-                          ),
-                        ),
-                        Icon(
-                          Icons.arrow_drop_down,
-                          color: colorGrayDark,
-                        )
-                      ],
-                    ),
-                  ),
-                )*/
               ],
             ),
           ),

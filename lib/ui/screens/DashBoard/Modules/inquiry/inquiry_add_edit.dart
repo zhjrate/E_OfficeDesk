@@ -1,4 +1,3 @@
-import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,30 +6,20 @@ import 'package:soleoserp/blocs/other/bloc_modules/inquiry/inquiry_bloc.dart';
 import 'package:soleoserp/models/api_requests/closer_reason_list_request.dart';
 import 'package:soleoserp/models/api_requests/customer_source_list_request.dart';
 import 'package:soleoserp/models/api_requests/inqiory_header_save_request.dart';
-import 'package:soleoserp/models/api_requests/inquiry_list_request.dart';
 import 'package:soleoserp/models/api_requests/inquiry_no_to_delete_product.dart';
 import 'package:soleoserp/models/api_requests/inquiry_no_to_product_list_request.dart';
 import 'package:soleoserp/models/api_requests/inquiry_status_list_request.dart';
-import 'package:soleoserp/models/api_requests/search_inquiry_list_by_name_request.dart';
-import 'package:soleoserp/models/api_requests/search_inquiry_list_by_number_request.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/customer_label_value_response.dart';
-import 'package:soleoserp/models/api_responses/customer_source_response.dart';
 import 'package:soleoserp/models/api_responses/inquiry_list_reponse.dart';
-import 'package:soleoserp/models/api_responses/inquiry_status_list_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
-import 'package:soleoserp/models/api_responses/search_inquiry_list_response.dart';
 import 'package:soleoserp/models/common/all_name_id_list.dart';
 import 'package:soleoserp/models/common/globals.dart';
 import 'package:soleoserp/models/common/inquiry_product_model.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
-import 'package:soleoserp/ui/res/dimen_resources.dart';
-import 'package:soleoserp/ui/res/image_resources.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/customer_search/customer_search_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_list_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/search_inquiry_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
-import 'package:soleoserp/ui/screens/contactscrud/contacts_list_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
 import 'package:soleoserp/utils/General_Constants.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
@@ -98,7 +87,7 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Folowup_Priority = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_LeadStatus = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_LeadSource = [];
-  List<ALL_Name_ID> arr_ALL_Name_ID_For_CloserReasonStatusType =[];
+  List<ALL_Name_ID> arr_ALL_Name_ID_For_CloserReasonStatusType = [];
 
   InquiryDetails _editModel;
   bool _isForUpdate;
@@ -112,9 +101,9 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
   SearchDetails _searchInquiryListResponse;
 
   final TextEditingController edt_CloserReasonStatusType =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController edt_CloserReasonStatusTypepkID =
-  TextEditingController();
+      TextEditingController();
   bool ISDisQualified = false;
   bool ISDisQualifiedEmpty = false;
 
@@ -124,9 +113,9 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
     screenStatusBarColor = colorPrimary;
     _offlineLoggedInData = SharedPrefHelper.instance.getLoginUserData();
     _offlineCompanyData = SharedPrefHelper.instance.getCompanyData();
-   // _offlineCustomerSource = SharedPrefHelper.instance.getCustomerSourceData();
-  //  _offlineInquiryLeadStatusData = SharedPrefHelper.instance.getInquiryLeadStatus();
-   // _onLeadSourceListTypeCallSuccess(_offlineCustomerSource);
+    // _offlineCustomerSource = SharedPrefHelper.instance.getCustomerSourceData();
+    //  _offlineInquiryLeadStatusData = SharedPrefHelper.instance.getInquiryLeadStatus();
+    // _onLeadSourceListTypeCallSuccess(_offlineCustomerSource);
     //_onLeadStatusListTypeCallSuccess(_offlineInquiryLeadStatusData);
     CompanyID = _offlineCompanyData.details[0].pkId;
     LoginUserID = _offlineLoggedInData.details[0].userID;
@@ -138,20 +127,12 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
     });
     edt_LeadStatus.addListener(() {
       setState(() {
-
-        if(edt_LeadStatus.text=="Close - Lost")
-        {
-
-          ISDisQualified =true;
-
-        }
-        else
-        {
-          ISDisQualified =false;
-
+        if (edt_LeadStatus.text == "Close - Lost") {
+          ISDisQualified = true;
+        } else {
+          ISDisQualified = false;
         }
       });
-
     });
 
     _isForUpdate = widget.arguments != null;
@@ -169,6 +150,29 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
           selectedDate.month.toString() +
           "-" +
           selectedDate.day.toString();
+
+      edt_NextFollowupDate.text = selectedDate.day.toString() +
+          "-" +
+          selectedDate.month.toString() +
+          "-" +
+          selectedDate.year.toString();
+
+      edt_ReverseNextFollowupDate.text = selectedDate.year.toString() +
+          "-" +
+          selectedDate.month.toString() +
+          "-" +
+          selectedDate.day.toString();
+
+      String AM_PM = selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
+      String beforZeroHour = selectedTime.hourOfPeriod <= 9
+          ? "0" + selectedTime.hourOfPeriod.toString()
+          : selectedTime.hourOfPeriod.toString();
+      String beforZerominute = selectedTime.minute <= 9
+          ? "0" + selectedTime.minute.toString()
+          : selectedTime.minute.toString();
+
+      edt_PreferedTime.text =
+          beforZeroHour + ":" + beforZerominute + " " + AM_PM;
     }
   }
 
@@ -199,14 +203,13 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
           if (state is InquiryLeadStatusListCallResponseState) {
             _onLeadStatusListTypeCallSuccess(state);
           }
-          if(state is CustomerSourceCallEventResponseState)
-            {
-              _onLeadSourceListTypeCallSuccess(state);
-            }
+          if (state is CustomerSourceCallEventResponseState) {
+            _onLeadSourceListTypeCallSuccess(state);
+          }
           if (state is CloserReasonListCallResponseState) {
             _onCloserReasonStatusListTypeCallSuccess(state);
           }
-         /* if (state is SearchInquiryListByNameCallResponseState) {
+          /* if (state is SearchInquiryListByNameCallResponseState) {
             _onSearchInquiryListCallSuccess(state);
           }*/
           return super.build(context);
@@ -215,10 +218,9 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
           if (currentState is InquiryHeaderSaveResponseState ||
               currentState is InquiryProductSaveResponseState ||
               currentState is InquiryNotoProductResponseState ||
-          currentState is InquiryLeadStatusListCallResponseState||
-          currentState is CustomerSourceCallEventResponseState ||
-          currentState is CloserReasonListCallResponseState
-          ) {
+              currentState is InquiryLeadStatusListCallResponseState ||
+              currentState is CustomerSourceCallEventResponseState ||
+              currentState is CloserReasonListCallResponseState) {
             return true;
           }
           return false;
@@ -342,22 +344,28 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
                           height: 15,
                         ),
                         _isForUpdate == false ? FollowupFields() : Container(),
-                        ISDisQualified==true?Column(
-                          children: [
-                            //edt_LeadStatus
-                            showcustomdialogWithID1("Closure Reason",
-                                enable1: false,
-                                title: "Closure Reason *",
-                                hintTextvalue: "Tap to Select Closer Reason",
-                                icon: Icon(Icons.arrow_drop_down),
-                                controllerForLeft: edt_CloserReasonStatusType,
-                                controllerpkID: edt_CloserReasonStatusTypepkID,
-                                Custom_values1: arr_ALL_Name_ID_For_CloserReasonStatusType),
-                            SizedBox(height: 15,)
-                          ],
-                        ):Container(),
-
-
+                        ISDisQualified == true
+                            ? Column(
+                                children: [
+                                  //edt_LeadStatus
+                                  showcustomdialogWithID1("Closure Reason",
+                                      enable1: false,
+                                      title: "Closure Reason *",
+                                      hintTextvalue:
+                                          "Tap to Select Closer Reason",
+                                      icon: Icon(Icons.arrow_drop_down),
+                                      controllerForLeft:
+                                          edt_CloserReasonStatusType,
+                                      controllerpkID:
+                                          edt_CloserReasonStatusTypepkID,
+                                      Custom_values1:
+                                          arr_ALL_Name_ID_For_CloserReasonStatusType),
+                                  SizedBox(
+                                    height: 15,
+                                  )
+                                ],
+                              )
+                            : Container(),
                         Container(
                           margin: EdgeInsets.all(10),
                           alignment: Alignment.bottomCenter,
@@ -379,24 +387,15 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
                           margin: EdgeInsets.all(10),
                           alignment: Alignment.bottomCenter,
                           child: getCommonButton(baseTheme, () {
-
-                            if(ISDisQualified==true)
-                            {
-                              if(edt_CloserReasonStatusType.text!="")
-                              {
-                                ISDisQualifiedEmpty= true;
+                            if (ISDisQualified == true) {
+                              if (edt_CloserReasonStatusType.text != "") {
+                                ISDisQualifiedEmpty = true;
+                              } else {
+                                ISDisQualifiedEmpty = false;
                               }
-                              else
-                                {
-                                  ISDisQualifiedEmpty= false;
-
-                                }
+                            } else {
+                              ISDisQualifiedEmpty = true;
                             }
-                            else
-                              {
-                                ISDisQualifiedEmpty= true;
-
-                              }
 
                             _onTapToSaveHeaderDetails();
                           }, "Save", width: 600),
@@ -420,7 +419,9 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
   Widget _buildFollowupDate() {
     return InkWell(
       onTap: () {
-        _selectDate(context, edt_InquiryDate);
+        _isForUpdate == false
+            ? _selectDate(context, edt_InquiryDate)
+            : Container();
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -563,13 +564,13 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
   }
 
   Future<void> _onTapOfSearchView() async {
-    if(_isForUpdate==false ){
+    if (_isForUpdate == false) {
       navigateTo(context, SearchInquiryCustomerScreen.routeName).then((value) {
         if (value != null) {
           _searchInquiryListResponse = value;
           edt_CustomerName.text = _searchInquiryListResponse.label;
           edt_CustomerpkID.text = _searchInquiryListResponse.value.toString();
-         /* _inquiryBloc.add(SearchInquiryListByNameCallEvent(
+          /* _inquiryBloc.add(SearchInquiryListByNameCallEvent(
               SearchInquiryListByNameRequest(word:  edt_CustomerName.text,CompanyId:CompanyID.toString(),LoginUserID: LoginUserID,needALL: "1")));
 */
           //  _CustomerBloc.add(CustomerListCallEvent(1,CustomerPaginationRequest(companyId: 8033,loginUserID: "admin",CustomerID: "",ListMode: "L")));
@@ -577,7 +578,6 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
         }
       });
     }
-
   }
 
   Future<bool> _onBackPressed() async {
@@ -664,41 +664,36 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
   }
 
   FetchInquiryPriorityDetails() {
+    if (_offlineLoggedInData.details[0].serialKey.toLowerCase() ==
+        "dol2-6uh7-ph03-in5h") {
+      arr_ALL_Name_ID_For_Folowup_Priority.clear();
+      for (var i = 0; i < 3; i++) {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
 
-    if(_offlineLoggedInData.details[0].serialKey.toLowerCase()=="dol2-6uh7-ph03-in5h")
-      {
-        arr_ALL_Name_ID_For_Folowup_Priority.clear();
-        for (var i = 0; i < 3; i++) {
-          ALL_Name_ID all_name_id = ALL_Name_ID();
-
-          if (i == 0) {
-            all_name_id.Name = "Hot";
-          } else if (i == 1) {
-            all_name_id.Name = "Cold";
-          } else if (i == 2) {
-            all_name_id.Name = "Warm";
-          }
-          arr_ALL_Name_ID_For_Folowup_Priority.add(all_name_id);
+        if (i == 0) {
+          all_name_id.Name = "Hot";
+        } else if (i == 1) {
+          all_name_id.Name = "Cold";
+        } else if (i == 2) {
+          all_name_id.Name = "Warm";
         }
+        arr_ALL_Name_ID_For_Folowup_Priority.add(all_name_id);
       }
-    else
-      {
-        arr_ALL_Name_ID_For_Folowup_Priority.clear();
-        for (var i = 0; i < 3; i++) {
-          ALL_Name_ID all_name_id = ALL_Name_ID();
+    } else {
+      arr_ALL_Name_ID_For_Folowup_Priority.clear();
+      for (var i = 0; i < 3; i++) {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
 
-          if (i == 0) {
-            all_name_id.Name = "High";
-          } else if (i == 1) {
-            all_name_id.Name = "Medium";
-          } else if (i == 2) {
-            all_name_id.Name = "Low";
-          }
-          arr_ALL_Name_ID_For_Folowup_Priority.add(all_name_id);
+        if (i == 0) {
+          all_name_id.Name = "High";
+        } else if (i == 1) {
+          all_name_id.Name = "Medium";
+        } else if (i == 2) {
+          all_name_id.Name = "Low";
         }
+        arr_ALL_Name_ID_For_Folowup_Priority.add(all_name_id);
       }
-
-
+    }
   }
 
   Widget showcustomdialogWithID1(String Category,
@@ -714,14 +709,14 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
       child: Column(
         children: [
           InkWell(
-            onTap: () => /*showcustomdialogWithID(
+            onTap:
+                () => /*showcustomdialogWithID(
                 values: Custom_values1,
                 context1: context,
                 controller: controllerForLeft,
                 controllerID: controllerpkID,
                 lable: "Select $Category")*/
-            CreateDialogDropdown(Category),
-
+                    CreateDialogDropdown(Category),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -784,13 +779,16 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
     );
   }
 
-  void _onLeadStatusListTypeCallSuccess(InquiryLeadStatusListCallResponseState state) {
-    if (state.inquiryStatusListResponse.details.length !=0) {
+  void _onLeadStatusListTypeCallSuccess(
+      InquiryLeadStatusListCallResponseState state) {
+    if (state.inquiryStatusListResponse.details.length != 0) {
       arr_ALL_Name_ID_For_LeadStatus.clear();
       for (var i = 0; i < state.inquiryStatusListResponse.details.length; i++) {
-        print("InquiryStatus : " + state.inquiryStatusListResponse.details[i].inquiryStatus);
+        print("InquiryStatus : " +
+            state.inquiryStatusListResponse.details[i].inquiryStatus);
         ALL_Name_ID all_name_id = ALL_Name_ID();
-        all_name_id.Name = state.inquiryStatusListResponse.details[i].inquiryStatus;
+        all_name_id.Name =
+            state.inquiryStatusListResponse.details[i].inquiryStatus;
         all_name_id.pkID = state.inquiryStatusListResponse.details[i].pkID;
         arr_ALL_Name_ID_For_LeadStatus.add(all_name_id);
       }
@@ -801,14 +799,15 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
           controllerID: edt_LeadStatusID,
           lable: "Select Status");
     }
-
   }
 
-  void _onLeadSourceListTypeCallSuccess(CustomerSourceCallEventResponseState state) {
+  void _onLeadSourceListTypeCallSuccess(
+      CustomerSourceCallEventResponseState state) {
     if (state.sourceResponse.details.length != 0) {
       arr_ALL_Name_ID_For_LeadSource.clear();
       for (var i = 0; i < state.sourceResponse.details.length; i++) {
-        print("InquiryStatus : " + state.sourceResponse.details[i].inquiryStatus);
+        print(
+            "InquiryStatus : " + state.sourceResponse.details[i].inquiryStatus);
         ALL_Name_ID all_name_id = ALL_Name_ID();
         all_name_id.Name = state.sourceResponse.details[i].inquiryStatus;
         all_name_id.pkID = state.sourceResponse.details[i].pkID;
@@ -854,8 +853,8 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
               children: [
                 Expanded(
                   child: TextField(
-                    textInputAction: TextInputAction.next,
-                    focusNode: ReferenceFocusNode,
+                      textInputAction: TextInputAction.next,
+                      focusNode: ReferenceFocusNode,
                       controller: edt_Reference_Name,
                       decoration: InputDecoration(
                         hintText: "Tap to enter Name",
@@ -956,9 +955,9 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
     edt_LeadSource.text = _editModel.InquirySourceName.toString();
     edt_Reference_Name.text = _editModel.referenceName.toString();
     edt_Description.text = _editModel.meetingNotes.toString();
-    edt_ReverseNextFollowupDate.text ="";
-    edt_PreferedTime.text ="";
-    edt_FollowupNotes.text ="";
+    edt_ReverseNextFollowupDate.text = "";
+    edt_PreferedTime.text = "";
+    edt_FollowupNotes.text = "";
     InquiryNo = _editModel.inquiryNo;
     edt_CloserReasonStatusType.text = _editModel.closureReason;
     edt_CloserReasonStatusTypepkID.text = _editModel.closureReasonID.toString();
@@ -974,104 +973,102 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
   _onTapToSaveHeaderDetails() async {
     await getInquiryProductDetails();
 
-    if (edt_InquiryDate.text != '') {
-      if (edt_CustomerName.text != '') {
-        if (edt_LeadSource.text != '') {
-          if(edt_Description.text !='')
-            {
-              if(ISDisQualifiedEmpty==true)
-                {
-                  if (_inquiryProductList.length != 0) {
-                    print("HeaderDetailsRequestParam" +
-                        "InquiryDate" +
-                        edt_InquiryDate.text +
-                        "ReverseInquiryDate" +
-                        edt_ReverseInquiryDate.text +
-                        "CustomerID" +
-                        edt_CustomerpkID.text +
-                        " CustomerName" +
-                        edt_CustomerName.text +
-                        "InquiryNo " +
-                        InquiryNo +
-                        "MeetingNotes" +
-                        edt_Description.text +
-                        "InquirySourceID" +
-                        edt_LeadSourceID.text +
-                        "InquirySource" +
-                        edt_LeadSource.text +
-                        "ReferenceName" +
-                        edt_Reference_Name.text +
-                        "InquiryStatusID" +
-                        edt_LeadStatusID.text +
-                        "LoginUserID" +
-                        LoginUserID +
-                        "Priority" +
-                        edt_Priority.text +
-                        "CompanyId" +
-                        CompanyID.toString());
+    if (edt_InquiryDate.text.toString().trim() != '') {
+      if (edt_CustomerName.text.toString().trim() != '') {
+        if (edt_LeadSource.text.toString().trim() != '') {
+          if (edt_Description.text.toString().trim() != '') {
+            if (ISDisQualifiedEmpty == true) {
+              if (_inquiryProductList.length != 0) {
+                print("HeaderDetailsRequestParam" +
+                    "InquiryDate" +
+                    edt_InquiryDate.text +
+                    "ReverseInquiryDate" +
+                    edt_ReverseInquiryDate.text +
+                    "CustomerID" +
+                    edt_CustomerpkID.text +
+                    " CustomerName" +
+                    edt_CustomerName.text +
+                    "InquiryNo " +
+                    InquiryNo +
+                    "MeetingNotes" +
+                    edt_Description.text +
+                    "InquirySourceID" +
+                    edt_LeadSourceID.text +
+                    "InquirySource" +
+                    edt_LeadSource.text +
+                    "ReferenceName" +
+                    edt_Reference_Name.text +
+                    "InquiryStatusID" +
+                    edt_LeadStatusID.text +
+                    "LoginUserID" +
+                    LoginUserID +
+                    "Priority" +
+                    edt_Priority.text +
+                    "CompanyId" +
+                    CompanyID.toString());
 
-                    showCommonDialogWithTwoOptions(
-                        context, "Are you sure you want to Save this Inquiry?",
-                        negativeButtonTitle: "No",
-                        positiveButtonTitle: "Yes", onTapOfPositiveButton: () {
-                      Navigator.of(context).pop();
-                      if (InquiryNo != '') {
-                        _inquiryBloc.add(InquiryNotoDeleteProductCallEvent(
-                            InquiryNo,
-                            InquiryNoToDeleteProductRequest(
-                                InquiryNo: InquiryNo,
-                                CompanyId: CompanyID.toString())));
-                      }
-                      _inquiryBloc.add(InquiryHeaderSaveNameCallEvent(
-                          pkID,
-                          InquiryHeaderSaveRequest(
-                              pkID: pkID.toString(),
-                              FollowupDate: edt_ReverseNextFollowupDate.text.toString(),
-                              CustomerID: edt_CustomerpkID.text.toString(),
-                              InquiryNo: InquiryNo,
-                              InquiryDate: edt_ReverseInquiryDate.text.toString(),
-                              MeetingNotes: edt_Description.text.toString(),
-                              InquirySource: edt_LeadSource.text.toString(),//edt_LeadSourceID.text.toString(),
-                              ReferenceName: edt_Reference_Name.text.toString(),
-                              FollowupNotes: edt_FollowupNotes.text.toString(),
-                              InquiryStatusID: edt_LeadStatusID.text.toString(),
-                              LoginUserID: LoginUserID,
-                              Latitude: SharedPrefHelper.instance.getLatitude(),
-                              Longitude: SharedPrefHelper.instance.getLongitude(),
-                              FollowupTypeID: "5",
-                              PreferredTime: edt_PreferedTime.text.toString(),
-                              Priority: edt_Priority.text.toString(),
-                              CompanyId: CompanyID.toString(),
-                              ClosureReason:edt_CloserReasonStatusTypepkID.text.toString()==null?0:edt_CloserReasonStatusTypepkID.text.toString()
-                          )));
-                    });
-                  } else {
-                    showCommonDialogWithSingleOption(
-                        context, "Product Details are required!",
-                        positiveButtonTitle: "OK");
+                showCommonDialogWithTwoOptions(
+                    context, "Are you sure you want to Save this Inquiry?",
+                    negativeButtonTitle: "No",
+                    positiveButtonTitle: "Yes", onTapOfPositiveButton: () {
+                  Navigator.of(context).pop();
+                  if (InquiryNo != '') {
+                    _inquiryBloc.add(InquiryNotoDeleteProductCallEvent(
+                        InquiryNo,
+                        InquiryNoToDeleteProductRequest(
+                            InquiryNo: InquiryNo,
+                            CompanyId: CompanyID.toString())));
                   }
-                }
-              else
-                {
-                  showCommonDialogWithSingleOption(
-                      context, "Closer Reason is required!",
-                      positiveButtonTitle: "OK");
-                }
-
-
+                  _inquiryBloc.add(InquiryHeaderSaveNameCallEvent(
+                      pkID,
+                      InquiryHeaderSaveRequest(
+                          pkID: pkID.toString(),
+                          FollowupDate:
+                              edt_ReverseNextFollowupDate.text.toString(),
+                          CustomerID: edt_CustomerpkID.text.toString(),
+                          InquiryNo: InquiryNo,
+                          InquiryDate: edt_ReverseInquiryDate.text.toString(),
+                          MeetingNotes: edt_Description.text.toString(),
+                          InquirySource: edt_LeadSource.text
+                              .toString(), //edt_LeadSourceID.text.toString(),
+                          ReferenceName: edt_Reference_Name.text.toString(),
+                          FollowupNotes: edt_FollowupNotes.text.toString(),
+                          InquiryStatusID: edt_LeadStatusID.text.toString(),
+                          LoginUserID: LoginUserID,
+                          Latitude: SharedPrefHelper.instance.getLatitude(),
+                          Longitude: SharedPrefHelper.instance.getLongitude(),
+                          FollowupTypeID: "5",
+                          PreferredTime: edt_PreferedTime.text.toString(),
+                          Priority: edt_Priority.text.toString(),
+                          CompanyId: CompanyID.toString(),
+                          ClosureReason:
+                              edt_CloserReasonStatusTypepkID.text.toString() ==
+                                      null
+                                  ? 0
+                                  : edt_CloserReasonStatusTypepkID.text
+                                      .toString())));
+                });
+              } else {
+                showCommonDialogWithSingleOption(
+                    context, "Product Details are required!",
+                    positiveButtonTitle: "OK");
+              }
+            } else {
+              showCommonDialogWithSingleOption(
+                  context, "Closer Reason is required!",
+                  positiveButtonTitle: "OK");
             }
-          else {
+          } else {
             showCommonDialogWithSingleOption(
                 context, "Description is required!",
                 positiveButtonTitle: "OK");
           }
-
         } else {
           showCommonDialogWithSingleOption(context, "Lead Source is required!",
               positiveButtonTitle: "OK");
         }
       } else {
-        showCommonDialogWithSingleOption(context, "CustomerName is required!",
+        showCommonDialogWithSingleOption(context, "Customer Name is required!",
             positiveButtonTitle: "OK");
       }
     } else {
@@ -1114,15 +1111,18 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
   _OnInquiryProductSaveResponse(InquiryProductSaveResponseState state) async {
     print("InquiryHeaderResponse " +
         state.inquiryProductSaveResponse.details[0].column2);
-    String Msg = _isForUpdate == true ? "Inquiry Updated Successfully" : "Inquiry Added Successfully";
+    String Msg = _isForUpdate == true
+        ? "Inquiry Updated Successfully"
+        : "Inquiry Added Successfully";
 
-   /* showCommonDialogWithSingleOption(context, Msg,
+    /* showCommonDialogWithSingleOption(context, Msg,
         positiveButtonTitle: "OK", onTapOfPositiveButton: () {
           navigateTo(context, InquiryListScreen.routeName, clearAllStack: true);
         });*/
-    await showCommonDialogWithSingleOption(Globals.context,Msg,
-        positiveButtonTitle: "OK");
-    Navigator.of(context).pop();
+    await showCommonDialogWithSingleOption(Globals.context, Msg,
+        positiveButtonTitle: "OK", onTapOfPositiveButton: () {
+      navigateTo(context, InquiryListScreen.routeName, clearAllStack: true);
+    });
   }
 
   _OnInquiryNoToProductListResponse(InquiryNotoProductResponseState state) {
@@ -1325,7 +1325,6 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
 
   Future<void> _selectNextFollowupDate(
       BuildContext context, TextEditingController F_datecontroller) async {
-
     DateTime selectedDate = DateTime.now();
 
     final DateTime picked = await showDatePicker(
@@ -1383,10 +1382,7 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
   }
 
   CreateDialogDropdown(String category) {
-
-    if(category=="Lead Status")
-    {
-
+    if (category == "Lead Status") {
       _inquiryBloc.add(InquiryLeadStatusTypeListByNameCallEvent(
           FollowupInquiryStatusTypeListRequest(
               CompanyId: CompanyID.toString(),
@@ -1394,18 +1390,15 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
               StatusCategory: "Inquiry",
               LoginUserID: LoginUserID,
               SearchKey: "")));
-    }
-    else if(category=="Closure Reason")
-      {
-        _inquiryBloc
-          ..add(CloserReasonTypeListByNameCallEvent(CloserReasonTypeListRequest(
-              CompanyId: CompanyID.toString(),
-              pkID: "",
-              StatusCategory: "DisQualifiedReason",
-              LoginUserID: LoginUserID,
-              SearchKey: "")));
-      }
-    else {
+    } else if (category == "Closure Reason") {
+      _inquiryBloc
+        ..add(CloserReasonTypeListByNameCallEvent(CloserReasonTypeListRequest(
+            CompanyId: CompanyID.toString(),
+            pkID: "",
+            StatusCategory: "DisQualifiedReason",
+            LoginUserID: LoginUserID,
+            SearchKey: "")));
+    } else {
       _inquiryBloc.add(CustomerSourceCallEvent(CustomerSourceRequest(
           pkID: "0",
           StatusCategory: "InquirySource",
@@ -1413,30 +1406,24 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
           LoginUserID: LoginUserID,
           SearchKey: "")));
     }
-
-
   }
 
-  void _onSearchInquiryListCallSuccess(SearchInquiryListByNameCallResponseState state) {
-
-    if(state.response.details.isNotEmpty)
-      {
-        for(int i=0;i<state.response.details.length;i++)
-          {
-            int empID = state.response.details[i].createdEmployeeID;
-            if(_offlineLoggedInData.details[0].employeeID==empID)
-              {
-                showCommonDialogWithSingleOption(
-                    context, "Customer is Already Created by ",
-                    positiveButtonTitle: "OK");
-              }
-          }
+  void _onSearchInquiryListCallSuccess(
+      SearchInquiryListByNameCallResponseState state) {
+    if (state.response.details.isNotEmpty) {
+      for (int i = 0; i < state.response.details.length; i++) {
+        int empID = state.response.details[i].createdEmployeeID;
+        if (_offlineLoggedInData.details[0].employeeID == empID) {
+          showCommonDialogWithSingleOption(
+              context, "Customer is Already Created by ",
+              positiveButtonTitle: "OK");
+        }
       }
-
+    }
   }
 
-  void _onCloserReasonStatusListTypeCallSuccess(CloserReasonListCallResponseState state) {
-
+  void _onCloserReasonStatusListTypeCallSuccess(
+      CloserReasonListCallResponseState state) {
     if (state.closerReasonListResponse.details.length != 0) {
       arr_ALL_Name_ID_For_CloserReasonStatusType.clear();
       for (var i = 0; i < state.closerReasonListResponse.details.length; i++) {
@@ -1454,7 +1441,6 @@ class _InquiryAddEditScreenState extends BaseState<InquiryAddEditScreen>
           controller: edt_CloserReasonStatusType,
           controllerID: edt_CloserReasonStatusTypepkID,
           lable: "Select DisQualified Reason");
-
     }
   }
 }

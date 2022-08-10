@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:lottie/lottie.dart';
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/leave_request/leave_request_bloc.dart';
-import 'package:soleoserp/models/api_requests/attendance_employee_list_request.dart';
 import 'package:soleoserp/models/api_requests/followup_delete_request.dart';
 import 'package:soleoserp/models/api_requests/leave_approval_save_request.dart';
 import 'package:soleoserp/models/api_requests/leave_request_list_request.dart';
@@ -20,28 +19,24 @@ import 'package:soleoserp/ui/res/image_resources.dart';
 import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
-import 'package:soleoserp/ui/widgets/custom_gredient_app_bar.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/general_utils.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
-
-
-
-
 
 class LeaveRequestApprovalListScreen extends BaseStatefulWidget {
   static const routeName = '/LeaveRequestApprovalListScreen';
 
   @override
-  _LeaveRequestApprovalListScreenState createState() => _LeaveRequestApprovalListScreenState();
+  _LeaveRequestApprovalListScreenState createState() =>
+      _LeaveRequestApprovalListScreenState();
 }
 
-class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprovalListScreen>
+class _LeaveRequestApprovalListScreenState
+    extends BaseState<LeaveRequestApprovalListScreen>
     with BasicScreen, WidgetsBindingObserver {
   LeaveRequestScreenBloc _leaveRequestScreenBloc;
   int _pageNo = 0;
   bool isListExist = false;
-
 
   LeaveRequestListResponse _leaveRequestListResponse;
   bool expanded = true;
@@ -49,12 +44,12 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
   double sizeboxsize = 12;
   double _fontSize_Label = 9;
   double _fontSize_Title = 11;
-  int label_color = 0xff4F4F4F;//0x66666666;
+  int label_color = 0xff4F4F4F; //0x66666666;
   int title_color = 0xff362d8b;
   int _key;
   String foos = 'One';
   int selected = 0; //attention
-  bool isExpand=false;
+  bool isExpand = false;
 
   CompanyDetailsResponse _offlineCompanyData;
   LoginUserDetialsResponse _offlineLoggedInData;
@@ -68,11 +63,12 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
   final TextEditingController edt_FollowupStatus = TextEditingController();
   final TextEditingController edt_ApprovalStatus = TextEditingController();
 
-  final TextEditingController edt_FollowupEmployeeList = TextEditingController();
-  final TextEditingController edt_FollowupEmployeeUserID = TextEditingController();
+  final TextEditingController edt_FollowupEmployeeList =
+      TextEditingController();
+  final TextEditingController edt_FollowupEmployeeUserID =
+      TextEditingController();
 
   List<String> selectedItemValue = [];
-
 
   @override
   void initState() {
@@ -80,116 +76,137 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
     screenStatusBarColor = colorDarkYellow;
     _offlineLoggedInData = SharedPrefHelper.instance.getLoginUserData();
     _offlineCompanyData = SharedPrefHelper.instance.getCompanyData();
-    _offlineFollowerEmployeeListData = SharedPrefHelper.instance.getFollowerEmployeeList();
+    _offlineFollowerEmployeeListData =
+        SharedPrefHelper.instance.getFollowerEmployeeList();
     CompanyID = _offlineCompanyData.details[0].pkId;
     LoginUserID = _offlineLoggedInData.details[0].userID;
-    _onFollowerEmployeeListByStatusCallSuccess(_offlineFollowerEmployeeListData);
+    _onFollowerEmployeeListByStatusCallSuccess(
+        _offlineFollowerEmployeeListData);
 
     _leaveRequestScreenBloc = LeaveRequestScreenBloc(baseBloc);
-    edt_FollowupEmployeeList.text = _offlineLoggedInData.details[0].employeeName;
-    edt_FollowupEmployeeUserID.text = _offlineLoggedInData.details[0].employeeID.toString();
+    edt_FollowupEmployeeList.text =
+        _offlineLoggedInData.details[0].employeeName;
+    edt_FollowupEmployeeUserID.text =
+        _offlineLoggedInData.details[0].employeeID.toString();
     edt_FollowupStatus.text = "Pending";
 
-   // _leaveRequestScreenBloc..add(LeaveRequestEmployeeListCallEvent(AttendanceEmployeeListRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID)));
+    // _leaveRequestScreenBloc..add(LeaveRequestEmployeeListCallEvent(AttendanceEmployeeListRequest(CompanyId: CompanyID.toString(),LoginUserID: LoginUserID)));
     FetchFollowupStatusDetails();
     edt_FollowupStatus.addListener(followupStatusListener);
     edt_FollowupEmployeeList.addListener(followerEmployeeList);
     edt_FollowupEmployeeUserID.addListener(followerEmployeeList);
-    isExpand=false;
-
+    isExpand = false;
   }
 
-  followupStatusListener(){
+  followupStatusListener() {
     print("Current status Text is ${edt_FollowupStatus.text}");
 
-      // _FollowupBloc.add(SearchFollowupListByNameCallEvent(SearchFollowupListByNameRequest(CompanyId: CompanyID.toString(),LoginUserID: edt_FollowupEmployeeUserID.text,FollowupStatusID: "",FollowupStatus: edt_FollowupStatus.text,SearchKey: "",Month: "",Year: "")));
-    _leaveRequestScreenBloc.add(LeaveRequestCallEvent(1,LeaveRequestListAPIRequest(EmployeeID: edt_FollowupEmployeeUserID.text,ApprovalStatus:edt_FollowupStatus.text,Month: "",Year: "",CompanyId: CompanyID )));
-
-
+    // _FollowupBloc.add(SearchFollowupListByNameCallEvent(SearchFollowupListByNameRequest(CompanyId: CompanyID.toString(),LoginUserID: edt_FollowupEmployeeUserID.text,FollowupStatusID: "",FollowupStatus: edt_FollowupStatus.text,SearchKey: "",Month: "",Year: "")));
+    _leaveRequestScreenBloc.add(LeaveRequestCallEvent(
+        1,
+        LeaveRequestListAPIRequest(
+            EmployeeID: edt_FollowupEmployeeUserID.text,
+            ApprovalStatus: edt_FollowupStatus.text,
+            Month: "",
+            Year: "",
+            CompanyId: CompanyID)));
   }
 
-  followerEmployeeList(){
-    print("CurrentEMP Text is ${edt_FollowupEmployeeList.text+ " USERID : " + edt_FollowupEmployeeUserID.text}");
-    _leaveRequestScreenBloc.add(LeaveRequestCallEvent(1,LeaveRequestListAPIRequest(EmployeeID: edt_FollowupEmployeeUserID.text,ApprovalStatus:edt_FollowupStatus.text,Month: "",Year: "",CompanyId: CompanyID )));
-
+  followerEmployeeList() {
+    print(
+        "CurrentEMP Text is ${edt_FollowupEmployeeList.text + " USERID : " + edt_FollowupEmployeeUserID.text}");
+    _leaveRequestScreenBloc.add(LeaveRequestCallEvent(
+        1,
+        LeaveRequestListAPIRequest(
+            EmployeeID: edt_FollowupEmployeeUserID.text,
+            ApprovalStatus: edt_FollowupStatus.text,
+            Month: "",
+            Year: "",
+            CompanyId: CompanyID)));
   }
 
   @override
   Widget build(BuildContext context) {
-
     return BlocProvider(
-      create: (BuildContext context) =>
-          _leaveRequestScreenBloc..add(LeaveRequestCallEvent(1,LeaveRequestListAPIRequest(EmployeeID: edt_FollowupEmployeeUserID.text,ApprovalStatus:edt_FollowupStatus.text,Month: "",Year: "",CompanyId: CompanyID ))),
-
+      create: (BuildContext context) => _leaveRequestScreenBloc
+        ..add(LeaveRequestCallEvent(
+            1,
+            LeaveRequestListAPIRequest(
+                EmployeeID: edt_FollowupEmployeeUserID.text,
+                ApprovalStatus: edt_FollowupStatus.text,
+                Month: "",
+                Year: "",
+                CompanyId: CompanyID))),
       child: BlocConsumer<LeaveRequestScreenBloc, LeaveRequestStates>(
         builder: (BuildContext context, LeaveRequestStates state) {
           if (state is LeaveRequestStatesResponseState) {
             _onInquiryListCallSuccess(state);
           }
 
-
           return super.build(context);
         },
         buildWhen: (oldState, currentState) {
           if (currentState is LeaveRequestStatesResponseState) {
-
             return true;
           }
           return false;
         },
         listener: (BuildContext context, LeaveRequestStates state) {
-          if(state is LeaveRequestDeleteCallResponseState)
-          {
-            _onLeaveRequestDeleteCallSucess(state,context);
+          if (state is LeaveRequestDeleteCallResponseState) {
+            _onLeaveRequestDeleteCallSucess(state, context);
           }
-          if(state is LeaveApprovalSaveResponseState)
-          {
-            _onLeaveApprovalSaveCallSucess(state,context);
+          if (state is LeaveApprovalSaveResponseState) {
+            _onLeaveApprovalSaveCallSucess(state, context);
           }
           return super.build(context);
-
         },
         listenWhen: (oldState, currentState) {
-
-          if (currentState is LeaveRequestDeleteCallResponseState || currentState is LeaveApprovalSaveResponseState) {
+          if (currentState is LeaveRequestDeleteCallResponseState ||
+              currentState is LeaveApprovalSaveResponseState) {
             return true;
           }
           return false;
-          },
+        },
       ),
     );
   }
 
   @override
   Widget buildBody(BuildContext context) {
-
     return WillPopScope(
       onWillPop: _onBackPressed,
       child: Scaffold(
         appBar: NewGradientAppBar(
           title: Text('Leave Approval'),
-          gradient: LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
+          gradient:
+              LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
           actions: <Widget>[
             IconButton(
-                icon: Icon(Icons.water_damage_sharp,color: colorWhite,),
+                icon: Icon(
+                  Icons.water_damage_sharp,
+                  color: colorWhite,
+                ),
                 onPressed: () {
                   //_onTapOfLogOut();
                   navigateTo(context, HomeScreen.routeName,
                       clearAllStack: true);
                 })
           ],
-
         ),
-
         body: Container(
           child: Column(
             children: [
-
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    _leaveRequestScreenBloc.add(LeaveRequestCallEvent(1,LeaveRequestListAPIRequest(EmployeeID: edt_FollowupEmployeeUserID.text,ApprovalStatus:edt_FollowupStatus.text,Month: "",Year: "",CompanyId: CompanyID )));
-
+                    _leaveRequestScreenBloc.add(LeaveRequestCallEvent(
+                        1,
+                        LeaveRequestListAPIRequest(
+                            EmployeeID: edt_FollowupEmployeeUserID.text,
+                            ApprovalStatus: edt_FollowupStatus.text,
+                            Month: "",
+                            Year: "",
+                            CompanyId: CompanyID)));
                   },
                   child: Container(
                     padding: EdgeInsets.only(
@@ -199,38 +216,30 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
                     ),
                     child: Column(
                       children: [
-                        Row(
-                            children: [
-                              Expanded(
-                                flex: 2,
-                                child: _buildEmplyeeListView(),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: _buildSearchView(),
-                              ),
-                            ]),
+                        Row(children: [
+                          Expanded(
+                            flex: 2,
+                            child: _buildEmplyeeListView(),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: _buildSearchView(),
+                          ),
+                        ]),
                         Expanded(child: _buildInquiryList())
                       ],
                     ),
                   ),
                 ),
               ),
-
             ],
           ),
         ),
-
         drawer: build_Drawer(
             context: context, UserName: "KISHAN", RolCode: "Admin"),
       ),
     );
-
-
-
   }
-
-
 
   ///builds inquiry list
   Widget _buildInquiryList() {
@@ -239,7 +248,7 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
         onNotification: (scrollInfo) {
           if (shouldPaginate(
             scrollInfo,
-          ) ) {
+          )) {
             _onInquiryListPagination();
             return true;
           } else {
@@ -248,7 +257,6 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
         },
         child: ListView.builder(
           key: Key('selected $selected'),
-
           itemBuilder: (context, index) {
             return _buildInquiryListItem(index);
           },
@@ -256,22 +264,17 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
           itemCount: _leaveRequestListResponse.details.length,
         ),
       );
-    }
-    else {
+    } else {
       return Container(
         alignment: Alignment.center,
-        child:   Lottie.asset(
-            NO_SEARCH_RESULT_FOUND,
-            height: 200,
-            width: 200
-        ),);
+        child: Lottie.asset(NO_SEARCH_RESULT_FOUND, height: 200, width: 200),
+      );
     }
   }
 
   ///builds row item view of inquiry list
   Widget _buildInquiryListItem(int index) {
-    return ExpantionCustomer(context,index);
-
+    return ExpantionCustomer(context, index);
   }
 
   ///updates data of inquiry list
@@ -280,17 +283,16 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
       //checking if new data is arrived
       if (state.newPage == 1) {
         //resetting search
-        _leaveRequestListResponse =  state.leaveRequestListResponse;
+        _leaveRequestListResponse = state.leaveRequestListResponse;
       } else {
-        _leaveRequestListResponse.details.addAll(state.leaveRequestListResponse.details);
+        _leaveRequestListResponse.details
+            .addAll(state.leaveRequestListResponse.details);
       }
       _pageNo = state.newPage;
     }
-    if(_leaveRequestListResponse.details.length !=0)
-      {
-        isListExist = true;
-      }
-    else{
+    if (_leaveRequestListResponse.details.length != 0) {
+      isListExist = true;
+    } else {
       isListExist = false;
     }
   }
@@ -298,7 +300,14 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
   ///checks if already all records are arrive or not
   ///calls api with new page
   void _onInquiryListPagination() {
-    _leaveRequestScreenBloc.add(LeaveRequestCallEvent(_pageNo+1,LeaveRequestListAPIRequest(EmployeeID: edt_FollowupEmployeeUserID.text,ApprovalStatus:edt_FollowupStatus.text,Month: "",Year: "",CompanyId: CompanyID )));
+    _leaveRequestScreenBloc.add(LeaveRequestCallEvent(
+        _pageNo + 1,
+        LeaveRequestListAPIRequest(
+            EmployeeID: edt_FollowupEmployeeUserID.text,
+            ApprovalStatus: edt_FollowupStatus.text,
+            Month: "",
+            Year: "",
+            CompanyId: CompanyID)));
 
     /* if (_leaveRequestListResponse.details.length < _leaveRequestListResponse.totalCount) {
        _leaveRequestScreenBloc.add(LeaveRequestCallEvent(_pageNo + 1,LeaveRequestListAPIRequest(CompanyId: CompanyID,LoginUserID: LoginUserID,pkID: "",ApprovalStatus: "",Reason: "")));
@@ -307,31 +316,40 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
   }
 
   ExpantionCustomer(BuildContext context, int index) {
-   // Details model = _leaveRequestListResponse.details[index];
+    // Details model = _leaveRequestListResponse.details[index];
 
     return Container(
         padding: EdgeInsets.all(15),
-        child : ExpansionTileCard(
+        child: ExpansionTileCard(
           // key:Key(index.toString()),
           initialElevation: 5.0,
           elevation: 5.0,
-         /* elevationCurve: Curves.easeInOut,
+          /* elevationCurve: Curves.easeInOut,
           initiallyExpanded : index==selected,*/
 
           shadowColor: Color(0xFF504F4F),
           baseColor: Color(0xFFFCFCFC),
-          expandedColor: Color(0xFFC1E0FA),//Colors.deepOrange[50],ADD8E6
+          expandedColor: Color(0xFFC1E0FA), //Colors.deepOrange[50],ADD8E6
           leading: CircleAvatar(
-
               backgroundColor: Color(0xFF504F4F),
-              child: /*Image.asset(IC_USERNAME,height: 25,width: 25,)*/Image.network("http://demo.sharvayainfotech.in/images/profile.png", height: 35, fit: BoxFit.fill,width: 35,)),
-          title: Text(_leaveRequestListResponse.details[index].employeeName,style: TextStyle(
-              color: Colors.black
-          ),),
-          subtitle: Text(_leaveRequestListResponse.details[index].approvalStatus,style: TextStyle(
-            color: Color(0xFF504F4F),
-            fontSize: _fontSize_Title,
-          ),),
+              child: /*Image.asset(IC_USERNAME,height: 25,width: 25,)*/ Image
+                  .network(
+                "http://demo.sharvayainfotech.in/images/profile.png",
+                height: 35,
+                fit: BoxFit.fill,
+                width: 35,
+              )),
+          title: Text(
+            _leaveRequestListResponse.details[index].employeeName,
+            style: TextStyle(color: Colors.black),
+          ),
+          subtitle: Text(
+            _leaveRequestListResponse.details[index].approvalStatus,
+            style: TextStyle(
+              color: Color(0xFF504F4F),
+              fontSize: _fontSize_Title,
+            ),
+          ),
 
           children: <Widget>[
             Divider(
@@ -349,48 +367,55 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
                     margin: EdgeInsets.all(20),
                     child: Container(
                         margin: EdgeInsets.only(left: 10),
-                        child:  Row(
+                        child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
                                   Row(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
-
                                         Expanded(
                                             flex: 1,
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Text("Period From",
                                                     style: TextStyle(
                                                         fontStyle:
-                                                        FontStyle.italic,
-                                                        color: Color(label_color),
-                                                        fontSize: _fontSize_Label,
+                                                            FontStyle.italic,
+                                                        color:
+                                                            Color(label_color),
+                                                        fontSize:
+                                                            _fontSize_Label,
                                                         letterSpacing: .3)),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
                                                 Text(
-                                                    _leaveRequestListResponse.details[index]
-                                                        .fromDate ==
-                                                        ""
+                                                    _leaveRequestListResponse
+                                                                .details[index]
+                                                                .fromDate ==
+                                                            ""
                                                         ? "N/A"
-                                                        :_leaveRequestListResponse.details[index]
-                                                        .fromDate.getFormattedDate(
-                                                        fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                                        toFormat: "dd-MM-yyyy") ??
-                                                        "-",
+                                                        : _leaveRequestListResponse
+                                                                .details[index]
+                                                                .fromDate
+                                                                .getFormattedDate(
+                                                                    fromFormat:
+                                                                        "yyyy-MM-ddTHH:mm:ss",
+                                                                    toFormat:
+                                                                        "dd-MM-yyyy") ??
+                                                            "-",
                                                     style: TextStyle(
-                                                        color: Color(title_color),
-                                                        fontSize: _fontSize_Title,
+                                                        color:
+                                                            Color(title_color),
+                                                        fontSize:
+                                                            _fontSize_Title,
                                                         letterSpacing: .3)),
                                               ],
                                             )),
@@ -398,31 +423,40 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
                                             flex: 1,
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Text("Period To",
                                                     style: TextStyle(
                                                         fontStyle:
-                                                        FontStyle.italic,
-                                                        color: Color(label_color),
-                                                        fontSize: _fontSize_Label,
+                                                            FontStyle.italic,
+                                                        color:
+                                                            Color(label_color),
+                                                        fontSize:
+                                                            _fontSize_Label,
                                                         letterSpacing: .3)),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
                                                 Text(
-                                                    _leaveRequestListResponse.details[index]
-                                                        .toDate ==
-                                                        ""
+                                                    _leaveRequestListResponse
+                                                                .details[index]
+                                                                .toDate ==
+                                                            ""
                                                         ? "N/A"
-                                                        :_leaveRequestListResponse.details[index]
-                                                        .toDate.getFormattedDate(
-                                                        fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                                        toFormat: "dd-MM-yyyy") ??
-                                                        "-",
+                                                        : _leaveRequestListResponse
+                                                                .details[index]
+                                                                .toDate
+                                                                .getFormattedDate(
+                                                                    fromFormat:
+                                                                        "yyyy-MM-ddTHH:mm:ss",
+                                                                    toFormat:
+                                                                        "dd-MM-yyyy") ??
+                                                            "-",
                                                     style: TextStyle(
-                                                        color: Color(title_color),
-                                                        fontSize: _fontSize_Title,
+                                                        color:
+                                                            Color(title_color),
+                                                        fontSize:
+                                                            _fontSize_Title,
                                                         letterSpacing: .3)),
                                               ],
                                             ))
@@ -433,35 +467,40 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
 
                                   Row(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
-
                                         Expanded(
                                             flex: 1,
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Text("Reason For Leave  ",
                                                     style: TextStyle(
                                                         fontStyle:
-                                                        FontStyle.italic,
-                                                        color: Color(label_color),
-                                                        fontSize: _fontSize_Label,
+                                                            FontStyle.italic,
+                                                        color:
+                                                            Color(label_color),
+                                                        fontSize:
+                                                            _fontSize_Label,
                                                         letterSpacing: .3)),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
                                                 Text(
-                                                    _leaveRequestListResponse.details[index]
-                                                        .reasonForLeave ==
-                                                        ""
+                                                    _leaveRequestListResponse
+                                                                .details[index]
+                                                                .reasonForLeave ==
+                                                            ""
                                                         ? "N/A"
-                                                        :_leaveRequestListResponse.details[index]
-                                                        .reasonForLeave,
+                                                        : _leaveRequestListResponse
+                                                            .details[index]
+                                                            .reasonForLeave,
                                                     style: TextStyle(
-                                                        color: Color(title_color),
-                                                        fontSize: _fontSize_Title,
+                                                        color:
+                                                            Color(title_color),
+                                                        fontSize:
+                                                            _fontSize_Title,
                                                         letterSpacing: .3)),
                                               ],
                                             )),
@@ -472,35 +511,40 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
 
                                   Row(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
-
                                         Expanded(
                                             flex: 1,
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Text("Created By  ",
                                                     style: TextStyle(
                                                         fontStyle:
-                                                        FontStyle.italic,
-                                                        color: Color(label_color),
-                                                        fontSize: _fontSize_Label,
+                                                            FontStyle.italic,
+                                                        color:
+                                                            Color(label_color),
+                                                        fontSize:
+                                                            _fontSize_Label,
                                                         letterSpacing: .3)),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
                                                 Text(
-                                                    _leaveRequestListResponse.details[index]
-                                                        .createdBy ==
-                                                        ""
+                                                    _leaveRequestListResponse
+                                                                .details[index]
+                                                                .createdBy ==
+                                                            ""
                                                         ? "N/A"
-                                                        :_leaveRequestListResponse.details[index]
-                                                        .createdBy,
+                                                        : _leaveRequestListResponse
+                                                            .details[index]
+                                                            .createdBy,
                                                     style: TextStyle(
-                                                        color: Color(title_color),
-                                                        fontSize: _fontSize_Title,
+                                                        color:
+                                                            Color(title_color),
+                                                        fontSize:
+                                                            _fontSize_Title,
                                                         letterSpacing: .3)),
                                               ],
                                             )),
@@ -508,30 +552,40 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
                                             flex: 1,
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Text("Leave Type  ",
                                                     style: TextStyle(
                                                         fontStyle:
-                                                        FontStyle.italic,
-                                                        color: Color(label_color),
-                                                        fontSize: _fontSize_Label,
+                                                            FontStyle.italic,
+                                                        color:
+                                                            Color(label_color),
+                                                        fontSize:
+                                                            _fontSize_Label,
                                                         letterSpacing: .3)),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
                                                 Text(
-                                                    _leaveRequestListResponse.details[index]
-                                                        .leaveType ==
-                                                        "" ||  _leaveRequestListResponse.details[index]
-                                                        .leaveType ==
-                                                        "--Not Available--"
+                                                    _leaveRequestListResponse
+                                                                    .details[
+                                                                        index]
+                                                                    .leaveType ==
+                                                                "" ||
+                                                            _leaveRequestListResponse
+                                                                    .details[
+                                                                        index]
+                                                                    .leaveType ==
+                                                                "--Not Available--"
                                                         ? "N/A"
-                                                        :_leaveRequestListResponse.details[index]
-                                                        .leaveType ,
+                                                        : _leaveRequestListResponse
+                                                            .details[index]
+                                                            .leaveType,
                                                     style: TextStyle(
-                                                        color: Color(title_color),
-                                                        fontSize: _fontSize_Title,
+                                                        color:
+                                                            Color(title_color),
+                                                        fontSize:
+                                                            _fontSize_Title,
                                                         letterSpacing: .3)),
                                               ],
                                             )),
@@ -542,38 +596,46 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
 
                                   Row(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
-
                                         Expanded(
                                             flex: 1,
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: <Widget>[
                                                 Text("Created Date  ",
                                                     style: TextStyle(
                                                         fontStyle:
-                                                        FontStyle.italic,
-                                                        color: Color(label_color),
-                                                        fontSize: _fontSize_Label,
+                                                            FontStyle.italic,
+                                                        color:
+                                                            Color(label_color),
+                                                        fontSize:
+                                                            _fontSize_Label,
                                                         letterSpacing: .3)),
                                                 SizedBox(
                                                   width: 5,
                                                 ),
                                                 Text(
-                                                    _leaveRequestListResponse.details[index]
-                                                        .createdDate ==
-                                                        ""
+                                                    _leaveRequestListResponse
+                                                                .details[index]
+                                                                .createdDate ==
+                                                            ""
                                                         ? "N/A"
-                                                        :_leaveRequestListResponse.details[index]
-                                                        .createdDate.getFormattedDate(
-                                                        fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                                        toFormat: "dd-MM-yyyy HH:mm") ??
-                                                        "-",
+                                                        : _leaveRequestListResponse
+                                                                .details[index]
+                                                                .createdDate
+                                                                .getFormattedDate(
+                                                                    fromFormat:
+                                                                        "yyyy-MM-ddTHH:mm:ss",
+                                                                    toFormat:
+                                                                        "dd-MM-yyyy HH:mm") ??
+                                                            "-",
                                                     style: TextStyle(
-                                                        color: Color(title_color),
-                                                        fontSize: _fontSize_Title,
+                                                        color:
+                                                            Color(title_color),
+                                                        fontSize:
+                                                            _fontSize_Title,
                                                         letterSpacing: .3)),
                                               ],
                                             )),
@@ -582,21 +644,26 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
                                     height: sizeboxsize,
                                   ),
 
-
                                   Container(
-                                    padding: const EdgeInsets.only(left: 10.0, right: 10.0),
+                                    padding: const EdgeInsets.only(
+                                        left: 10.0, right: 10.0),
                                     decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10.0),
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
                                         color: colorWhite,
-                                        border: Border.all(color: colorPrimary)),
+                                        border:
+                                            Border.all(color: colorPrimary)),
                                     child: DropdownButtonHideUnderline(
-                                      child:  DropdownButton(
+                                      child: DropdownButton(
                                         isExpanded: true,
                                         style: TextStyle(color: colorPrimary),
-                                        value:_leaveRequestListResponse.details[index].approvalStatus ,
+                                        value: _leaveRequestListResponse
+                                            .details[index].approvalStatus,
                                         items: _dropDownApprovalItem(),
                                         onChanged: (value) {
-                                          _leaveRequestListResponse.details[index].approvalStatus = value;
+                                          _leaveRequestListResponse
+                                              .details[index]
+                                              .approvalStatus = value;
                                           setState(() {});
                                         },
                                         hint: Text('Select Gender'),
@@ -604,13 +671,10 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
                                     ),
                                   ),
 
-
-                                 // _buildApprovalStatus(index),
-                              SizedBox(
-                              height: sizeboxsize,
-                            ),
-
-
+                                  // _buildApprovalStatus(index),
+                                  SizedBox(
+                                    height: sizeboxsize,
+                                  ),
                                 ],
                               ),
                             ),
@@ -618,33 +682,33 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
                         ))),
               ),
             ),
-            Divider(
-                color: Colors.black
-            ),
+            Divider(color: Colors.black),
             ButtonBar(
                 alignment: MainAxisAlignment.spaceAround,
                 buttonHeight: 52.0,
                 buttonMinWidth: 90.0,
                 children: <Widget>[
-
                   FlatButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4.0)),
                     onPressed: () {
-
-                      _onTapOfEditCustomer(_leaveRequestListResponse.details[index]);
-
+                      _onTapOfEditCustomer(
+                          _leaveRequestListResponse.details[index]);
                     },
                     child: Column(
                       children: <Widget>[
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 2.0),
                         ),
-                        Text('Save',style: TextStyle(color: colorPrimary,fontWeight: FontWeight.bold),),
+                        Text(
+                          'Save',
+                          style: TextStyle(
+                              color: colorPrimary, fontWeight: FontWeight.bold),
+                        ),
                       ],
                     ),
                   ),
-                /*  FlatButton(
+                  /*  FlatButton(
 
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(4.0)),
@@ -664,16 +728,10 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
                     ),
                   ),
 */
-
-
-
                 ]),
-
           ],
         ));
-
   }
-
 
   Future<bool> _onBackPressed() {
     navigateTo(context, HomeScreen.routeName, clearAllStack: true);
@@ -681,14 +739,10 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
 
   ///navigates to search list screen
 
-
   ///updates data of inquiry list
 
-
-
   void _onTapOfEditCustomer(LeaveRequestDetails detail) {
-
-   /* navigateTo(context, LeaveRequestAddEditScreen.routeName,
+    /* navigateTo(context, LeaveRequestAddEditScreen.routeName,
 
         arguments: AddUpdateLeaveRequestScreenArguments(detail))
         .then((value) {
@@ -696,25 +750,34 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
 
     });*/
 
-    _leaveRequestScreenBloc.add(LeaveRequestApprovalSaveCallEvent(detail.pkID,LeaveApprovalSaveAPIRequest(ApprovalStatus: detail.approvalStatus,LoginUserID: LoginUserID,CompanyId: CompanyID)));
+    showCommonDialogWithTwoOptions(
+        context, "Are you sure you want to Update Missed Punch ?",
+        negativeButtonTitle: "No",
+        positiveButtonTitle: "Yes", onTapOfPositiveButton: () {
+      Navigator.of(context).pop();
 
+      _leaveRequestScreenBloc.add(LeaveRequestApprovalSaveCallEvent(
+          detail.pkID,
+          LeaveApprovalSaveAPIRequest(
+              ApprovalStatus: detail.approvalStatus,
+              LoginUserID: LoginUserID,
+              CompanyId: CompanyID)));
+    });
   }
 
-  void _onFollowerEmployeeListByStatusCallSuccess(FollowerEmployeeListResponse state) {
-
+  void _onFollowerEmployeeListByStatusCallSuccess(
+      FollowerEmployeeListResponse state) {
     arr_ALL_Name_ID_For_Folowup_EmplyeeList.clear();
 
-    if(state.details!=null)
-    {
-      if(_offlineLoggedInData.details[0].roleCode.toLowerCase().trim()=="admin")
-      {
+    if (state.details != null) {
+      if (_offlineLoggedInData.details[0].roleCode.toLowerCase().trim() ==
+          "admin") {
         ALL_Name_ID all_name_id = ALL_Name_ID();
         all_name_id.Name = "ALL";
-        all_name_id.Name1 ="";
+        all_name_id.Name1 = "";
         arr_ALL_Name_ID_For_Folowup_EmplyeeList.add(all_name_id);
       }
-      for(var i=0;i<state.details.length;i++)
-      {
+      for (var i = 0; i < state.details.length; i++) {
         ALL_Name_ID all_name_id = ALL_Name_ID();
         all_name_id.Name = state.details[i].employeeName;
         all_name_id.Name1 = state.details[i].pkID.toString();
@@ -723,28 +786,19 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
     }
   }
 
-
-
   void FetchFollowupStatusDetails() {
     arr_ALL_Name_ID_For_Folowup_Status.clear();
-    for(var i =0 ; i<3;i++)
-    {
+    for (var i = 0; i < 3; i++) {
       ALL_Name_ID all_name_id = ALL_Name_ID();
 
-      if(i==0)
-      {
+      if (i == 0) {
         all_name_id.Name = "Pending";
-      }
-      else if(i==1)
-      {
+      } else if (i == 1) {
         all_name_id.Name = "Approved";
-      }
-      else if(i==2)
-      {
+      } else if (i == 2) {
         all_name_id.Name = "Rejected";
       }
       arr_ALL_Name_ID_For_Folowup_Status.add(all_name_id);
-
     }
   }
 
@@ -756,24 +810,26 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
             values: arr_ALL_Name_ID_For_Folowup_EmplyeeList,
             context1: context,
             controller: edt_FollowupEmployeeList,
-            controller2: edt_FollowupEmployeeUserID ,
+            controller2: edt_FollowupEmployeeUserID,
             lable: "Select Employee");
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                    "Select Employee",
-                    style:TextStyle(fontSize: 12,color: colorPrimary,fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text("Select Employee",
+                style: TextStyle(
+                    fontSize: 12,
+                    color: colorPrimary,
+                    fontWeight: FontWeight
+                        .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
                 ),
-                Icon(
-                  Icons.filter_list_alt,
-                  color: colorPrimary,
-                ),]),
+            Icon(
+              Icons.filter_list_alt,
+              color: colorPrimary,
+            ),
+          ]),
           SizedBox(
             height: 5,
           ),
@@ -781,38 +837,40 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
             elevation: 5,
             color: colorLightGray,
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
               padding: EdgeInsets.only(top: 5, bottom: 5, left: 5, right: 10),
               width: double.maxFinite,
               child: Row(
                 children: [
                   Expanded(
-                    child:/* Text(
+                    child: /* Text(
                         SelectedStatus =="" ?
                         "Tap to select Status" : SelectedStatus.Name,
                         style:TextStyle(fontSize: 12,color: Color(0xFF000000),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
                     ),*/
 
-                    TextField(
+                        TextField(
                       controller: edt_FollowupEmployeeList,
                       enabled: false,
                       /*  onChanged: (value) => {
                     print("StatusValue " + value.toString() )
-                },*/  style: TextStyle(
-                      color: Colors.black, // <-- Change this
-                      fontSize: 12, fontWeight: FontWeight.bold),
+                },*/
+                      style: TextStyle(
+                          color: Colors.black, // <-- Change this
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
                       decoration: new InputDecoration(
                           border: InputBorder.none,
                           focusedBorder: InputBorder.none,
                           enabledBorder: InputBorder.none,
                           errorBorder: InputBorder.none,
                           disabledBorder: InputBorder.none,
-                          contentPadding:
-                          EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
-                          hintText: "Select"
-                      ),),
+                          contentPadding: EdgeInsets.only(
+                              left: 15, bottom: 11, top: 11, right: 15),
+                          hintText: "Select"),
+                    ),
                     // dropdown()
                   ),
                   /*  Icon(
@@ -841,18 +899,20 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                    "Select Status",
-                    style:TextStyle(fontSize: 12,color: colorPrimary,fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text("Select Status",
+                style: TextStyle(
+                    fontSize: 12,
+                    color: colorPrimary,
+                    fontWeight: FontWeight
+                        .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
                 ),
-                Icon(
-                  Icons.filter_list_alt,
-                  color: colorPrimary,
-                ),]),
+            Icon(
+              Icons.filter_list_alt,
+              color: colorPrimary,
+            ),
+          ]),
           SizedBox(
             height: 5,
           ),
@@ -860,37 +920,38 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
             elevation: 5,
             color: colorLightGray,
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
               padding: EdgeInsets.only(top: 5, bottom: 5, left: 5, right: 5),
               width: double.maxFinite,
               child: Row(
                 children: [
                   Expanded(
-                    child:/* Text(
+                    child: /* Text(
                         SelectedStatus =="" ?
                         "Tap to select Status" : SelectedStatus.Name,
                         style:TextStyle(fontSize: 12,color: Color(0xFF000000),fontWeight: FontWeight.bold)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
                     ),*/
 
-                    TextField(
+                        TextField(
                       controller: edt_FollowupStatus,
                       enabled: false,
                       /*  onChanged: (value) => {
                     print("StatusValue " + value.toString() )
                 },*/
-                style: TextStyle(
-                  color: Colors.black, // <-- Change this
-                  fontSize: 12,fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          color: Colors.black, // <-- Change this
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
                       decoration: new InputDecoration(
                         border: InputBorder.none,
                         focusedBorder: InputBorder.none,
                         enabledBorder: InputBorder.none,
                         errorBorder: InputBorder.none,
                         disabledBorder: InputBorder.none,
-                        contentPadding:
-                        EdgeInsets.only(left: 15, bottom: 11, top: 11, right: 15),
+                        contentPadding: EdgeInsets.only(
+                            left: 15, bottom: 11, top: 11, right: 15),
                         hintText: "Select",
                         /* hintStyle: TextStyle(
                     color: Colors.grey, // <-- Change this
@@ -902,8 +963,8 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
                     fontSize: 12,
 
                   ),*/
-
-                      ),),
+                      ),
+                    ),
                     // dropdown()
                   ),
                   /*Icon(
@@ -919,16 +980,11 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
     );
   }
 
-
-
-
-  void _onLeaveRequestDeleteCallSucess(LeaveRequestDeleteCallResponseState state, BuildContext buildContext123) {
-
-   /* navigateTo(buildContext123, LeaveRequestListScreen.routeName,
+  void _onLeaveRequestDeleteCallSucess(
+      LeaveRequestDeleteCallResponseState state, BuildContext buildContext123) {
+    /* navigateTo(buildContext123, LeaveRequestListScreen.routeName,
         clearAllStack: true);*/
-
   }
-
 
   void _onTapOfDeleteCustomer(int id) {
     showCommonDialogWithTwoOptions(
@@ -937,42 +993,48 @@ class _LeaveRequestApprovalListScreenState extends BaseState<LeaveRequestApprova
         positiveButtonTitle: "Yes", onTapOfPositiveButton: () {
       Navigator.of(context).pop();
       //_collapse();
-      _leaveRequestScreenBloc.add(LeaveRequestDeleteByNameCallEvent(id,FollowupDeleteRequest(CompanyId: CompanyID.toString())));
+      _leaveRequestScreenBloc.add(LeaveRequestDeleteByNameCallEvent(
+          id, FollowupDeleteRequest(CompanyId: CompanyID.toString())));
     });
   }
-
 
   List<DropdownMenuItem<String>> _dropDownApprovalItem() {
     List<String> ddl = ["Pending", "Approved", "Rejected"];
     return ddl
         .map((value) => DropdownMenuItem(
-      value: value,
-      child: Text(value),
-    ))
+              value: value,
+              child: Text(value),
+            ))
         .toList();
   }
+
   List<DropdownMenuItem<String>> _dropDownPaidUnpaidItem() {
-    List<String> ddl = ["Paid","unpaid"];
+    List<String> ddl = ["Paid", "unpaid"];
     return ddl
         .map((value) => DropdownMenuItem(
-      value: value,
-      child: Text(value),
-    ))
+              value: value,
+              child: Text(value),
+            ))
         .toList();
   }
 
-  void _onLeaveApprovalSaveCallSucess(LeaveApprovalSaveResponseState state, BuildContext buildContext123) {
+  void _onLeaveApprovalSaveCallSucess(
+      LeaveApprovalSaveResponseState state, BuildContext buildContext123) {
     print("ResponseLeaveApproval : " + state.response.details[0].column2);
-   /* navigateTo(buildContext123, LeaveRequestApprovalListScreen.routeName,
+    /* navigateTo(buildContext123, LeaveRequestApprovalListScreen.routeName,
         clearAllStack: true);*/
     //Navigator.of(context).pop();
-   //baseBloc.refreshScreen();
+    //baseBloc.refreshScreen();
 
     setState(() {
-      _leaveRequestScreenBloc.add(LeaveRequestCallEvent(1,LeaveRequestListAPIRequest(EmployeeID: edt_FollowupEmployeeUserID.text,ApprovalStatus:edt_FollowupStatus.text,Month: "",Year: "",CompanyId: CompanyID )));
+      _leaveRequestScreenBloc.add(LeaveRequestCallEvent(
+          1,
+          LeaveRequestListAPIRequest(
+              EmployeeID: edt_FollowupEmployeeUserID.text,
+              ApprovalStatus: edt_FollowupStatus.text,
+              Month: "",
+              Year: "",
+              CompanyId: CompanyID)));
     });
-
   }
-
-
 }

@@ -525,6 +525,7 @@ class _Customer_ADD_EDITState extends BaseState<Customer_ADD_EDIT>
                       alignment: Alignment.bottomCenter,
                       child: getCommonButton(baseTheme, () {
                         //  _onTapOfDeleteALLContact();
+
                         navigateTo(context, ContactsListScreen.routeName);
                       }, "Add Contact + ",
                           width: 600, backGroundColor: Color(0xff4d62dc)),
@@ -1450,25 +1451,33 @@ class _Customer_ADD_EDITState extends BaseState<Customer_ADD_EDIT>
                   children: [
                     Expanded(
                       child: TextField(
-                          controller: edt_GST_Name,
-                          keyboardType: TextInputType.text,
-                          maxLength: 15,
-                          textInputAction: TextInputAction.next,
-                          decoration: InputDecoration(
-                            contentPadding: EdgeInsets.only(bottom: 10),
-                            counterText: "",
-                            hintText: "Tap to enter Gst No.",
-                            labelStyle: TextStyle(
-                              color: Color(0xFF000000),
-                            ),
-                            border: InputBorder.none,
-                          ),
-                          style: TextStyle(
-                            fontSize: 15,
+                        controller: edt_GST_Name,
+                        keyboardType: TextInputType.text,
+                        maxLength: 15,
+                        textInputAction: TextInputAction.next,
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.only(bottom: 10),
+                          counterText: "",
+                          hintText: "Tap to enter Gst No.",
+                          labelStyle: TextStyle(
                             color: Color(0xFF000000),
-                          ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-
                           ),
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Color(0xFF000000),
+                        ),
+                        // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+                        onChanged: (value) {
+                          if (value.length == 15) {
+                            edt_PAN_Name.text =
+                                value.substring(2, value.length - 3);
+                          } else {
+                            edt_PAN_Name.text = "";
+                          }
+                        },
+                      ),
                     ),
                     Icon(
                       Icons.admin_panel_settings,
@@ -2102,7 +2111,7 @@ class _Customer_ADD_EDITState extends BaseState<Customer_ADD_EDIT>
   }
 
   _onTapOfSaveCustomerAPICall() async {
-    if (edt_Email_Name.text != "") {
+    if (edt_Email_Name.text.toString().trim() != "") {
       emailValid = RegExp(
               r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
           .hasMatch(edt_Email_Name.text);
@@ -2136,70 +2145,72 @@ class _Customer_ADD_EDITState extends BaseState<Customer_ADD_EDIT>
         edt_sourceID.text +
         "");
 
-    if (edt_Customer_Name.text != "") {
-      if (edt_Category.text != "") {
-        if (edt_Customer_Contact1_Name.text != "") {
-          if (emailValid == true) {
-            if (edt_QualifiedCountry.text != "") {
-              if (edt_QualifiedState.text != "") {
-                if (edt_QualifiedCity.text != "") {
-                  showCommonDialogWithTwoOptions(
-                      context, "Are you sure you want to Save this Customer?",
-                      negativeButtonTitle: "No",
-                      positiveButtonTitle: "Yes", onTapOfPositiveButton: () {
-                    Navigator.of(context).pop();
+    if (edt_Customer_Name.text.toString().trim() != "") {
+      if (edt_Category.text.toString().trim() != "") {
+        if (edt_Customer_Contact1_Name.text.toString().trim() != "") {
+          if (emailValid == true ||
+              edt_Email_Name.text.toString().trim() == "") {
+            if (edt_GST_Name.text.toString().trim() == "" ||
+                edt_GST_Name.text.toString().trim().length == 15) {
+              if (edt_QualifiedCountry.text.toString().trim() != "") {
+                if (edt_QualifiedState.text.toString().trim() != "") {
+                  if (edt_QualifiedCity.text.toString().trim() != "") {
+                    if (edt_Pincode.text.toString().trim() == "" ||
+                        edt_Pincode.text.toString().trim().length == 6) {
+                      showCommonDialogWithTwoOptions(context,
+                          "Are you sure you want to Save this Customer?",
+                          negativeButtonTitle: "No", positiveButtonTitle: "Yes",
+                          onTapOfPositiveButton: () {
+                        Navigator.of(context).pop();
 
-                    /*if (customerID != 0 || customerID != null) {
-                    _CustomerBloc.add(CustomerIdToDeleteAllContactCallEvent(
-                        customerID,
-                        CustomerIdToDeleteAllContactRequest(
-                            CompanyId: CompanyID.toString())));
-                  }*/
-
-                    _CustomerBloc.add(CustomerAddEditCallEvent(
-                        CustomerAddEditApiRequest(
-                            customerID: customerID.toString(),
-                            customerName: edt_Customer_Name.text,
-                            customerType: edt_Category.text,
-                            address: edt_Address.text,
-                            area: edt_Area.text,
-                            pinCode: edt_Pincode.text,
-                            gSTNo: edt_GST_Name.text,
-                            pANNo: edt_PAN_Name.text,
-                            contactNo1: edt_Customer_Contact1_Name.text,
-                            contactNo2: edt_Customer_Contact2_Name.text,
-                            emailAddress: edt_Email_Name.text,
-                            websiteAddress: edt_Website_Name.text,
-                            latitude: SharedPrefHelper.instance.getLatitude(),
-                            longitude: SharedPrefHelper.instance.getLongitude(),
-                            loginUserID: LoginUserID,
-                            countryCode: edt_QualifiedCountryCode.text,
-                            blockCustomer: nofollowupvalue.toString(),
-                            customerSourceID: edt_sourceID.text,
-                            companyId: CompanyID.toString(),
-                            stateCode: edt_QualifiedStateCode.text,
-                            cityCode: edt_QualifiedCityCode.text)));
-                  });
-                  //_CustomerBloc.add(CustomerContactSaveCallEvent(_contactsList));
-
-                  /*
-
-                _CustomerBloc.add(CustomerContactSaveCallEvent([ContactModel(
-                  "0","51506","Satyam1","10032","Satyam1","98256458952","infsatyamo@testapi.com","admin"
-                )]));
-
-                 */
-
+                        _CustomerBloc.add(CustomerAddEditCallEvent(
+                            CustomerAddEditApiRequest(
+                                customerID: customerID.toString(),
+                                customerName: edt_Customer_Name.text,
+                                customerType: edt_Category.text,
+                                address: edt_Address.text,
+                                area: edt_Area.text,
+                                pinCode: edt_Pincode.text,
+                                gSTNo: edt_GST_Name.text,
+                                pANNo: edt_PAN_Name.text,
+                                contactNo1: edt_Customer_Contact1_Name.text,
+                                contactNo2: edt_Customer_Contact2_Name.text,
+                                emailAddress: edt_Email_Name.text,
+                                websiteAddress: edt_Website_Name.text,
+                                latitude:
+                                    SharedPrefHelper.instance.getLatitude(),
+                                longitude:
+                                    SharedPrefHelper.instance.getLongitude(),
+                                loginUserID: LoginUserID,
+                                countryCode: edt_QualifiedCountryCode.text,
+                                blockCustomer: nofollowupvalue.toString(),
+                                customerSourceID: edt_sourceID.text,
+                                companyId: CompanyID.toString(),
+                                stateCode: edt_QualifiedStateCode.text,
+                                cityCode: edt_QualifiedCityCode.text)));
+                      });
+                    } else {
+                      showCommonDialogWithSingleOption(
+                          context, "PinCode is not Valid !",
+                          positiveButtonTitle: "OK");
+                    }
+                  } else {
+                    showCommonDialogWithSingleOption(
+                        context, "City is required!",
+                        positiveButtonTitle: "OK");
+                  }
                 } else {
-                  showCommonDialogWithSingleOption(context, "City is required!",
+                  showCommonDialogWithSingleOption(
+                      context, "State is required!",
                       positiveButtonTitle: "OK");
                 }
               } else {
-                showCommonDialogWithSingleOption(context, "State is required!",
+                showCommonDialogWithSingleOption(
+                    context, "Country is required!",
                     positiveButtonTitle: "OK");
               }
             } else {
-              showCommonDialogWithSingleOption(context, "Country is required!",
+              showCommonDialogWithSingleOption(context, "Enter valid GSTNo. !",
                   positiveButtonTitle: "OK");
             }
           } else {
@@ -2380,6 +2391,11 @@ class _Customer_ADD_EDITState extends BaseState<Customer_ADD_EDIT>
     _searchStateDetails.value = _editModel.stateCode;
     _searchStateDetails.label = _editModel.stateName;
     _isSwitched = _editModel.blockCustomer;
+
+    if (_editModel.gSTNO.length == 15) {
+      edt_PAN_Name.text =
+          _editModel.gSTNO.substring(2, _editModel.gSTNO.length - 3);
+    }
 
     print("BlockCustomer" + _editModel.blockCustomer.toString());
     if (customerID != null) {

@@ -15,8 +15,8 @@ class ToDoHeaderSaveRequest {
   String ClosingRemarks;
   String CompanyId;
 
-  ToDoHeaderSaveRequest({
-      this.Priority,
+  ToDoHeaderSaveRequest(
+      {this.Priority,
       this.TaskDescription,
       this.Location,
       this.TaskCategoryID,
@@ -48,7 +48,7 @@ Longitude:
 ClosingRemarks:Test INS Done And Check For Update Now
 CompanyId:10032*/
 
- // ToDoHeaderSaveRequest({this.CompanyId,this.pkID,this.StatusCategory,this.LoginUserID,this.SearchKey});
+  // ToDoHeaderSaveRequest({this.CompanyId,this.pkID,this.StatusCategory,this.LoginUserID,this.SearchKey});
 
   ToDoHeaderSaveRequest.fromJson(Map<String, dynamic> json) {
     Priority = json['Priority'];
@@ -66,28 +66,25 @@ CompanyId:10032*/
     Longitude = json['Longitude'];
     ClosingRemarks = json['ClosingRemarks'];
     CompanyId = json['CompanyId'];
-
-
-
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['Priority'] = this.Priority;
     data['TaskDescription'] = this.TaskDescription;
-    data['Location']=this.Location;
-    data['TaskCategoryID']=this.TaskCategoryID;
-    data['StartDate']=this.StartDate;
-    data['DueDate']=this.DueDate;
-    data['CompletionDate']=this.CompletionDate;
-    data['LoginUserID']=this.LoginUserID;
-    data['EmployeeID']=this.EmployeeID;
-    data['Reminder']=this.Reminder;
-    data['ReminderMonth']=this.ReminderMonth;
-    data['Latitude']=this.Latitude;
-    data['Longitude']=this.Longitude;
-    data['ClosingRemarks']=this.ClosingRemarks;
-    data['CompanyId']=this.CompanyId;
+    data['Location'] = this.Location;
+    data['TaskCategoryID'] = this.TaskCategoryID;
+    data['StartDate'] = this.StartDate;
+    data['DueDate'] = this.DueDate;
+    data['CompletionDate'] = this.CompletionDate;
+    data['LoginUserID'] = this.LoginUserID;
+    data['EmployeeID'] = this.EmployeeID;
+    data['Reminder'] = this.Reminder;
+    data['ReminderMonth'] = this.ReminderMonth;
+    data['Latitude'] = this.Latitude;
+    data['Longitude'] = this.Longitude;
+    data['ClosingRemarks'] = this.ClosingRemarks;
+    data['CompanyId'] = this.CompanyId;
 
     return data;
   }

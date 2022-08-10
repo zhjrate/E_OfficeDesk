@@ -13,7 +13,6 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:soleoserp/firebase_options.dart';
-import 'package:soleoserp/models/common/globals.dart';
 import 'package:soleoserp/ui/res/localizations/app_localizations.dart';
 import 'package:soleoserp/ui/res/style_resources.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Attend_Visit/Attend_Visit_Add_Edit/attend_visit_add_edit_screen.dart';
@@ -22,6 +21,7 @@ import 'package:soleoserp/ui/screens/DashBoard/Modules/Attend_Visit/Attend_Visit
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/complaint_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/complaint_pagination_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/complaint_search_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/digital_signature.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/search_customer_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/country_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/customer_add_edit.dart';
@@ -39,9 +39,12 @@ import 'package:soleoserp/ui/screens/DashBoard/Modules/Installation/installation
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Installation/installation_search_customer_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Installation/installation_state_search.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Installation/search_installation.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/OfficeTODO/office_to_do.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/OfficeTODO/office_to_do_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_pagination_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_serach_customer_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_work_log_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/attendance/employee_attandance_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/attendance/employee_attendance_list.dart';
@@ -74,9 +77,11 @@ import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/Followup_dialog/f
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/add_inquiry_product_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/customer_search/customer_search_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_add_edit.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_fillter/FollowupFromInquiry.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_fillter/inquiry_filter_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_product_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_product_shortcut_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_share_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/search_inquiry_product_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/search_inquiry_screen.dart';
@@ -90,6 +95,7 @@ import 'package:soleoserp/ui/screens/DashBoard/Modules/maintenance/maintenance_l
 import 'package:soleoserp/ui/screens/DashBoard/Modules/maintenance/maintenance_list/maintenance_search_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/missed_punch/missed_punch_list/missed_punch_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/missed_punch/missed_punch_list/missed_punch_search_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/missed_punch_approval/missed_punch_approval_list/missed_punch_approval_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/packing_checklist/packing_asambly_crud/packing_assambly_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/packing_checklist/packing_asambly_crud/packing_assambly_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/packing_checklist/packing_checklist_add.dart';
@@ -112,6 +118,9 @@ import 'package:soleoserp/ui/screens/DashBoard/Modules/quotation/search_quotatio
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salary_upad/salary_upad_list/salary_upad_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salary_upad/salary_upad_list/salary_upad_search_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sale_bill_list/sales_bill_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sale_bill_list/search_sales_bill_sceen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sales_bill_add_edit/sale_bill_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/SaleOrder_manan_design/sales_order_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/salesorder_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/search_salesorder_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/telecaller/telecaller_add_edit/company_search_screen.dart';
@@ -171,7 +180,6 @@ Future<void> main() async {
     }
   }
   checkPermissionStatus();
-
   runApp(MyApp());
 }
 
@@ -191,14 +199,14 @@ void checkPermissionStatus() async {
   if (Denied == true) {
     // openAppSettings();
     is_LocationService_Permission = false;
-    showCommonDialogWithSingleOption(Globals.context,
+    /*  showCommonDialogWithSingleOption(Globals.context,
         "Location permission is required , You have to click on OK button to Allow the location access !",
         positiveButtonTitle: "OK", onTapOfPositiveButton: () async {
       await openAppSettings();
       Navigator.of(Globals.context).pop();
-    });
+    });*/
 
-    // await Permission.location.request();
+    await Permission.location.request();
     // We didn't ask for permission yet or the permission has been denied before but not permanently.
   }
 
@@ -547,6 +555,37 @@ class MyApp extends StatefulWidget {
         return getMaterialPageRoute(
             FollowUpInquiryAddEditScreen(settings.arguments));
 
+      case FollowUpFromInquiryAddEditScreen.routeName:
+        return getMaterialPageRoute(
+            FollowUpFromInquiryAddEditScreen(settings.arguments));
+
+      case ProductHistoryScreen.routeName:
+        return getMaterialPageRoute(ProductHistoryScreen(settings.arguments));
+
+      case SearchSalesBillScreen.routeName:
+        return getMaterialPageRoute(SearchSalesBillScreen());
+
+      case MyDigitalSignature.routeName:
+        return getMaterialPageRoute(MyDigitalSignature());
+
+      case MissedPunchApprovalListScreen.routeName:
+        return getMaterialPageRoute(MissedPunchApprovalListScreen());
+
+      case SearchTODOCustomerScreen.routeName:
+        return getMaterialPageRoute(SearchTODOCustomerScreen());
+
+      case OfficeToDoScreen.routeName:
+        return getMaterialPageRoute(OfficeToDoScreen());
+
+      case OfficeToDoAddEditScreen.routeName:
+        return getMaterialPageRoute(
+            OfficeToDoAddEditScreen(settings.arguments));
+      case SalesBillAddEditScreen.routeName:
+        return getMaterialPageRoute(SalesBillAddEditScreen(settings.arguments));
+      case SaleOrderNewAddEditScreen.routeName:
+        return getMaterialPageRoute(SaleOrderNewAddEditScreen());
+
+      //SalesBillAddEditScreen
       default:
         return null;
     }

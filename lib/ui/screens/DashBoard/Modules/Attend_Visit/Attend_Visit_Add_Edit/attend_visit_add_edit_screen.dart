@@ -1,32 +1,23 @@
-import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/attend_visit/attend_visit_bloc.dart';
 import 'package:soleoserp/models/api_requests/attend_visit_save_request.dart';
 import 'package:soleoserp/models/api_requests/complaint_no_list_request.dart';
-import 'package:soleoserp/models/api_requests/complaint_save_request.dart';
 import 'package:soleoserp/models/api_requests/customer_source_list_request.dart';
 import 'package:soleoserp/models/api_requests/transection_mode_list_request.dart';
 import 'package:soleoserp/models/api_responses/all_employee_List_response.dart';
 import 'package:soleoserp/models/api_responses/attend_visit_list_response.dart';
-import 'package:soleoserp/models/api_responses/attend_visit_save_response.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
-import 'package:soleoserp/models/api_responses/complaint_list_response.dart';
 import 'package:soleoserp/models/api_responses/customer_label_value_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
 import 'package:soleoserp/models/common/all_name_id_list.dart';
 import 'package:soleoserp/models/common/globals.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/complaint_pagination_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/Attend_Visit/Attend_Visit_List/attend_visit_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/search_customer_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/customer_add_edit.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/followup/followup_pagination_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
-import 'package:soleoserp/ui/widgets/common_input_text_filed.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
 import 'package:soleoserp/utils/General_Constants.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
@@ -46,7 +37,8 @@ class AttendVisitAddEditScreen extends BaseStatefulWidget {
   AttendVisitAddEditScreen(this.arguments);
 
   @override
-  _AttendVisitAddEditScreenState createState() => _AttendVisitAddEditScreenState();
+  _AttendVisitAddEditScreenState createState() =>
+      _AttendVisitAddEditScreenState();
 }
 
 /*class JosKeys {
@@ -58,7 +50,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
   final _formKey = GlobalKey<FormState>();
   final TextEditingController edt_ComplanitDate = TextEditingController();
   final TextEditingController edt_ReverseComplanitDate =
-  TextEditingController();
+      TextEditingController();
 
   final TextEditingController edt_SheduleDate = TextEditingController();
   final TextEditingController edt_ReverseSheduleDate = TextEditingController();
@@ -68,7 +60,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
 
   final TextEditingController edt_Referene = TextEditingController();
   final TextEditingController edt_ComplaintDiscription =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController edt_PreferedTime = TextEditingController();
   final TextEditingController edt_AssignTo = TextEditingController();
   final TextEditingController edt_AssignToID = TextEditingController();
@@ -85,7 +77,6 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
 
   final TextEditingController edt_Complaint_No = TextEditingController();
   final TextEditingController edt_Complaint_NoID = TextEditingController();
-
 
   List<ALL_Name_ID> arr_ALL_Name_ID_For_AssignTo = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Status = [];
@@ -109,8 +100,8 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
   String LoginUserID = "";
   AttendVisitDetails _editModel;
   int savepkID = 0;
-  String ComplaintNo="";
-  bool IsCharged=false;
+  String ComplaintNo = "";
+  bool IsCharged = false;
 
   @override
   void initState() {
@@ -127,19 +118,13 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
     FetchTypeDetails();
 
     edt_Type.addListener(() {
-      if(edt_Type.text=="Charged")
-        {
-          IsCharged=true;
+      if (edt_Type.text == "Charged") {
+        IsCharged = true;
+      } else {
+        IsCharged = false;
+      }
 
-        }
-      else
-        {
-          IsCharged=false;
-        }
-
-      setState(() {
-
-      });
+      setState(() {});
     });
     _isForUpdate = widget.arguments != null;
     if (_isForUpdate) {
@@ -170,7 +155,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
 
       TimeOfDay selectedTime1234 = TimeOfDay.now();
       String AM_PM123 =
-      selectedTime1234.periodOffset.toString() == "12" ? "PM" : "AM";
+          selectedTime1234.periodOffset.toString() == "12" ? "PM" : "AM";
       String beforZeroHour123 = selectedTime1234.hourOfPeriod <= 9
           ? "0" + selectedTime1234.hourOfPeriod.toString()
           : selectedTime1234.hourOfPeriod.toString();
@@ -184,9 +169,9 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
           AM_PM123; //picked_s.periodOffset.toString();
 
       TimeOfDay selectedToTime =
-      TimeOfDay.fromDateTime(DateTime.now().add(Duration(hours: 1)));
+          TimeOfDay.fromDateTime(DateTime.now().add(Duration(hours: 1)));
       String AM_PMToTime =
-      selectedToTime.periodOffset.toString() == "12" ? "PM" : "AM";
+          selectedToTime.periodOffset.toString() == "12" ? "PM" : "AM";
       String beforZeroHourToTime = selectedToTime.hourOfPeriod <= 9
           ? "0" + selectedToTime.hourOfPeriod.toString()
           : selectedToTime.hourOfPeriod.toString();
@@ -264,22 +249,22 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
             _onLeadSourceListTypeCallSuccess(state);
           }
 
-          if(state is TransectionModeResponseState)
-            {
-              _OnTransectionModeSucess(state);
-            }
-          if(state is ComplaintNoListCallResponseState)
-            {
-              _OnComplaintNoListResponseSucess(state);
-            }
+          if (state is TransectionModeResponseState) {
+            _OnTransectionModeSucess(state);
+          }
+          if (state is ComplaintNoListCallResponseState) {
+            _OnComplaintNoListResponseSucess(state);
+          }
           if (state is AttendVisitSaveResponseState) {
             _OnComplaintSaveResponseSucess(state);
           }
           return super.build(context);
         },
         listenWhen: (oldState, currentState) {
-          if (currentState is CustomerSourceCallEventResponseState || currentState is TransectionModeResponseState ||
-              currentState is ComplaintNoListCallResponseState || currentState is AttendVisitSaveResponseState) {
+          if (currentState is CustomerSourceCallEventResponseState ||
+              currentState is TransectionModeResponseState ||
+              currentState is ComplaintNoListCallResponseState ||
+              currentState is AttendVisitSaveResponseState) {
             return true;
           }
           return false;
@@ -296,7 +281,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
         appBar: NewGradientAppBar(
           title: Text('Attend Visit Details'),
           gradient:
-          LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
+              LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
           actions: <Widget>[
             IconButton(
                 icon: Icon(
@@ -305,7 +290,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                 ),
                 onPressed: () {
                   //_onTapOfLogOut();
-                  navigateTo(context, HomeScreen.routeName,
+                  navigateTo(context, AttendVisitListScreen.routeName,
                       clearAllStack: true);
                 })
           ],
@@ -319,7 +304,6 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildBankACSearchView(),
-
                         SizedBox(
                           width: 20,
                           height: 15,
@@ -331,7 +315,8 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                             icon: Icon(Icons.arrow_drop_down),
                             controllerForLeft: edt_Complaint_No,
                             controllerpkID: edt_Complaint_NoID,
-                            Custom_values1: arr_ALL_Name_ID_For_TransectionMode),
+                            Custom_values1:
+                                arr_ALL_Name_ID_For_TransectionMode),
                         SizedBox(
                           width: 20,
                           height: 15,
@@ -353,7 +338,6 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                           width: 20,
                           height: 15,
                         ),
-
                         Container(
                           margin: EdgeInsets.only(left: 10, right: 10),
                           child: Text("Visit Timing *",
@@ -363,7 +347,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                   fontWeight: FontWeight
                                       .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                          ),
+                              ),
                         ),
                         Row(
                           children: [
@@ -374,7 +358,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                     color: colorLightGray,
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
-                                        BorderRadius.circular(15)),
+                                            BorderRadius.circular(15)),
                                     child: GestureDetector(
                                       onTap: () {
                                         _selectFromTime(context, edt_FromTime);
@@ -402,7 +386,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                                   color: Color(0xFF000000),
                                                 ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                                            ),
+                                                ),
                                           ),
                                           /* Icon(
                                 Icons.watch_later_outlined,
@@ -423,7 +407,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                     color: colorLightGray,
                                     shape: RoundedRectangleBorder(
                                         borderRadius:
-                                        BorderRadius.circular(15)),
+                                            BorderRadius.circular(15)),
                                     child: GestureDetector(
                                       onTap: () {
                                         _selectToTime(context, edt_ToTime);
@@ -451,7 +435,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                                   color: Color(0xFF000000),
                                                 ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                                            ),
+                                                ),
                                           ),
                                           /* Icon(
                                 Icons.watch_later_outlined,
@@ -474,9 +458,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                             hintTextvalue: "Tap to Select Type",
                             icon: Icon(Icons.arrow_drop_down),
                             controllerForLeft: edt_Type,
-                            Custom_values1:
-                            arr_ALL_Name_ID_For_Type),
-
+                            Custom_values1: arr_ALL_Name_ID_For_Type),
                         Container(
                           margin: EdgeInsets.only(left: 10, right: 10),
                           child: Text("Visit Notes *",
@@ -486,7 +468,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                   fontWeight: FontWeight
                                       .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                          ),
+                              ),
                         ),
                         Padding(
                           padding: EdgeInsets.only(left: 7, right: 7, top: 10),
@@ -501,7 +483,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                 hintStyle: TextStyle(color: Colors.grey),
                                 border: OutlineInputBorder(
                                   borderRadius:
-                                  BorderRadius.all(Radius.circular(10)),
+                                      BorderRadius.all(Radius.circular(10)),
                                 )),
                           ),
                         ),
@@ -509,9 +491,6 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                           width: 20,
                           height: 15,
                         ),
-
-
-
                         Visibility(
                           visible: IsCharged,
                           child: Column(
@@ -524,8 +503,8 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                   icon: Icon(Icons.arrow_drop_down),
                                   controllerForLeft: edt_TransectionName,
                                   controllerpkID: edt_TransectionID,
-                                  Custom_values1: arr_ALL_Name_ID_For_TransectionMode),
-
+                                  Custom_values1:
+                                      arr_ALL_Name_ID_For_TransectionMode),
                               SizedBox(
                                 width: 20,
                                 height: 15,
@@ -539,10 +518,11 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                         fontWeight: FontWeight
                                             .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                                ),
+                                    ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(left: 7, right: 7, top: 10),
+                                padding:
+                                    EdgeInsets.only(left: 7, right: 7, top: 10),
                                 child: TextFormField(
                                   controller: edt_Referene,
                                   minLines: 1,
@@ -553,132 +533,198 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                       hintText: 'Enter Amount',
                                       hintStyle: TextStyle(color: Colors.grey),
                                       border: OutlineInputBorder(
-                                        borderRadius:
-                                        BorderRadius.all(Radius.circular(10)),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10)),
                                       )),
                                 ),
                               ),
                             ],
                           ),
                         ),
-
-
                         SizedBox(
                           width: 20,
                           height: 15,
                         ),
-
-
-
-
                         getCommonButton(baseTheme, () {
-                          print("ComplaintDetails" + "ComplaintDate : " + edt_ComplanitDate.text + " ComplaintReverseDate : " + edt_ReverseComplanitDate.text
-                              +" CustomerName : " + edt_CustomerName.text + " Customer ID : " + edt_CustomerID.text + " Reference : " + edt_Referene.text +
-                              " ComplaintNotes : " + edt_ComplaintNotes.text + " SheduleDate : " + edt_SheduleDate.text + " ReverseSheduleDate : " + edt_ReverseSheduleDate.text +
-                              " FromTime : " + edt_FromTime.text + " ToTime : " + edt_ToTime.text + " AssignTo : " + edt_AssignTo.text + " AssignToID : " + edt_AssignToID.text +
-                              " Status : " + edt_satus.text + " StatusID : " + edt_satusID.text + " Type : " + edt_Type.text + ""
-                          );
+                          print("ComplaintDetails" +
+                              "ComplaintDate : " +
+                              edt_ComplanitDate.text +
+                              " ComplaintReverseDate : " +
+                              edt_ReverseComplanitDate.text +
+                              " CustomerName : " +
+                              edt_CustomerName.text +
+                              " Customer ID : " +
+                              edt_CustomerID.text +
+                              " Reference : " +
+                              edt_Referene.text +
+                              " ComplaintNotes : " +
+                              edt_ComplaintNotes.text +
+                              " SheduleDate : " +
+                              edt_SheduleDate.text +
+                              " ReverseSheduleDate : " +
+                              edt_ReverseSheduleDate.text +
+                              " FromTime : " +
+                              edt_FromTime.text +
+                              " ToTime : " +
+                              edt_ToTime.text +
+                              " AssignTo : " +
+                              edt_AssignTo.text +
+                              " AssignToID : " +
+                              edt_AssignToID.text +
+                              " Status : " +
+                              edt_satus.text +
+                              " StatusID : " +
+                              edt_satusID.text +
+                              " Type : " +
+                              edt_Type.text +
+                              "");
 
-
-
-
-                          if(edt_CustomerName.text!="")
-                          {
-
-                            if(edt_Complaint_No.text!="")
-                                {
-
-                                  if(IsCharged==true)
-                                    {
-                                      if(edt_TransectionName.text!="")
-                                        {
-                                          if(edt_Referene.text!="")
-                                            {
-                                              showCommonDialogWithTwoOptions(
-                                                  context,
-                                                  "Are you sure you want to Save this Complaint Details ?",
-                                                  negativeButtonTitle: "No",
-                                                  positiveButtonTitle: "Yes",
-                                                  onTapOfPositiveButton: () {
-                                                    Navigator.of(context).pop();
-                                                     _complaintScreenBloc.add(AttendVisitSaveCallEvent(context,savepkID, AttendVisitSaveRequest(
-                                                         VisitDate:edt_ReverseComplanitDate.text,ComplaintNo: edt_Complaint_NoID.text,CustomerID: edt_CustomerID.text,VisitCharge: edt_Referene.text==null?"":edt_Referene.text,
-                                                VisitNotes: edt_ComplaintNotes.text,VisitType: edt_Type.text==null?"":edt_Type.text,ComplaintStatus: edt_satus.text==null ?"":edt_satus.text,VisitChargeType: edt_TransectionName.text,
-                                                         TimeFrom: edt_FromTime.text,TimeTo: edt_ToTime.text,LoginUserID: LoginUserID,CompanyId: CompanyID.toString()
-                                            )));
-                                                  });
-                                            }
-                                          else{
-                                            showCommonDialogWithSingleOption(
-                                                context, "Visit Charge is required !",
-                                                positiveButtonTitle: "OK");
-                                          }
-
-                                        }
-                                      else
-                                        {
-                                          showCommonDialogWithSingleOption(
-                                              context, "Charge Type is required !",
-                                              positiveButtonTitle: "OK");
-                                        }
-
-                                    }
-                                  else
-                                    {
-                                      showCommonDialogWithTwoOptions(
-                                          context,
-                                          "Are you sure you want to Save this Complaint Details ?",
+                          if (edt_CustomerName.text.toString().trim() != "") {
+                            if (edt_Complaint_No.text.toString().trim() != "") {
+                              if (edt_ComplaintNotes.text.toString().trim() !=
+                                  "") {
+                                if (IsCharged == true) {
+                                  if (edt_TransectionName.text
+                                          .toString()
+                                          .trim() !=
+                                      "") {
+                                    if (edt_Referene.text != "") {
+                                      showCommonDialogWithTwoOptions(context,
+                                          "Are you sure you want to Save this Attend Visit Details ?",
                                           negativeButtonTitle: "No",
                                           positiveButtonTitle: "Yes",
                                           onTapOfPositiveButton: () {
-                                            Navigator.of(context).pop();
-                                            _complaintScreenBloc.add(AttendVisitSaveCallEvent(context,savepkID, AttendVisitSaveRequest(
-                                                VisitDate:edt_ReverseComplanitDate.text,ComplaintNo: edt_Complaint_NoID.text,CustomerID: edt_CustomerID.text,VisitCharge: "0",
-                                                VisitNotes: edt_ComplaintNotes.text,VisitType: edt_Type.text==null?"":edt_Type.text,ComplaintStatus: edt_satus.text==null ?"":edt_satus.text,VisitChargeType: "",
-                                                TimeFrom: edt_FromTime.text,TimeTo: edt_ToTime.text,LoginUserID: LoginUserID,CompanyId: CompanyID.toString()
-                                            )));
-                                          });
+                                        Navigator.of(context).pop();
+                                        _complaintScreenBloc.add(
+                                            AttendVisitSaveCallEvent(
+                                                context,
+                                                savepkID,
+                                                AttendVisitSaveRequest(
+                                                    VisitDate:
+                                                        edt_ReverseComplanitDate
+                                                            .text,
+                                                    ComplaintNo:
+                                                        edt_Complaint_NoID.text,
+                                                    CustomerID:
+                                                        edt_CustomerID.text,
+                                                    VisitCharge:
+                                                        edt_Referene.text ==
+                                                                null
+                                                            ? ""
+                                                            : edt_Referene.text,
+                                                    VisitNotes:
+                                                        edt_ComplaintNotes.text,
+                                                    VisitType:
+                                                        edt_Type.text == null
+                                                            ? ""
+                                                            : edt_Type.text,
+                                                    ComplaintStatus:
+                                                        edt_satus.text == null
+                                                            ? ""
+                                                            : edt_satus.text,
+                                                    VisitChargeType:
+                                                        edt_TransectionName
+                                                            .text,
+                                                    TimeFrom: edt_FromTime.text,
+                                                    TimeTo: edt_ToTime.text,
+                                                    LoginUserID: LoginUserID,
+                                                    CompanyId:
+                                                        CompanyID.toString())));
+                                      });
+                                    } else {
+                                      showCommonDialogWithSingleOption(
+                                          context, "Visit Charge is required !",
+                                          positiveButtonTitle: "OK",
+                                          onTapOfPositiveButton: () {
+                                        Navigator.of(context).pop();
+                                      });
                                     }
-
-
+                                  } else {
+                                    showCommonDialogWithSingleOption(
+                                        context, "Charge Type is required !",
+                                        positiveButtonTitle: "OK",
+                                        onTapOfPositiveButton: () {
+                                      Navigator.of(context).pop();
+                                    });
+                                  }
+                                } else {
+                                  showCommonDialogWithTwoOptions(context,
+                                      "Are you sure you want to Save this Complaint Details ?",
+                                      negativeButtonTitle: "No",
+                                      positiveButtonTitle: "Yes",
+                                      onTapOfPositiveButton: () {
+                                    Navigator.of(context).pop();
+                                    _complaintScreenBloc.add(
+                                        AttendVisitSaveCallEvent(
+                                            context,
+                                            savepkID,
+                                            AttendVisitSaveRequest(
+                                                VisitDate:
+                                                    edt_ReverseComplanitDate
+                                                        .text,
+                                                ComplaintNo:
+                                                    edt_Complaint_NoID.text,
+                                                CustomerID: edt_CustomerID.text,
+                                                VisitCharge: "0",
+                                                VisitNotes:
+                                                    edt_ComplaintNotes.text,
+                                                VisitType: edt_Type.text == null
+                                                    ? ""
+                                                    : edt_Type.text,
+                                                ComplaintStatus:
+                                                    edt_satus.text == null
+                                                        ? ""
+                                                        : edt_satus.text,
+                                                VisitChargeType: "",
+                                                TimeFrom: edt_FromTime.text,
+                                                TimeTo: edt_ToTime.text,
+                                                LoginUserID: LoginUserID,
+                                                CompanyId:
+                                                    CompanyID.toString())));
+                                  });
                                 }
-                              else{
+                              } else {
                                 showCommonDialogWithSingleOption(
-                                    context, "Complaint No is required !",
-                                    positiveButtonTitle: "OK");
+                                    context, "Visit Notes is required !",
+                                    positiveButtonTitle: "OK",
+                                    onTapOfPositiveButton: () {
+                                  Navigator.of(context).pop();
+                                });
                               }
-
-                          }
-                          else{
+                            } else {
+                              showCommonDialogWithSingleOption(
+                                  context, "Complaint No is required !",
+                                  positiveButtonTitle: "OK",
+                                  onTapOfPositiveButton: () {
+                                Navigator.of(context).pop();
+                              });
+                            }
+                          } else {
                             showCommonDialogWithSingleOption(
                                 context, "Customer name is required !",
-                                positiveButtonTitle: "OK");
+                                positiveButtonTitle: "OK",
+                                onTapOfPositiveButton: () {
+                              Navigator.of(context).pop();
+                            });
                           }
-
-
-
-
-                        }, "Save",
-                            backGroundColor: colorPrimary),
+                        }, "Save", backGroundColor: colorPrimary),
                         SizedBox(
                           width: 20,
                           height: 15,
                         ),
-
                       ]))),
         ),
       ),
     );
   }
 
-
   Widget CustomDropDown1(String Category,
       {bool enable1,
-        Icon icon,
-        String title,
-        String hintTextvalue,
-        TextEditingController controllerForLeft,
-        List<ALL_Name_ID> Custom_values1}) {
+      Icon icon,
+      String title,
+      String hintTextvalue,
+      TextEditingController controllerForLeft,
+      List<ALL_Name_ID> Custom_values1}) {
     return Container(
       margin: EdgeInsets.only(top: 15, bottom: 15),
       child: Column(
@@ -701,7 +747,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                           fontWeight: FontWeight
                               .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                  ),
+                      ),
                 ),
                 SizedBox(
                   height: 5,
@@ -733,7 +779,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                 color: Color(0xFF000000),
                               ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                          ),
+                              ),
                         ),
                         Icon(
                           Icons.arrow_drop_down,
@@ -753,26 +799,24 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
 
   Widget showcustomdialogWithID1(String Category,
       {bool enable1,
-        Icon icon,
-        String title,
-        String hintTextvalue,
-        TextEditingController controllerForLeft,
-        TextEditingController controller1,
-        TextEditingController controllerpkID,
-        List<ALL_Name_ID> Custom_values1}) {
+      Icon icon,
+      String title,
+      String hintTextvalue,
+      TextEditingController controllerForLeft,
+      TextEditingController controller1,
+      TextEditingController controllerpkID,
+      List<ALL_Name_ID> Custom_values1}) {
     return Container(
       child: Column(
         children: [
           InkWell(
-            onTap:
-                () =>
-                _complaintScreenBloc.add(CustomerSourceCallEvent(
-                    CustomerSourceRequest(
-                        pkID: "0",
-                        StatusCategory: "ComplaintStatus",
-                        companyId: CompanyID,
-                        LoginUserID: LoginUserID,
-                        SearchKey: ""))),
+            onTap: () => _complaintScreenBloc.add(CustomerSourceCallEvent(
+                CustomerSourceRequest(
+                    pkID: "0",
+                    StatusCategory: "ComplaintStatus",
+                    companyId: CompanyID,
+                    LoginUserID: LoginUserID,
+                    SearchKey: ""))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -785,7 +829,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                           fontWeight: FontWeight
                               .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                  ),
+                      ),
                 ),
                 SizedBox(
                   height: 5,
@@ -817,7 +861,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                 color: Color(0xFF000000),
                               ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                          ),
+                              ),
                         ),
                         Icon(
                           Icons.arrow_drop_down,
@@ -837,20 +881,19 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
 
   Widget showcustomdialogWithID1ChargeType(String Category,
       {bool enable1,
-        Icon icon,
-        String title,
-        String hintTextvalue,
-        TextEditingController controllerForLeft,
-        TextEditingController controller1,
-        TextEditingController controllerpkID,
-        List<ALL_Name_ID> Custom_values1}) {
+      Icon icon,
+      String title,
+      String hintTextvalue,
+      TextEditingController controllerForLeft,
+      TextEditingController controller1,
+      TextEditingController controllerpkID,
+      List<ALL_Name_ID> Custom_values1}) {
     return Container(
       child: Column(
         children: [
           InkWell(
-            onTap:
-                () =>
-                _complaintScreenBloc.add(TransectionModeCallEvent(TransectionModeListRequest(CompanyID: CompanyID.toString()))),
+            onTap: () => _complaintScreenBloc.add(TransectionModeCallEvent(
+                TransectionModeListRequest(CompanyID: CompanyID.toString()))),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -863,7 +906,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                           fontWeight: FontWeight
                               .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                  ),
+                      ),
                 ),
                 SizedBox(
                   height: 5,
@@ -895,7 +938,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                                 color: Color(0xFF000000),
                               ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                          ),
+                              ),
                         ),
                         Icon(
                           Icons.arrow_drop_down,
@@ -915,88 +958,86 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
 
   Widget ComplaintDropDown(String Category,
       {bool enable1,
-        Icon icon,
-        String title,
-        String hintTextvalue,
-        TextEditingController controllerForLeft,
-        TextEditingController controller1,
-        TextEditingController controllerpkID,
-        List<ALL_Name_ID> Custom_values1}) {
+      Icon icon,
+      String title,
+      String hintTextvalue,
+      TextEditingController controllerForLeft,
+      TextEditingController controller1,
+      TextEditingController controllerpkID,
+      List<ALL_Name_ID> Custom_values1}) {
     return Container(
       child: Column(
         children: [
-           InkWell(
-             onTap: () =>
-        arr_ALL_Name_ID_For_ComplaintNoList.length!=0 ?
-                 showcustomdialogWithID(
-                 values: arr_ALL_Name_ID_For_ComplaintNoList,
-                 context1: context,
-                 controller: edt_Complaint_No,
-                 controllerID: edt_Complaint_NoID,
-                 lable: "Select Complaint No."): Container(),
-             child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    margin: EdgeInsets.only(left: 10, right: 10),
-                    child: Text(title,
-                        style: TextStyle(
-                            fontSize: 12,
-                            color: colorPrimary,
-                            fontWeight: FontWeight
-                                .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+          InkWell(
+            onTap: () => arr_ALL_Name_ID_For_ComplaintNoList.length != 0
+                ? showcustomdialogWithID(
+                    values: arr_ALL_Name_ID_For_ComplaintNoList,
+                    context1: context,
+                    controller: edt_Complaint_No,
+                    controllerID: edt_Complaint_NoID,
+                    lable: "Select Complaint No.")
+                : Container(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  margin: EdgeInsets.only(left: 10, right: 10),
+                  child: Text(title,
+                      style: TextStyle(
+                          fontSize: 12,
+                          color: colorPrimary,
+                          fontWeight: FontWeight
+                              .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                    ),
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Card(
-                    elevation: 5,
-                    color: colorLightGray,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
-                    child: Container(
-                      height: 60,
-                      padding: EdgeInsets.only(left: 20, right: 20),
-                      width: double.maxFinite,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                                controller: controllerForLeft,
-                                enabled: false,
-                                decoration: InputDecoration(
-                                  hintText: hintTextvalue,
-                                  labelStyle: TextStyle(
-                                    color: Color(0xFF000000),
-                                  ),
-                                  border: InputBorder.none,
-                                ),
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  color: Color(0xFF000000),
-                                ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-
-                            ),
-                          ),
-                          Icon(
-                            Icons.arrow_drop_down,
-                            color: colorGrayDark,
-                          )
-                        ],
                       ),
-                    ),
-                  )
-                ],
-              ),
-           ),
+                ),
+                SizedBox(
+                  height: 5,
+                ),
+                Card(
+                  elevation: 5,
+                  color: colorLightGray,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Container(
+                    height: 60,
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    width: double.maxFinite,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                              controller: controllerForLeft,
+                              enabled: false,
+                              decoration: InputDecoration(
+                                hintText: hintTextvalue,
+                                labelStyle: TextStyle(
+                                  color: Color(0xFF000000),
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF000000),
+                              ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
+                              ),
+                        ),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color: colorGrayDark,
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
-
 
   Widget _buildEmplyeeListView() {
     return InkWell(
@@ -1022,7 +1063,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                       fontWeight: FontWeight
                           .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-              ),
+                  ),
               /* Icon(
                 Icons.filter_list_alt,
                 color: colorPrimary,
@@ -1036,7 +1077,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
             elevation: 5,
             color: colorLightGray,
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
               padding: EdgeInsets.only(top: 5, bottom: 5, left: 5, right: 10),
               width: double.maxFinite,
@@ -1050,7 +1091,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
 
                     ),*/
 
-                    TextField(
+                        TextField(
                       controller: edt_AssignTo,
                       enabled: false,
                       /*  onChanged: (value) => {
@@ -1102,7 +1143,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
         selectedTime = picked_s;
 
         String AM_PM =
-        selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
+            selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
         String beforZeroHour = selectedTime.hourOfPeriod <= 9
             ? "0" + selectedTime.hourOfPeriod.toString()
             : selectedTime.hourOfPeriod.toString();
@@ -1135,7 +1176,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
         selectedTime = picked_s;
 
         String AM_PM =
-        selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
+            selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
         String beforZeroHour = selectedTime.hourOfPeriod <= 9
             ? "0" + selectedTime.hourOfPeriod.toString()
             : selectedTime.hourOfPeriod.toString();
@@ -1168,7 +1209,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                     fontWeight: FontWeight
                         .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-            ),
+                ),
           ),
           SizedBox(
             height: 5,
@@ -1177,7 +1218,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
             elevation: 5,
             color: colorLightGray,
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
               height: 60,
               padding: EdgeInsets.only(left: 20, right: 20),
@@ -1191,7 +1232,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                           : edt_SheduleDate.text,
                       style: baseTheme.textTheme.headline3.copyWith(
                           color: edt_SheduleDate.text == null ||
-                              edt_SheduleDate.text == ""
+                                  edt_SheduleDate.text == ""
                               ? colorGrayDark
                               : colorBlack),
                     ),
@@ -1251,7 +1292,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                     fontWeight: FontWeight
                         .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-            ),
+                ),
           ),
           SizedBox(
             height: 5,
@@ -1260,7 +1301,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
             elevation: 5,
             color: colorLightGray,
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
               height: 60,
               padding: EdgeInsets.only(left: 20, right: 20),
@@ -1270,12 +1311,12 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                   Expanded(
                     child: Text(
                       edt_ComplanitDate.text == null ||
-                          edt_ComplanitDate.text == ""
+                              edt_ComplanitDate.text == ""
                           ? "DD-MM-YYYY"
                           : edt_ComplanitDate.text,
                       style: baseTheme.textTheme.headline3.copyWith(
                           color: edt_ComplanitDate.text == null ||
-                              edt_ComplanitDate.text == ""
+                                  edt_ComplanitDate.text == ""
                               ? colorGrayDark
                               : colorBlack),
                     ),
@@ -1295,11 +1336,12 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
 
   Future<void> _selectDate(
       BuildContext context, TextEditingController F_datecontroller) async {
-    DateTime selectedDate = DateTime.now();
+    DateTime selectedDate123 = DateTime.now();
 
     final DateTime picked = await showDatePicker(
+        currentDate: selectedDate,
         context: context,
-        initialDate: selectedDate,
+        initialDate: selectedDate123,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
     if (picked != null && picked != selectedDate)
@@ -1335,7 +1377,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                     fontWeight: FontWeight
                         .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-            ),
+                ),
           ),
           SizedBox(
             height: 5,
@@ -1344,7 +1386,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
             elevation: 5,
             color: colorLightGray,
             shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
             child: Container(
               height: 60,
               padding: EdgeInsets.only(left: 20, right: 20),
@@ -1367,7 +1409,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
                           color: Color(0xFF000000),
                         ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                    ),
+                        ),
                   ),
                   Icon(
                     Icons.search,
@@ -1390,7 +1432,10 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
           _searchDetails = value;
           edt_CustomerID.text = _searchDetails.value.toString();
           edt_CustomerName.text = _searchDetails.label.toString();
-          _complaintScreenBloc.add(ComplaintNoListCallEvent(ComplaintNoListRequest(CustomerID:_searchDetails.value.toString(),CompanyId: CompanyID.toString())));
+          _complaintScreenBloc.add(ComplaintNoListCallEvent(
+              ComplaintNoListRequest(
+                  CustomerID: _searchDetails.value.toString(),
+                  CompanyId: CompanyID.toString())));
 
           /*  _FollowupBloc.add(SearchBankVoucherCustomerListByNameCallEvent(
               CustomerLabelValueRequest(
@@ -1408,17 +1453,8 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
   }
 
   Future<bool> _onBackPressed() {
-    navigateTo(context, ComplaintPaginationListScreen.routeName,
-        clearAllStack: true);
+    navigateTo(context, AttendVisitListScreen.routeName, clearAllStack: true);
   }
-
-
-
-
-
-
-
-
 
   FetchAssignTODetails(ALL_EmployeeList_Response offlineALLEmployeeListData) {
     arr_ALL_Name_ID_For_AssignTo.clear();
@@ -1432,11 +1468,7 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
     }
   }
 
-
-
-
   void fillData() {
-
     if (_editModel.visitDate == "") {
       selectedDate = DateTime.now();
       edt_ComplanitDate.text = selectedDate.day.toString() +
@@ -1471,16 +1503,14 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
     } else {
       edt_SheduleDate.text = _editModel.preferredDate.getFormattedDate(
           fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
-      edt_ReverseSheduleDate.text = _editModel.preferredDate
-          .getFormattedDate(
+      edt_ReverseSheduleDate.text = _editModel.preferredDate.getFormattedDate(
           fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "yyyy-MM-dd");
     }
 
-    if(_editModel.timeFrom=="")
-    {
+    if (_editModel.timeFrom == "") {
       TimeOfDay selectedTime1234 = TimeOfDay.now();
       String AM_PM123 =
-      selectedTime1234.periodOffset.toString() == "12" ? "PM" : "AM";
+          selectedTime1234.periodOffset.toString() == "12" ? "PM" : "AM";
       String beforZeroHour123 = selectedTime1234.hourOfPeriod <= 9
           ? "0" + selectedTime1234.hourOfPeriod.toString()
           : selectedTime1234.hourOfPeriod.toString();
@@ -1493,67 +1523,54 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
           " " +
           AM_PM123; //picked_s.periodOffset.toString();
 
-
-    }
-    else{
+    } else {
       edt_FromTime.text = _editModel.timeFrom.getFormattedDate(
           fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "hh:mm a");
     }
-    if(_editModel.timeTo=="")
-    {
+    if (_editModel.timeTo == "") {
       TimeOfDay selectedToTime =
-      TimeOfDay.fromDateTime(DateTime.now().add(Duration(hours: 1)));
+          TimeOfDay.fromDateTime(DateTime.now().add(Duration(hours: 1)));
       String AM_PMToTime =
-      selectedToTime.periodOffset.toString() == "12" ? "PM" : "AM";
+          selectedToTime.periodOffset.toString() == "12" ? "PM" : "AM";
       String beforZeroHourToTime = selectedToTime.hourOfPeriod <= 9
           ? "0" + selectedToTime.hourOfPeriod.toString()
           : selectedToTime.hourOfPeriod.toString();
       String beforZerominuteToTime = selectedToTime.minute <= 9
           ? "0" + selectedToTime.minute.toString()
           : selectedToTime.minute.toString();
-      edt_ToTime.text = beforZeroHourToTime +
-          ":" +
-          beforZerominuteToTime +
-          " " +
-          AM_PMToTime;
-    }
-    else{
+      edt_ToTime.text =
+          beforZeroHourToTime + ":" + beforZerominuteToTime + " " + AM_PMToTime;
+    } else {
       edt_ToTime.text = _editModel.timeTo.getFormattedDate(
           fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "hh:mm a");
     }
 
-
     //selectedInTime =
-
-
-
 
     savepkID = _editModel.pkID.toInt();
     edt_CustomerName.text = _editModel.customerName;
     edt_CustomerID.text = _editModel.customerID.toString();
     edt_Complaint_No.text = _editModel.complaintNo;
     edt_Complaint_NoID.text = _editModel.visitID.toString();
-    _complaintScreenBloc.add(ComplaintNoListCallEvent(ComplaintNoListRequest(CustomerID:_editModel.customerID.toString(),CompanyId: CompanyID.toString())));
-    edt_satus.text = _editModel.complaintStatus=="0"?"":_editModel.complaintStatus;
+    _complaintScreenBloc.add(ComplaintNoListCallEvent(ComplaintNoListRequest(
+        CustomerID: _editModel.customerID.toString(),
+        CompanyId: CompanyID.toString())));
+    edt_satus.text =
+        _editModel.complaintStatus == "0" ? "" : _editModel.complaintStatus;
     edt_Type.text = _editModel.visitType;
-    if(edt_Type.text=="Charged")
-      {
-        IsCharged=true;
-        edt_TransectionName.text =  _editModel.visitChargeType;
-        edt_Referene.text = _editModel.visitCharge.toString();
-      }
-    else
-      {
-        IsCharged=false;
-        edt_TransectionName.text = "";
-        edt_Referene.text = "";
-      }
-
+    if (edt_Type.text == "Charged") {
+      IsCharged = true;
+      edt_TransectionName.text = _editModel.visitChargeType;
+      edt_Referene.text = _editModel.visitCharge.toString();
+    } else {
+      IsCharged = false;
+      edt_TransectionName.text = "";
+      edt_Referene.text = "";
+    }
 
     edt_ComplaintNotes.text = _editModel.visitNotes;
     edt_AssignTo.text = _editModel.employeeName;
     edt_AssignToID.text = _editModel.employeeID.toString();
-
   }
 
   void _onLeadSourceListTypeCallSuccess(
@@ -1594,11 +1611,14 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
   void _OnTransectionModeSucess(TransectionModeResponseState state) {
     if (state.transectionModeListResponse.details.length != 0) {
       arr_ALL_Name_ID_For_TransectionMode.clear();
-      for (var i = 0; i < state.transectionModeListResponse.details.length; i++) {
-        print(
-            "InquiryStatus : " + state.transectionModeListResponse.details[i].walletName);
+      for (var i = 0;
+          i < state.transectionModeListResponse.details.length;
+          i++) {
+        print("InquiryStatus : " +
+            state.transectionModeListResponse.details[i].walletName);
         ALL_Name_ID all_name_id = ALL_Name_ID();
-        all_name_id.Name = state.transectionModeListResponse.details[i].walletName;
+        all_name_id.Name =
+            state.transectionModeListResponse.details[i].walletName;
         all_name_id.pkID = state.transectionModeListResponse.details[i].pkID;
         arr_ALL_Name_ID_For_TransectionMode.add(all_name_id);
       }
@@ -1609,40 +1629,38 @@ class _AttendVisitAddEditScreenState extends BaseState<AttendVisitAddEditScreen>
           controllerID: edt_TransectionID,
           lable: "Select ChargeType");
     }
-
   }
 
-  void _OnComplaintNoListResponseSucess(ComplaintNoListCallResponseState state) {
-
+  void _OnComplaintNoListResponseSucess(
+      ComplaintNoListCallResponseState state) {
     if (state.response.details.length != 0) {
       arr_ALL_Name_ID_For_ComplaintNoList.clear();
       for (var i = 0; i < state.response.details.length; i++) {
-        print(
-            "InquiryStatus : " + state.response.details[i].complaintNo);
+        print("InquiryStatus : " + state.response.details[i].complaintNo);
         ALL_Name_ID all_name_id = ALL_Name_ID();
         all_name_id.Name = state.response.details[i].complaintNo;
         all_name_id.pkID = state.response.details[i].visitID;
         arr_ALL_Name_ID_For_ComplaintNoList.add(all_name_id);
       }
-
     }
-
   }
 
-  void _OnComplaintSaveResponseSucess(AttendVisitSaveResponseState state) async {
-    String Msg="";
- /*   for(var i=0;i<state.attendVisitSaveResponse.details.length;i++)
+  void _OnComplaintSaveResponseSucess(
+      AttendVisitSaveResponseState state) async {
+    String Msg = "";
+    /*   for(var i=0;i<state.attendVisitSaveResponse.details.length;i++)
     {
       print("SAveSucesss"+state.attendVisitSaveResponse.details[i].column2);
 
     }*/
-    Msg = _isForUpdate == true ? "Attend Visit Updated Successfully" : "Attend Visit Added Successfully";
+    Msg = _isForUpdate == true
+        ? "Attend visit updated successfully"
+        : "Attend visit added successfully";
 
-   /* await showCommonDialogWithSingleOption(Globals.context, Msg,
-        positiveButtonTitle: "OK");
-
-    Navigator.of(context).pop();*/
-    Navigator.of(context).pop();
+    await showCommonDialogWithSingleOption(Globals.context, Msg,
+        positiveButtonTitle: "OK", onTapOfPositiveButton: () {
+      navigateTo(context, AttendVisitListScreen.routeName, clearAllStack: true);
+    });
   }
 
 /*  void _OnComplaintSaveResponseSucess(ComplaintSaveResponseState state) async {

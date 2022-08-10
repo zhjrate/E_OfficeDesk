@@ -1,7 +1,5 @@
 part of 'quotation_bloc.dart';
 
-
-
 @immutable
 abstract class QuotationEvents {}
 
@@ -9,7 +7,7 @@ abstract class QuotationEvents {}
 class QuotationListCallEvent extends QuotationEvents {
   final int pageNo;
   final QuotationListApiRequest quotationListApiRequest;
-  QuotationListCallEvent(this.pageNo,this.quotationListApiRequest);
+  QuotationListCallEvent(this.pageNo, this.quotationListApiRequest);
 }
 
 class SearchQuotationListByNameCallEvent extends QuotationEvents {
@@ -22,7 +20,7 @@ class SearchQuotationListByNumberCallEvent extends QuotationEvents {
   final int pkID;
   final SearchQuotationListByNumberRequest request;
 
-  SearchQuotationListByNumberCallEvent(this.pkID,this.request);
+  SearchQuotationListByNumberCallEvent(this.pkID, this.request);
 }
 
 class QuotationPDFGenerateCallEvent extends QuotationEvents {
@@ -30,6 +28,7 @@ class QuotationPDFGenerateCallEvent extends QuotationEvents {
 
   QuotationPDFGenerateCallEvent(this.request);
 }
+
 class SearchQuotationCustomerListByNameCallEvent extends QuotationEvents {
   final CustomerLabelValueRequest request;
 
@@ -38,8 +37,8 @@ class SearchQuotationCustomerListByNameCallEvent extends QuotationEvents {
 
 class QuotationNoToProductListCallEvent extends QuotationEvents {
   final QuotationNoToProductListRequest request;
- int StateCode;
-  QuotationNoToProductListCallEvent(this.StateCode,this.request);
+  int StateCode;
+  QuotationNoToProductListCallEvent(this.StateCode, this.request);
 }
 
 class QuotationSpecificationCallEvent extends QuotationEvents {
@@ -53,7 +52,6 @@ class QuotationKindAttListCallEvent extends QuotationEvents {
 
   QuotationKindAttListCallEvent(this.request);
 }
-
 
 class QuotationProjectListCallEvent extends QuotationEvents {
   final QuotationProjectListRequest request;
@@ -73,7 +71,6 @@ class CustIdToInqListCallEvent extends QuotationEvents {
   CustIdToInqListCallEvent(this.request);
 }
 
-
 class InqNoToProductListCallEvent extends QuotationEvents {
   final InquiryNoToProductListRequest request;
 
@@ -81,40 +78,42 @@ class InqNoToProductListCallEvent extends QuotationEvents {
 }
 
 class InquiryProductSearchNameWithStateCodeCallEvent extends QuotationEvents {
-
   int ProductID;
   String ProductName;
   double Quantity;
   double UnitRate;
   final InquiryProductSearchRequest inquiryProductSearchRequest;
 
-  InquiryProductSearchNameWithStateCodeCallEvent(this.ProductID,this.ProductName,this.Quantity,this.UnitRate,this.inquiryProductSearchRequest);
+  InquiryProductSearchNameWithStateCodeCallEvent(
+      this.ProductID,
+      this.ProductName,
+      this.Quantity,
+      this.UnitRate,
+      this.inquiryProductSearchRequest);
 }
-
-
 
 class QuotationHeaderSaveCallEvent extends QuotationEvents {
   int pkID;
   BuildContext context;
   final QuotationHeaderSaveRequest request;
 
-  QuotationHeaderSaveCallEvent(this.context,this.pkID,this.request);
+  QuotationHeaderSaveCallEvent(this.context, this.pkID, this.request);
 }
 
 class QuotationProductSaveCallEvent extends QuotationEvents {
   String QT_No;
   BuildContext context;
   final List<QuotationTable> quotationProductModel;
-  QuotationProductSaveCallEvent(this.context,this.QT_No,this.quotationProductModel);
+  QuotationProductSaveCallEvent(
+      this.context, this.QT_No, this.quotationProductModel);
 }
 
 class QuotationDeleteProductCallEvent extends QuotationEvents {
   String qt_No;
   final QuotationProductDeleteRequest request;
 
-  QuotationDeleteProductCallEvent(this.qt_No,this.request);
+  QuotationDeleteProductCallEvent(this.qt_No, this.request);
 }
-
 
 class QuotationDeleteRequestCallEvent extends QuotationEvents {
   BuildContext context;
@@ -122,14 +121,15 @@ class QuotationDeleteRequestCallEvent extends QuotationEvents {
 
   final QuotationDeleteRequest quotationDeleteRequest;
 
-  QuotationDeleteRequestCallEvent(this.context,this.pkID,this.quotationDeleteRequest);
+  QuotationDeleteRequestCallEvent(
+      this.context, this.pkID, this.quotationDeleteRequest);
 }
 
 class QuotationOtherChargeCallEvent extends QuotationEvents {
   String CompanyID;
   final QuotationOtherChargesListRequest request;
 
-  QuotationOtherChargeCallEvent(this.CompanyID,this.request);
+  QuotationOtherChargeCallEvent(this.CompanyID, this.request);
 }
 
 class QuotationBankDropDownCallEvent extends QuotationEvents {
@@ -138,4 +138,8 @@ class QuotationBankDropDownCallEvent extends QuotationEvents {
   QuotationBankDropDownCallEvent(this.request);
 }
 
+class SearchCustomerListByNumberCallEvent extends QuotationEvents {
+  final CustomerSearchByIdRequest request;
 
+  SearchCustomerListByNumberCallEvent(this.request);
+}

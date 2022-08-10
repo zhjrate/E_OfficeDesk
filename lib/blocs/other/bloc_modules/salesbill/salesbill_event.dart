@@ -36,3 +36,18 @@ class SalesBillPDFGenerateCallEvent extends SalesBillEvents {
 
   SalesBillPDFGenerateCallEvent(this.request);
 }
+
+
+class SalesBillSearchByNameRequestCallEvent extends SalesBillEvents {
+  final SalesBillSearchByNameRequest request;
+
+  SalesBillSearchByNameRequestCallEvent(this.request);
+}
+
+class SalesBillSearchByIdRequestCallEvent extends SalesBillEvents {
+
+  int custID;
+  final SalesBillSearchByIdRequest request;
+
+  SalesBillSearchByIdRequestCallEvent(this.custID,this.request);
+}

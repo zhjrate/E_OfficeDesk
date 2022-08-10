@@ -1,6 +1,7 @@
 import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:soleoserp/models/api_responses/customer_details_api_response.dart';
 import 'package:soleoserp/models/common/contact_model.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/image_resources.dart';
@@ -26,42 +27,79 @@ class _ContactsListScreenState extends BaseState<ContactsListScreen>
   double _fontSize_Title = 11;
   int label_color = 0xff4F4F4F; //0x66666666;
   int title_color = 0xff362d8b;
+
+  CustomerDetails _editModel;
+
   @override
   void initState() {
     super.initState();
     screenStatusBarColor = colorWhite;
+
     getContacts();
   }
 
   @override
   Widget buildBody(BuildContext context) {
-    return Column(
-      children: [
-        getCommonAppBar(context, baseTheme, "Contacts List", showBack: true),
-        Expanded(
-          child: Stack(
-            children: [
-              _buildContactsListView(),
-              Container(
-                margin: EdgeInsets.all(20),
-                alignment: Alignment.bottomRight,
-                child: FloatingActionButton(
-                  backgroundColor: colorPrimary,
-                  onPressed: () async {
-                    await navigateTo(
-                      context,
-                      AddContactScreen.routeName,
-                    );
-                    getContacts(); //right now calling again get contacts, later it can be optimized
-                  },
-                  child: Icon(Icons.add),
+    return WillPopScope(
+      onWillPop: _onBackPressed,
+      child: Column(
+        children: [
+          getCommonAppBar(context, baseTheme, "Contacts List", showBack: true,
+              onTapOfBack: () {
+            //Navigator.pop(_contactsList);
+            //Navigator.pop(context);
+            //Navigator.of(context).pop(_editModel);
+            Navigator.pop(context, _editModel);
+            /*  navigateTo(context, Customer_ADD_EDIT.routeName,
+                    arguments: AddUpdateCustomerScreenArguments(_editModel))
+                .then((value) {});*/
+          }),
+          Expanded(
+            child: Stack(
+              children: [
+                _buildContactsListView(),
+                Container(
+                  margin: EdgeInsets.all(20),
+                  alignment: Alignment.bottomRight,
+                  child: FloatingActionButton(
+                    backgroundColor: colorPrimary,
+                    onPressed: () async {
+                      await navigateTo(
+                        context,
+                        AddContactScreen.routeName,
+                      );
+                      getContacts(); //right now calling again get contacts, later it can be optimized
+                    },
+                    child: Icon(Icons.add),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
+  }
+
+  Future<bool> _onBackPressed() async {
+    // Your back press code here...
+    // CommonUtils.showToast(context, "Back presses");
+    // Navigator.defaultRouteName.
+    //   navigateTo(context, Customer_ADD_EDIT.routeName);
+    //navigateTo(context, Customer_ADD_EDIT.routeName, useRootNavigator: false);
+    // Navigator.of(context).pop("_model");
+
+    // _editModel
+
+    /*navigateTo(context, Customer_ADD_EDIT.routeName,
+            arguments: AddUpdateCustomerScreenArguments(_editModel))
+        .then((value) {});*/
+
+    //Navigator.of(context).pop(_editModel);
+    Navigator.pop(context, _editModel);
+
+    // Navigator.of(context, rootNavigator: true).pop(context);
+    return Future.value(false);
   }
 
   Widget _buildContactsListView() {

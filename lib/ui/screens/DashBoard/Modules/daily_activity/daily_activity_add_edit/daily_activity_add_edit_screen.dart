@@ -7,10 +7,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:full_screen_image/full_screen_image.dart';
 import 'package:http/http.dart' as http;
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
+import 'package:numberpicker/numberpicker.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/dailyactivity/dailyactivity_bloc.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/expense/expense_bloc.dart';
+import 'package:soleoserp/models/api_requests/daily_activity_save_request.dart';
 import 'package:soleoserp/models/api_requests/task_category_list_request.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/daily_activity_list_response.dart';
@@ -61,6 +63,9 @@ class _DailyActivityAddEditScreenState
   final TextEditingController edt_ExpenseType = TextEditingController();
   final TextEditingController edt_ExpenseTypepkID = TextEditingController();
   final TextEditingController edt_ExpenseAmount = TextEditingController();
+
+  final TextEditingController edt_Mibutes = TextEditingController();
+
   final TextEditingController edt_FromLocation = TextEditingController();
   final TextEditingController edt_ToLocation = TextEditingController();
 
@@ -93,6 +98,8 @@ class _DailyActivityAddEditScreenState
   String ImageURLFromListing = "";
   String GetImageNamefromEditMode = "";
   FocusNode AmountFocusNode, FromLocationFocusNode;
+  int _currentValue = 1;
+  int _currentMinutes = 0;
 
   @override
   void initState() {
@@ -132,6 +139,9 @@ class _DailyActivityAddEditScreenState
     if (_isForUpdate) {
       _editModel = widget.arguments.editModel;
       fillData(_editModel);
+    } else {
+      edt_ExpenseAmount.text = "1";
+      edt_Mibutes.text = "0";
     }
 
     is_visibleLocation = false;
@@ -356,33 +366,60 @@ class _DailyActivityAddEditScreenState
                                       toFormat: "yyyy-MM-dd")
                                   .toString());
 
+                          int hours = edt_ExpenseAmount.text != ""
+                              ? int.parse(
+                                  edt_ExpenseAmount.text.toString().trim())
+                              : 0;
+
                           if (edt_ExpenseDateController.text.toString() != "") {
                             if (edt_ExpenseType.text != "") {
                               if (edt_ExpenseAmount.text != "") {
-                                if (edt_ExpenseNotes.text != "") {
-                                  showCommonDialogWithTwoOptions(context,
-                                      "Are you sure you want to Save DailyActivity Details ?",
-                                      negativeButtonTitle: "No",
-                                      positiveButtonTitle: "Yes",
-                                      onTapOfPositiveButton: () {
-                                    Navigator.of(context).pop();
+                                if (hours <= 24) {
+                                  if (edt_ExpenseNotes.text != "") {
+                                    double DURATIONHOUR =
+                                        double.parse(edt_ExpenseAmount.text);
 
-                                    SendEmail();
+                                    double DURATIONMINUTE =
+                                        double.parse(edt_Mibutes.text);
+                                    double DURATION = DURATIONHOUR +
+                                        DURATIONMINUTE; //double.parse(edt_Mibutes.text);
 
-                                    /*_expenseBloc.add(DailyActivitySaveByNameCallEvent(
-                                            ExpensepkID,
-                                            DailyActivitySaveRequest(
-                                              CompanyId: CompanyID.toString(),
-                                              ActivityDate: edt_ReverseExpenseDateController.text,
-                                              TaskCategoryID: edt_ExpenseTypepkID.text,
-                                              TaskDuration: edt_ExpenseAmount.text,
-                                              LoginUserID: LoginUserID,
-                                              TaskDescription: edt_ExpenseNotes.text
-                                            )));*/
-                                  });
+                                    showCommonDialogWithTwoOptions(context,
+                                        "Are you sure you want to Save DailyActivity Details ?",
+                                        negativeButtonTitle: "No",
+                                        positiveButtonTitle: "Yes",
+                                        onTapOfPositiveButton: () {
+                                      Navigator.of(context).pop();
+
+                                      //SendEmail();
+
+                                      _expenseBloc.add(
+                                          DailyActivitySaveByNameCallEvent(
+                                              ExpensepkID,
+                                              DailyActivitySaveRequest(
+                                                  CompanyId:
+                                                      CompanyID.toString(),
+                                                  ActivityDate:
+                                                      edt_ReverseExpenseDateController
+                                                          .text,
+                                                  TaskCategoryID:
+                                                      edt_ExpenseTypepkID.text,
+                                                  TaskDuration:
+                                                      edt_ExpenseAmount.text +
+                                                          "." +
+                                                          edt_Mibutes.text,
+                                                  LoginUserID: LoginUserID,
+                                                  TaskDescription:
+                                                      edt_ExpenseNotes.text)));
+                                    });
+                                  } else {
+                                    showCommonDialogWithSingleOption(
+                                        context, "Work Note is required!",
+                                        positiveButtonTitle: "OK");
+                                  }
                                 } else {
-                                  showCommonDialogWithSingleOption(
-                                      context, "Work Note is required!",
+                                  showCommonDialogWithSingleOption(context,
+                                      "Work Hrs. should not be greater than 24 Hrs. !",
                                       positiveButtonTitle: "OK");
                                 }
                               } else {
@@ -426,64 +463,206 @@ class _DailyActivityAddEditScreenState
   }*/
 
   Widget ExpenseAmount() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Container(
-          margin: EdgeInsets.only(left: 10, right: 10),
-          child: Text("Worked Hrs *",
-              style: TextStyle(
-                  fontSize: 12,
-                  color: colorPrimary,
-                  fontWeight: FontWeight
-                      .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: EdgeInsets.only(left: 10, right: 10),
+                child: Text("Worked Hrs *",
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: colorPrimary,
+                        fontWeight: FontWeight
+                            .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
+                    ),
               ),
+              SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                onTap: () {
+                  pickHour();
+                },
+                child: Card(
+                  elevation: 5,
+                  color: colorLightGray,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Container(
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    width: double.maxFinite,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                              enabled: false,
+                              maxLength: 2,
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
+                              controller: edt_ExpenseAmount,
+                              decoration: InputDecoration(
+                                  hintText: "Hours",
+                                  labelStyle: TextStyle(
+                                    color: Color(0xFF000000),
+                                  ),
+                                  border: InputBorder.none,
+                                  counter: Offstage()),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF000000),
+                              ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                              ),
+                        ),
+                        Icon(
+                          Icons.access_time,
+                          size: 18,
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
         ),
         SizedBox(
-          height: 5,
+          width: 10,
         ),
-        Card(
-          elevation: 5,
-          color: colorLightGray,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          child: Container(
-            height: 60,
-            padding: EdgeInsets.only(left: 20, right: 20),
-            width: double.maxFinite,
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                      focusNode: AmountFocusNode,
-                      keyboardType: TextInputType.number,
-                      textInputAction: TextInputAction.next,
-                      controller: edt_ExpenseAmount,
-                      decoration: InputDecoration(
-                        hintText: "Tap to enter Hrs.",
-                        labelStyle: TextStyle(
-                          color: Color(0xFF000000),
-                        ),
-                        border: InputBorder.none,
-                      ),
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Color(0xFF000000),
-                      ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                margin: EdgeInsets.only(left: 10, right: 10),
+                child: Text("Worked Minute *",
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: colorPrimary,
+                        fontWeight: FontWeight
+                            .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
 
-                      ),
+                    ),
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              InkWell(
+                onTap: () {
+                  pickMinute();
+                },
+                child: Card(
+                  elevation: 5,
+                  color: colorLightGray,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Container(
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    width: double.maxFinite,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                              enabled: false,
+                              maxLength: 2,
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
+                              controller: edt_Mibutes,
+                              decoration: InputDecoration(
+                                  hintText: "Minute",
+                                  labelStyle: TextStyle(
+                                    color: Color(0xFF000000),
+                                  ),
+                                  border: InputBorder.none,
+                                  counter: Offstage()),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF000000),
+                              ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                              ),
+                        ),
+                        Icon(
+                          Icons.access_time,
+                          size: 18,
+                        )
+                      ],
+                    ),
+                  ),
                 ),
-                Icon(
-                  Icons.access_time,
-                  size: 18,
-                )
-              ],
-            ),
+              )
+            ],
           ),
         )
       ],
     );
+  }
+
+  void pickHour() {
+    showDialog<int>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Pick Hours"),
+            content: StatefulBuilder(builder: (context, setState) {
+              return NumberPicker(
+                selectedTextStyle: TextStyle(color: Colors.red),
+                value: _currentValue,
+                minValue: 0,
+                haptics: true,
+                maxValue: 24,
+                onChanged: (value) => setState(() {
+                  _currentValue = value;
+                  edt_ExpenseAmount.text = value.toString();
+                }),
+              );
+            }),
+            actions: [
+              TextButton(
+                child: Text("OK", style: TextStyle(color: colorPrimary)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
+  }
+
+  void pickMinute() {
+    showDialog<int>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Pick Minutes"),
+            content: StatefulBuilder(builder: (context, setState) {
+              return NumberPicker(
+                selectedTextStyle: TextStyle(color: Colors.red),
+                value: _currentMinutes,
+                minValue: 0,
+                haptics: true,
+                maxValue: 60,
+                onChanged: (value) => setState(() {
+                  _currentMinutes = value;
+                  edt_Mibutes.text = value.toString();
+                }),
+              );
+            }),
+            actions: [
+              TextButton(
+                child: Text("OK", style: TextStyle(color: colorPrimary)),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        });
   }
 
   Widget FromLocation() {
@@ -795,7 +974,14 @@ class _DailyActivityAddEditScreenState
             : expenseDetails.taskCategoryName;
     edt_ExpenseTypepkID.text = expenseDetails.taskCategoryID.toString();
     ExpensepkID = expenseDetails.pkID;
-    edt_ExpenseAmount.text = expenseDetails.taskDuration.toString();
+
+    List<String> SpliteMinute =
+        expenseDetails.taskDuration.toString().split(".");
+    edt_ExpenseAmount.text = SpliteMinute[0].toString();
+    edt_Mibutes.text = SpliteMinute[1].toString();
+
+    _currentValue = int.parse(SpliteMinute[0].toString());
+    _currentMinutes = int.parse(SpliteMinute[1].toString());
   }
 
   Widget _buildFollowupDate() {

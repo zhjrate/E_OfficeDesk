@@ -1,28 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:soleoserp/blocs/other/bloc_modules/customer/customer_bloc.dart';
-import 'package:soleoserp/blocs/other/bloc_modules/inquiry/inquiry_bloc.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/quotation/quotation_bloc.dart';
-import 'package:soleoserp/blocs/other/firstscreen/first_screen_bloc.dart';
-import 'package:soleoserp/models/api_requests/designation_list_request.dart';
-import 'package:soleoserp/models/api_requests/inquiry_product_search_request.dart';
-import 'package:soleoserp/models/api_requests/login_user_details_api_request.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/designation_list_response.dart';
 import 'package:soleoserp/models/api_responses/inquiry_product_search_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
 import 'package:soleoserp/models/common/all_name_id_list.dart';
-import 'package:soleoserp/models/common/contact_model.dart';
-import 'package:soleoserp/models/common/inquiry_product_model.dart';
 import 'package:soleoserp/models/common/quotationtable.dart';
-import 'package:soleoserp/repositories/repository.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
-import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerList/customer_list_pagination_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/search_inquiry_product_screen.dart';
-import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
-import 'package:soleoserp/utils/app_constants.dart';
 import 'package:soleoserp/utils/general_utils.dart';
 import 'package:soleoserp/utils/offline_db_helper.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
@@ -171,7 +159,6 @@ class _AddQuotationProductScreenState
       edt_SGST_Per.text = "0.00";
       edt_CGST_Amount.text = "0.00";
       edt_SGST_Amount.text = "0.00";
-
 
       if (widget.arguments.StateCode != null) {
         edt_StateCode.text = widget.arguments.StateCode.toString();
@@ -376,25 +363,18 @@ class _AddQuotationProductScreenState
                     height: 20,
                   ),
                   getCommonButton(baseTheme, () {
-
-                    if(_productNameController.text!="")
-                      {
-                        if(_quantityController.text!="0.00")
-                        {
-                          _onTapOfAdd();
-
-                        }
-                        else
-                        {
-                          showCommonDialogWithSingleOption(
-                              context, "Quantity Should not be Zero Value..!!",
-                              positiveButtonTitle: "OK", onTapOfPositiveButton: () {
-                            Navigator.of(context).pop();
-                          });
-                        }
+                    if (_productNameController.text != "") {
+                      if (_quantityController.text != "0.00") {
+                        _onTapOfAdd();
+                      } else {
+                        showCommonDialogWithSingleOption(
+                            context, "Quantity Should not be Zero Value..!!",
+                            positiveButtonTitle: "OK",
+                            onTapOfPositiveButton: () {
+                          Navigator.of(context).pop();
+                        });
                       }
-                    else
-                    {
+                    } else {
                       showCommonDialogWithSingleOption(
                           context, "ProductName is required..!!",
                           positiveButtonTitle: "OK", onTapOfPositiveButton: () {
@@ -432,13 +412,11 @@ class _AddQuotationProductScreenState
     String unit = _unitController.text.toString();
 
     double Taxtype = 0.00;
-    int ISTaxType =0;
+    int ISTaxType = 0;
 
-    if(_taxTypeController.text!=null)
-    {
+    if (_taxTypeController.text != null) {
       Taxtype = double.parse(_taxTypeController.text);
       ISTaxType = Taxtype.toInt();
-
     }
 
     /*int ISTaxType = int.parse(_taxTypeController.text.toString() == null
@@ -479,12 +457,8 @@ class _AddQuotationProductScreenState
 
     await getInquiryProductDetails();
 
-
     if (isProductExist == false) {
       if (isForUpdate) {
-
-
-
         await OfflineDbHelper.getInstance().updateQuotationProduct(
             QuotationTable(
                 "",
@@ -515,7 +489,6 @@ class _AddQuotationProductScreenState
                 0,
                 0.00,
                 id: widget.arguments.model.id));
-
       } else {
         await OfflineDbHelper.getInstance().insertQuotationProduct(
             QuotationTable(
@@ -597,9 +570,6 @@ class _AddQuotationProductScreenState
     }*/
   }
 
-
-
-
   void _onDesignationCallSuccess(DesignationApiResponse state) {
     arr_ALL_Name_ID_For_Designation.clear();
     for (var i = 0; i < state.details.length; i++) {
@@ -617,7 +587,7 @@ class _AddQuotationProductScreenState
       children: [
         Container(
           margin: EdgeInsets.only(left: 10, right: 10),
-          child: Text("Quantity",
+          child: Text("Quantity * ",
               style: TextStyle(
                   fontSize: 12,
                   color: colorPrimary,
@@ -902,7 +872,7 @@ class _AddQuotationProductScreenState
       children: [
         Container(
           margin: EdgeInsets.only(left: 10, right: 10),
-          child: Text("Unit",
+          child: Text("Unit * ",
               style: TextStyle(
                   fontSize: 12,
                   color: colorPrimary,
@@ -935,13 +905,10 @@ class _AddQuotationProductScreenState
                         }
                         return null;
                       },
-                      enabled: false,
-                      keyboardType:
-                          TextInputType.numberWithOptions(decimal: true),
                       controller: _unitController,
                       decoration: InputDecoration(
                         contentPadding: EdgeInsets.only(bottom: 10),
-                        hintText: "NO",
+                        hintText: "Unit",
                         labelStyle: TextStyle(
                           color: Color(0xFF000000),
                         ),
@@ -968,7 +935,7 @@ class _AddQuotationProductScreenState
       children: [
         Container(
           margin: EdgeInsets.only(left: 10, right: 10),
-          child: Text("NetAmount",
+          child: Text("Net Amount",
               style: TextStyle(
                   fontSize: 12,
                   color: colorPrimary,
@@ -1242,7 +1209,7 @@ class _AddQuotationProductScreenState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text("Search Product",
+          Text("Search Product * ",
               style: TextStyle(
                   fontSize: 12,
                   color: colorPrimary,
@@ -1373,7 +1340,7 @@ class _AddQuotationProductScreenState
 
   TotalAmountCalculation() async {
     List<QuotationTable> temp =
-    await OfflineDbHelper.getInstance().getQuotationProduct();
+        await OfflineDbHelper.getInstance().getQuotationProduct();
     double Exclusivetot_amount = 0.00;
     double Exclusivetot_tax_amt = 0.00;
     double Exclusivetot_amnt_net = 0.00;
@@ -1382,42 +1349,39 @@ class _AddQuotationProductScreenState
     double Inclusivetot_amnt_net = 0.00;
 
     double TotEXINNetmant = 0.00;
-    double ExTotalNetAmnt=0.00;
-    double InTotalNetAmnt=0.00;
-
+    double ExTotalNetAmnt = 0.00;
+    double InTotalNetAmnt = 0.00;
 
     List<QuotationTable> temp2 = [];
     if (temp.length != 0) {
       for (int i = 0; i < temp.length; i++) {
-
-
-        if(temp[i].TaxType==1)
-        {
+        if (temp[i].TaxType == 1) {
           Exclusivetot_amount = temp[i].Quantity * temp[i].NetRate;
           Exclusivetot_tax_amt = (Exclusivetot_amount * temp[i].TaxRate) / 100;
           Exclusivetot_amnt_net = Exclusivetot_amount + Exclusivetot_tax_amt;
           ExTotalNetAmnt += Exclusivetot_amnt_net;
-          print("TotExclusive" + "ExclusiveNaetAmnt : " + Exclusivetot_amnt_net.toStringAsFixed(2));
-        }
-        else
-        {
-
+          print("TotExclusive" +
+              "ExclusiveNaetAmnt : " +
+              Exclusivetot_amnt_net.toStringAsFixed(2));
+        } else {
           Inclusivetot_amount = temp[i].Quantity * temp[i].NetRate;
-          Inclusivetot_tax_amt = ((temp[i].Quantity * temp[i].NetRate) * temp[i].TaxRate) / (100+temp[i].TaxRate);
+          Inclusivetot_tax_amt =
+              ((temp[i].Quantity * temp[i].NetRate) * temp[i].TaxRate) /
+                  (100 + temp[i].TaxRate);
           Inclusivetot_amnt_net = Inclusivetot_amount + Inclusivetot_tax_amt;
-          InTotalNetAmnt +=Inclusivetot_amnt_net;
-          print("TotInclusive" + "InclusiveNaetAmnt : " + Inclusivetot_amnt_net.toStringAsFixed(2));
-
+          InTotalNetAmnt += Inclusivetot_amnt_net;
+          print("TotInclusive" +
+              "InclusiveNaetAmnt : " +
+              Inclusivetot_amnt_net.toStringAsFixed(2));
         }
-
       }
     }
     TotEXINNetmant = ExTotalNetAmnt + InTotalNetAmnt;
 
     double Hdrdis = 0.00;
-   // double.parse(_HeaderDiscAmnt == null ? 0.00 : _HeaderDiscAmnt);
+    // double.parse(_HeaderDiscAmnt == null ? 0.00 : _HeaderDiscAmnt);
 
-   /* if(isForUpdate!=true)
+    /* if(isForUpdate!=true)
       {
         Hdrdis = 0.00;
       }
@@ -1444,7 +1408,7 @@ class _AddQuotationProductScreenState
         double ExclusiveItemWiseHeaderDisAmnt = 0.00;
         double ExclusiveItemWiseAmount = 0.00;
         double ExclusiveNetAmntAfterHeaderDisAmnt = 0.00;
-        double ExclusiveItemWiseTaxAmnt =0.00;
+        double ExclusiveItemWiseTaxAmnt = 0.00;
         double ExclusiveTaxPluse100 = 0.00;
         double ExclusiveFinalNetAmntAfterHeaderDisAmnt = 0.00;
 
@@ -1453,13 +1417,11 @@ class _AddQuotationProductScreenState
         double InclusiveItemWiseHeaderDisAmnt = 0.00;
         double InclusiveItemWiseAmount = 0.00;
         double InclusiveNetAmntAfterHeaderDisAmnt = 0.00;
-        double InclusiveItemWiseTaxAmnt =0.00;
+        double InclusiveItemWiseTaxAmnt = 0.00;
         double InclusiveTaxPluse100 = 0.00;
         double InclusiveFinalNetAmntAfterHeaderDisAmnt = 0.00;
 
         double InclusiveTotalNetAmntAfterHeaderDisAmnt = 0.00;
-
-
 
         if (DisPer > 0) {
           final disper = (UnitPrice * DisPer) / 100;
@@ -1472,62 +1434,69 @@ class _AddQuotationProductScreenState
 
         _netRateController.text = NetRate1.toStringAsFixed(2);
 
-
         double Taxtype = 0.00;
-        int intTaxType =0;
+        int intTaxType = 0;
 
-        if(_taxTypeController.text!=null)
-          {
-            Taxtype = double.parse(_taxTypeController.text);
-            intTaxType = Taxtype.toInt();
-
-          }
+        if (_taxTypeController.text != null) {
+          Taxtype = double.parse(_taxTypeController.text);
+          intTaxType = Taxtype.toInt();
+        }
         print("EditedTaxType" + " TaxType : " + intTaxType.toString());
 
         if (intTaxType == 1) {
-
-          if(Hdrdis==0.00)
-          {
+          if (Hdrdis == 0.00) {
             Amount1 = Quantity * NetRate1;
             _amountController.text = Amount1.toStringAsFixed(2);
             TaxAmount1 = (Amount1 * TaxPer) / 100;
             _taxAmountController.text = TaxAmount1.toStringAsFixed(2);
             TotalAmount = Amount1 + TaxAmount1;
             _totalAmountController.text = TotalAmount.toStringAsFixed(2);
-          }
-          else
-          {
+          } else {
             Amount1 = Quantity * NetRate1;
 
-            print("Onlyfg" +Quantity.toString()+" NetAmount : "+NetRate1.toString() + " Amount : " +Amount1.toString() );
+            print("Onlyfg" +
+                Quantity.toString() +
+                " NetAmount : " +
+                NetRate1.toString() +
+                " Amount : " +
+                Amount1.toString());
             //_amountController.text = Amount1.toStringAsFixed(2);
             TaxAmount1 = (Amount1 * TaxPer) / 100;
             // _taxAmountController.text = TaxAmount1.toStringAsFixed(2);
             TotalAmount = Amount1 + TaxAmount1;
             // _totalAmountController.text = TotalAmount.toStringAsFixed(2); //getNumber(TotalAmount,precision: 2).toString();//TotalAmount.toStringAsFixed(3);
 
-            ExclusiveItemWiseHeaderDisAmnt = TotalAmount * Hdrdis / TotEXINNetmant;
+            ExclusiveItemWiseHeaderDisAmnt =
+                TotalAmount * Hdrdis / TotEXINNetmant;
             ExclusiveItemWiseAmount = Quantity * NetRate1;
-            ExclusiveNetAmntAfterHeaderDisAmnt = ExclusiveItemWiseAmount-ExclusiveItemWiseHeaderDisAmnt;
-            ExclusiveItemWiseTaxAmnt = (ExclusiveNetAmntAfterHeaderDisAmnt * TaxPer)/100;
-            ExclusiveFinalNetAmntAfterHeaderDisAmnt = ExclusiveNetAmntAfterHeaderDisAmnt;
-            ExclusiveTotalNetAmntAfterHeaderDisAmnt = ExclusiveItemWiseAmount + ExclusiveItemWiseTaxAmnt;
+            ExclusiveNetAmntAfterHeaderDisAmnt =
+                ExclusiveItemWiseAmount - ExclusiveItemWiseHeaderDisAmnt;
+            ExclusiveItemWiseTaxAmnt =
+                (ExclusiveNetAmntAfterHeaderDisAmnt * TaxPer) / 100;
+            ExclusiveFinalNetAmntAfterHeaderDisAmnt =
+                ExclusiveNetAmntAfterHeaderDisAmnt;
+            ExclusiveTotalNetAmntAfterHeaderDisAmnt =
+                ExclusiveItemWiseAmount + ExclusiveItemWiseTaxAmnt;
             var CGSTPer = 0.00;
-            var CGSTAmount = 0.00;var SGSTPer = 0.00;var SGSTAmount = 0.00;var IGSTPer = 0.00;var IGSTAmount = 0.00;
+            var CGSTAmount = 0.00;
+            var SGSTPer = 0.00;
+            var SGSTAmount = 0.00;
+            var IGSTPer = 0.00;
+            var IGSTAmount = 0.00;
 
-            _amountController.text =ExclusiveFinalNetAmntAfterHeaderDisAmnt.toStringAsFixed(2);
-            _taxAmountController.text =ExclusiveItemWiseTaxAmnt.toStringAsFixed(2);
-            _totalAmountController.text = ExclusiveTotalNetAmntAfterHeaderDisAmnt.toStringAsFixed(2);
+            _amountController.text =
+                ExclusiveFinalNetAmntAfterHeaderDisAmnt.toStringAsFixed(2);
+            _taxAmountController.text =
+                ExclusiveItemWiseTaxAmnt.toStringAsFixed(2);
+            _totalAmountController.text =
+                ExclusiveTotalNetAmntAfterHeaderDisAmnt.toStringAsFixed(2);
           }
-
         } else {
           Amount1 = 0.00;
           TaxAmount1 = 0.00;
           TotalAmount = 0.00;
 
-
-          if(Hdrdis==0.00)
-          {
+          if (Hdrdis == 0.00) {
             TaxAmount1 = ((Quantity * NetRate1) * TaxPer) / (100 + TaxPer);
             _taxAmountController.text = TaxAmount1.toStringAsFixed(
                 2); //getNumber(TaxAmount1,precision: 2).toString();
@@ -1539,9 +1508,7 @@ class _AddQuotationProductScreenState
                 TaxAmount1; //getNumber(TaxAmount1,precision: 2);
             _totalAmountController.text = TotalAmount.toStringAsFixed(
                 2); //getNumber(TotalAmount,precision: 2).toString();
-          }
-          else
-          {
+          } else {
             TaxAmount1 = ((Quantity * NetRate1) * TaxPer) / (100 + TaxPer);
 
             Amount1 = (Quantity * NetRate1) - TaxAmount1;
@@ -1549,23 +1516,27 @@ class _AddQuotationProductScreenState
             TotalAmount = (Quantity * NetRate1) +
                 TaxAmount1; //getNumber(TaxAmount1,precision: 2);
 
-            InclusiveItemWiseHeaderDisAmnt =  (TotalAmount * Hdrdis)/TotEXINNetmant;
-            InclusiveItemWiseAmount =Quantity * NetRate1;
-            InclusiveNetAmntAfterHeaderDisAmnt = InclusiveItemWiseAmount-InclusiveItemWiseHeaderDisAmnt;
-            InclusiveTaxPluse100 = 100+TaxPer;
-            InclusiveItemWiseTaxAmnt = (InclusiveNetAmntAfterHeaderDisAmnt * TaxPer)/InclusiveTaxPluse100;
-            InclusiveFinalNetAmntAfterHeaderDisAmnt = InclusiveNetAmntAfterHeaderDisAmnt-InclusiveItemWiseTaxAmnt;
-            InclusiveTotalNetAmntAfterHeaderDisAmnt = InclusiveNetAmntAfterHeaderDisAmnt + InclusiveItemWiseTaxAmnt;
-            _amountController.text =InclusiveFinalNetAmntAfterHeaderDisAmnt.toStringAsFixed(2);
-            _taxAmountController.text =InclusiveItemWiseTaxAmnt.toStringAsFixed(2);
-            _totalAmountController.text = InclusiveTotalNetAmntAfterHeaderDisAmnt.toStringAsFixed(2);
+            InclusiveItemWiseHeaderDisAmnt =
+                (TotalAmount * Hdrdis) / TotEXINNetmant;
+            InclusiveItemWiseAmount = Quantity * NetRate1;
+            InclusiveNetAmntAfterHeaderDisAmnt =
+                InclusiveItemWiseAmount - InclusiveItemWiseHeaderDisAmnt;
+            InclusiveTaxPluse100 = 100 + TaxPer;
+            InclusiveItemWiseTaxAmnt =
+                (InclusiveNetAmntAfterHeaderDisAmnt * TaxPer) /
+                    InclusiveTaxPluse100;
+            InclusiveFinalNetAmntAfterHeaderDisAmnt =
+                InclusiveNetAmntAfterHeaderDisAmnt - InclusiveItemWiseTaxAmnt;
+            InclusiveTotalNetAmntAfterHeaderDisAmnt =
+                InclusiveNetAmntAfterHeaderDisAmnt + InclusiveItemWiseTaxAmnt;
+            _amountController.text =
+                InclusiveFinalNetAmntAfterHeaderDisAmnt.toStringAsFixed(2);
+            _taxAmountController.text =
+                InclusiveItemWiseTaxAmnt.toStringAsFixed(2);
+            _totalAmountController.text =
+                InclusiveTotalNetAmntAfterHeaderDisAmnt.toStringAsFixed(2);
           }
-
-
-
-
         }
-
       });
     }
   }
@@ -1642,7 +1613,6 @@ class _AddQuotationProductScreenState
       });
     }
   }*/
-
 
   double getNumber(double input, {int precision = 2}) => double.parse(
       '$input'.substring(0, '$input'.indexOf('.') + precision + 1));

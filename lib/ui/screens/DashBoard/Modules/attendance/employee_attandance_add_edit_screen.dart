@@ -4,6 +4,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart'
+    as geolocator; // or whatever name you want
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
@@ -11,17 +14,13 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:soleoserp/blocs/base/base_bloc.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/attendance_employee/attendance_bloc.dart';
 import 'package:soleoserp/models/api_requests/attendance_save_request.dart';
-import 'package:soleoserp/models/api_requests/location_address_request.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
-import 'package:soleoserp/models/api_responses/follower_employee_list_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/dimen_resources.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/utils/general_utils.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
-import 'package:geolocator/geolocator.dart' as geolocator; // or whatever name you want
-import 'package:http/http.dart' as http;
 
 import 'employee_attendance_list.dart';
 
@@ -83,8 +82,6 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
   Position _currentPosition;
   final Geolocator geolocator123 = Geolocator()..forceAndroidLocationManager;
 
-
-
   @override
   void initState() {
     super.initState();
@@ -109,7 +106,7 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
   */
     _selectedEvents = widget.arguments.selectedEvents;
     _EmployeeID = widget.arguments.EmployeeID;
-   // _PresentDate =
+    // _PresentDate =
 
     _PresentDate = selectedDate.year.toString() +
         "-" +
@@ -121,22 +118,27 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
 
     fillData();
     //saveDetails();
-
   }
 
   void checkPermissionStatus() async {
-
-
     bool granted = await Permission.location.isGranted;
-    bool Denied = await  Permission.location.isDenied;
+    bool Denied = await Permission.location.isDenied;
     bool PermanentlyDenied = await Permission.location.isPermanentlyDenied;
 
-    print("PermissionStatus" + "Granted : "+   granted.toString()  + " Denied : " + Denied.toString() + " PermanentlyDenied : " + PermanentlyDenied.toString() );
+    print("PermissionStatus" +
+        "Granted : " +
+        granted.toString() +
+        " Denied : " +
+        Denied.toString() +
+        " PermanentlyDenied : " +
+        PermanentlyDenied.toString());
 
-    if (Denied==true) {
+    if (Denied == true) {
       // openAppSettings();
-      is_LocationService_Permission=false;
-      showCommonDialogWithSingleOption(
+      is_LocationService_Permission = false;
+      await Permission.location.request();
+
+      /*showCommonDialogWithSingleOption(
           context, "Location permission is required , You have to click on OK button to Allow the location access !",
           positiveButtonTitle: "OK",
           onTapOfPositiveButton: () async {
@@ -146,7 +148,7 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
           }
 
       );
-
+*/
       // await Permission.location.request();
       // We didn't ask for permission yet or the permission has been denied before but not permanently.
     }
@@ -155,22 +157,18 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
     if (await Permission.location.isRestricted) {
       // The OS restricts access, for example because of parental controls.
       openAppSettings();
-
     }
-    if (PermanentlyDenied==true) {
+    if (PermanentlyDenied == true) {
       // The user opted to never again see the permission request dialog for this
       // app. The only way to change the permission's status now is to let the
       // user manually enable it in the system settings.
-      is_LocationService_Permission=false;
+      is_LocationService_Permission = false;
       openAppSettings();
-
-
-
     }
 
-    if (granted==true) {
+    if (granted == true) {
       // The OS restricts access, for example because of parental controls.
-      is_LocationService_Permission=true;
+      is_LocationService_Permission = true;
 
       /*if (serviceLocation == true) {
         // Use location.
@@ -189,16 +187,17 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
       }*/
     }
   }
-  _getCurrentLocation()  {
-    geolocator123.getCurrentPosition(desiredAccuracy: geolocator.LocationAccuracy.best)
+
+  _getCurrentLocation() {
+    geolocator123
+        .getCurrentPosition(desiredAccuracy: geolocator.LocationAccuracy.best)
         .then((Position position) async {
       _currentPosition = position;
       Longitude = position.longitude.toString();
       Latitude = position.latitude.toString();
 
-      Address = await getAddressFromLatLng(Latitude,Longitude,"AIzaSyCVs8h5lia6ktiHnj2yzLYJOGtn0CQG48k");
-
-
+      Address = await getAddressFromLatLng(
+          Latitude, Longitude, "AIzaSyCVs8h5lia6ktiHnj2yzLYJOGtn0CQG48k");
     }).catchError((e) {
       print(e);
     });
@@ -215,29 +214,31 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
       //  print("${first.featureName} : ${first.addressLine}");
       Latitude = currentLocation.latitude.toString();
       Longitude = currentLocation.longitude.toString();
-      Address = await getAddressFromLatLng(Latitude,Longitude,"AIzaSyCVs8h5lia6ktiHnj2yzLYJOGtn0CQG48k");
+      Address = await getAddressFromLatLng(
+          Latitude, Longitude, "AIzaSyCVs8h5lia6ktiHnj2yzLYJOGtn0CQG48k");
 
       //  Address = "${first.featureName} : ${first.addressLine}";
     });
 
-
-   // _FollowupBloc.add(LocationAddressCallEvent(LocationAddressRequest(key:"AIzaSyCVs8h5lia6ktiHnj2yzLYJOGtn0CQG48k",latlng:Latitude+","+Longitude)));
-
+    // _FollowupBloc.add(LocationAddressCallEvent(LocationAddressRequest(key:"AIzaSyCVs8h5lia6ktiHnj2yzLYJOGtn0CQG48k",latlng:Latitude+","+Longitude)));
   }
 
-  Future<String> getAddressFromLatLng(String lat, String lng, String skey) async {
+  Future<String> getAddressFromLatLng(
+      String lat, String lng, String skey) async {
     String _host = 'https://maps.google.com/maps/api/geocode/json';
     final url = '$_host?key=$skey&latlng=$lat,$lng';
-    if(lat != "" && lng != "null"){
+    if (lat != "" && lng != "null") {
       var response = await http.get(Uri.parse(url));
-      if(response.statusCode == 200) {
+      if (response.statusCode == 200) {
         Map data = jsonDecode(response.body);
         String _formattedAddress = data["results"][0]["formatted_address"];
         //Address = _formattedAddress;
         print("response ==== $_formattedAddress");
         return _formattedAddress;
-      } else return null;
-    } else return null;
+      } else
+        return null;
+    } else
+      return null;
   }
 
   @override
@@ -265,15 +266,14 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
           if (state is AttendanceSaveCallResponseState) {
             _onSaveAttendanceResponseSuccess(state);
           }
-          if(state is LocationAddressResponseState)
-            {
-              _onLocationAddressSucessResponse(state);
-
-            }
+          if (state is LocationAddressResponseState) {
+            _onLocationAddressSucessResponse(state);
+          }
           return super.build(context);
         },
         listenWhen: (oldState, currentState) {
-          if (currentState is AttendanceSaveCallResponseState || currentState is LocationAddressResponseState) {
+          if (currentState is AttendanceSaveCallResponseState ||
+              currentState is LocationAddressResponseState) {
             return true;
           }
           return false;
@@ -286,18 +286,17 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
   Widget buildBody(BuildContext context) {
     return WillPopScope(
       onWillPop: _onBackPressed,
-
       child: Column(
         children: [
           NewGradientAppBar(
             title: Text('ADD Attendance'),
-            gradient:
-                LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
+            gradient: LinearGradient(
+                colors: [Colors.blue, Colors.purple, Colors.red]),
             actions: <Widget>[
               IconButton(
-                onPressed: (){
-                  navigateTo(context, AttendanceListScreen.routeName, clearAllStack: true);
-
+                onPressed: () {
+                  navigateTo(context, AttendanceListScreen.routeName,
+                      clearAllStack: true);
                 },
                 icon: Icon(
                   Icons.water_damage_sharp,
@@ -327,7 +326,8 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
                               _selectFromTime(context, _eventControllerIn_Time);
                             } else {
                               if (_eventControllerIn_Time.text == "") {
-                                _selectFromTime(context, _eventControllerIn_Time);
+                                _selectFromTime(
+                                    context, _eventControllerIn_Time);
                               }
                             }
                           },
@@ -356,7 +356,8 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
                                       borderRadius: BorderRadius.circular(15)),
                                   child: Container(
                                     height: 60,
-                                    padding: EdgeInsets.only(left: 20, right: 20),
+                                    padding:
+                                        EdgeInsets.only(left: 20, right: 20),
                                     width: double.maxFinite,
                                     child: Row(
                                       children: [
@@ -407,7 +408,8 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
-                                    margin: EdgeInsets.only(left: 10, right: 10),
+                                    margin:
+                                        EdgeInsets.only(left: 10, right: 10),
                                     child: Text("Out-Time",
                                         style: TextStyle(
                                             fontSize: 12,
@@ -424,7 +426,8 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
                                     elevation: 5,
                                     color: colorLightGray,
                                     shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15)),
+                                        borderRadius:
+                                            BorderRadius.circular(15)),
                                     child: Container(
                                       height: 60,
                                       padding:
@@ -440,8 +443,10 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
                                                               .text ==
                                                           ""
                                                   ? "HH:MM:SS"
-                                                  : _eventControllerOut_Time.text,
-                                              style: baseTheme.textTheme.headline3
+                                                  : _eventControllerOut_Time
+                                                      .text,
+                                              style: baseTheme
+                                                  .textTheme.headline3
                                                   .copyWith(
                                                       color: _eventControllerOut_Time
                                                                       .text ==
@@ -502,146 +507,167 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
                         ),
                         InkWell(
                           onTap: () async {
-
                             bool IsValidDateTime123 = false;
 
-                           if(_eventControllerIn_Time.text !="" && _eventControllerOut_Time.text !="")
-                           {
-                             print("bothDate Inserted");
+                            if (_eventControllerIn_Time.text !=
+                                _eventControllerOut_Time.text) {
+                              if (_eventControllerIn_Time.text != "" &&
+                                  _eventControllerOut_Time.text != "") {
+                                print("bothDate Inserted");
 
-                              print("TimeFormatedddd" + "FromTime : " + stringToTimeOfDay(_eventControllerOut_Time.text).toString().replaceAll(":", ""));
+                                print("TimeFormatedddd" +
+                                    "FromTime : " +
+                                    stringToTimeOfDay(
+                                            _eventControllerOut_Time.text)
+                                        .toString()
+                                        .replaceAll(":", ""));
 
-                           var fromDate=  stringToTimeOfDay(_eventControllerIn_Time.text).toString().replaceAll(":", "") ;
-                           var toDate = stringToTimeOfDay(_eventControllerOut_Time.text).toString().replaceAll(":", "") ;
-                           String removeTiem =  fromDate.toString().replaceAll("TimeOfDay(", "");
-                           String removeTiem1 =  toDate.toString().replaceAll("TimeOfDay(", "");
-                           String FromTime7up = removeTiem.replaceAll(")", "");
-                           String ToTime7up = removeTiem1.replaceAll(")", "");
+                                var fromDate = stringToTimeOfDay(
+                                        _eventControllerIn_Time.text)
+                                    .toString()
+                                    .replaceAll(":", "");
+                                var toDate = stringToTimeOfDay(
+                                        _eventControllerOut_Time.text)
+                                    .toString()
+                                    .replaceAll(":", "");
+                                String removeTiem = fromDate
+                                    .toString()
+                                    .replaceAll("TimeOfDay(", "");
+                                String removeTiem1 = toDate
+                                    .toString()
+                                    .replaceAll("TimeOfDay(", "");
+                                String FromTime7up =
+                                    removeTiem.replaceAll(")", "");
+                                String ToTime7up =
+                                    removeTiem1.replaceAll(")", "");
 
-                           print("DoublValueTime" + "FromTime : "+ FromTime7up  + "ToTime : " + ToTime7up );
+                                print("DoublValueTime" +
+                                    "FromTime : " +
+                                    FromTime7up +
+                                    "ToTime : " +
+                                    ToTime7up);
 
-                           if(double.parse(FromTime7up) <=  double.parse(ToTime7up))
-                            {
-                              print("Valid");
-                              baseBloc.emit(ShowProgressIndicatorState(true));
+                                if (double.parse(FromTime7up) <=
+                                    double.parse(ToTime7up)) {
+                                  print("Valid");
+                                  baseBloc
+                                      .emit(ShowProgressIndicatorState(true));
 
-                              if(is_LocationService_Permission==true)
-                              {
+                                  if (is_LocationService_Permission == true) {
+                                    bool serviceLocation = await Permission
+                                        .locationWhenInUse
+                                        .serviceStatus
+                                        .isDisabled;
 
-                                bool serviceLocation = await Permission.locationWhenInUse.serviceStatus.isDisabled;
+                                    if (serviceLocation == false) {
+                                      _getCurrentLocation();
 
-                                if(serviceLocation==false)
-                                {
+                                      baseBloc.emit(
+                                          ShowProgressIndicatorState(false));
 
-                                  _getCurrentLocation();
+                                      showCommonDialogWithTwoOptions(context,
+                                          "Are you sure you want to Save this Attendance ?",
+                                          negativeButtonTitle: "No",
+                                          positiveButtonTitle: "Yes",
+                                          onTapOfPositiveButton: () {
+                                        Navigator.of(context).pop();
 
-                                  baseBloc.emit(ShowProgressIndicatorState(false));
-
-                                  showCommonDialogWithTwoOptions(
-                                      context, "Are you sure you want to Save this Attendance ?",
-                                      negativeButtonTitle: "No",
-                                      positiveButtonTitle: "Yes", onTapOfPositiveButton: () {
-                                    Navigator.of(context).pop();
-
-                                    _FollowupBloc.add(AttendanceSaveCallEvent(
-                                        AttendanceSaveApiRequest(
-                                            EmployeeID: _EmployeeID,
-                                            PresenceDate: _PresentDate,
-                                            TimeIn: _eventControllerIn_Time.text,
-                                            TimeOut: _eventControllerOut_Time.text,
-                                            Latitude: Latitude,
-                                            LocationAddress: Address,
-                                            Longitude: Longitude,
-                                            Notes: _eventControllerNotes.text,
-                                            LoginUserID: LoginUserID,
-                                            CompanyId: CompanyID.toString())));
-                                  });
+                                        _FollowupBloc.add(
+                                            AttendanceSaveCallEvent(
+                                                AttendanceSaveApiRequest(
+                                                    EmployeeID: _EmployeeID,
+                                                    PresenceDate: _PresentDate,
+                                                    TimeIn:
+                                                        _eventControllerIn_Time
+                                                            .text,
+                                                    TimeOut:
+                                                        _eventControllerOut_Time
+                                                            .text,
+                                                    Latitude: Latitude,
+                                                    LocationAddress: Address,
+                                                    Longitude: Longitude,
+                                                    Notes: _eventControllerNotes
+                                                        .text,
+                                                    LoginUserID: LoginUserID,
+                                                    CompanyId:
+                                                        CompanyID.toString())));
+                                      });
+                                    } else {
+                                      location.requestService();
+                                      await Future.delayed(
+                                          const Duration(seconds: 3), () {});
+                                      baseBloc.emit(
+                                          ShowProgressIndicatorState(false));
+                                    }
+                                  } else {
+                                    checkPermissionStatus();
+                                  }
+                                } else {
+                                  print("Invalid");
+                                  showCommonDialogWithSingleOption(context,
+                                      "Invalid Time ! Time-OUT is must be greater then Time-IN",
+                                      positiveButtonTitle: "OK");
                                 }
-                                else
-                                {
+                              } else {
+                                print("bothDate Not Inserted");
+                                baseBloc.emit(ShowProgressIndicatorState(true));
 
-                                  location.requestService();
-                                  await Future.delayed(const Duration(seconds:3), (){});
-                                  baseBloc.emit(ShowProgressIndicatorState(false));
+                                if (is_LocationService_Permission == true) {
+                                  bool serviceLocation = await Permission
+                                      .locationWhenInUse
+                                      .serviceStatus
+                                      .isDisabled;
+
+                                  if (serviceLocation == false) {
+                                    _getCurrentLocation();
+                                    baseBloc.emit(
+                                        ShowProgressIndicatorState(false));
+
+                                    showCommonDialogWithTwoOptions(context,
+                                        "Are you sure you want to Save this Attendance ?",
+                                        negativeButtonTitle: "No",
+                                        positiveButtonTitle: "Yes",
+                                        onTapOfPositiveButton: () {
+                                      Navigator.of(context).pop();
+
+                                      _FollowupBloc.add(AttendanceSaveCallEvent(
+                                          AttendanceSaveApiRequest(
+                                              EmployeeID: _EmployeeID,
+                                              PresenceDate: _PresentDate,
+                                              TimeIn:
+                                                  _eventControllerIn_Time.text,
+                                              TimeOut:
+                                                  _eventControllerOut_Time.text,
+                                              Latitude: Latitude,
+                                              LocationAddress: Address,
+                                              Longitude: Longitude,
+                                              Notes: _eventControllerNotes.text,
+                                              LoginUserID: LoginUserID,
+                                              CompanyId:
+                                                  CompanyID.toString())));
+                                    });
+                                  } else {
+                                    location.requestService();
+                                    await Future.delayed(
+                                        const Duration(seconds: 3), () {});
+                                    baseBloc.emit(
+                                        ShowProgressIndicatorState(false));
+                                  }
+                                } else {
+                                  checkPermissionStatus();
                                 }
-
                               }
-                              else{
-
-                                checkPermissionStatus();
-
-                              }
+                            } else {
+                              showCommonDialogWithSingleOption(context,
+                                  "In-Time and Out-Time Can't be Same !",
+                                  positiveButtonTitle: "OK");
                             }
-                          else{
-                            print("Invalid");
-                            showCommonDialogWithSingleOption(context, "Invalid Time ! Time-OUT is must be greater then Time-IN",
-                                positiveButtonTitle: "OK");
-                          }
-
-                           }
-                           else {
-                             print("bothDate Not Inserted");
-                             baseBloc.emit(ShowProgressIndicatorState(true));
-
-
-                             if(is_LocationService_Permission==true)
-                             {
-                               bool serviceLocation = await Permission.locationWhenInUse.serviceStatus.isDisabled;
-
-                               if(serviceLocation==false)
-                               {
-
-                                 _getCurrentLocation();
-                                 baseBloc.emit(ShowProgressIndicatorState(false));
-
-
-                                 showCommonDialogWithTwoOptions(
-                                     context, "Are you sure you want to Save this Attendance ?",
-                                     negativeButtonTitle: "No",
-                                     positiveButtonTitle: "Yes", onTapOfPositiveButton: () {
-                                   Navigator.of(context).pop();
-
-                                   _FollowupBloc.add(AttendanceSaveCallEvent(
-                                       AttendanceSaveApiRequest(
-                                           EmployeeID: _EmployeeID,
-                                           PresenceDate: _PresentDate,
-                                           TimeIn: _eventControllerIn_Time.text,
-                                           TimeOut: _eventControllerOut_Time.text,
-                                           Latitude: Latitude,
-                                           LocationAddress: Address,
-                                           Longitude: Longitude,
-                                           Notes: _eventControllerNotes.text,
-                                           LoginUserID: LoginUserID,
-                                           CompanyId: CompanyID.toString())));
-                                 });
-                               }
-                               else
-                               {
-
-                                  location.requestService();
-                                 await Future.delayed(const Duration(seconds:3), (){});
-                                  baseBloc.emit(ShowProgressIndicatorState(false));
-
-                               }
-
-                             }
-                             else{
-
-                               checkPermissionStatus();
-
-                             }
-
-
-                           }
 
                             // DateTime ToDate = DateTime.parse(_eventControllerOut_Time.text);
 
-
-
-
                             // _selectedEvents=[_eventControllerIn_Time.text,_eventControllerOut_Time.text];
                             //Navigator.of(context).pop(_selectedEvents);
-                           /* await navigateTo(
+                            /* await navigateTo(
                                 context, AttendanceListScreen.routeName,
                                 clearAllStack: true);*/
                           },
@@ -656,7 +682,8 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
                                       borderRadius: BorderRadius.circular(15)),
                                   child: Container(
                                     height: 60,
-                                    padding: EdgeInsets.only(left: 20, right: 20),
+                                    padding:
+                                        EdgeInsets.only(left: 20, right: 20),
                                     width: double.maxFinite,
                                     child: Row(
                                       children: [
@@ -664,7 +691,8 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
                                           child: Center(
                                             child: Text(
                                               "Save",
-                                              style: baseTheme.textTheme.headline3
+                                              style: baseTheme
+                                                  .textTheme.headline3
                                                   .copyWith(
                                                       color: colorWhite,
                                                       fontWeight:
@@ -720,33 +748,28 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
       //final TimeOfDay picked_s = TimeOfDay.now();
 
       if (picked_s != null) //&& picked_s != selectedTime)
-        {
-          //selectedTime = picked_s;
+      {
+        //selectedTime = picked_s;
 
-          String AM_PM =
-          picked_s.periodOffset.toString() == "12" ? "PM" : "AM";
-          String beforZeroHour = picked_s.hourOfPeriod <= 9
-              ? "0" + picked_s.hourOfPeriod.toString()
-              : picked_s.hourOfPeriod.toString();
-          String beforZerominute = picked_s.minute <= 9
-              ? "0" + picked_s.minute.toString()
-              : picked_s.minute.toString();
+        String AM_PM = picked_s.periodOffset.toString() == "12" ? "PM" : "AM";
+        String beforZeroHour = picked_s.hourOfPeriod <= 9
+            ? "0" + picked_s.hourOfPeriod.toString()
+            : picked_s.hourOfPeriod.toString();
+        String beforZerominute = picked_s.minute <= 9
+            ? "0" + picked_s.minute.toString()
+            : picked_s.minute.toString();
 
-          _eventControllerIn_Time.text = beforZeroHour +
-              ":" +
-              beforZerominute +
-              " " +
-              AM_PM; //picked_s.periodOffset.toString();
-          setState(() {
-
-          });
-        }
-
+        _eventControllerIn_Time.text = beforZeroHour +
+            ":" +
+            beforZerominute +
+            " " +
+            AM_PM; //picked_s.periodOffset.toString();
+        setState(() {});
+      }
     } else {
       selectedTime = TimeOfDay.now();
 
-      String AM_PM =
-      selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
+      String AM_PM = selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
       String beforZeroHour = selectedTime.hourOfPeriod <= 9
           ? "0" + selectedTime.hourOfPeriod.toString()
           : selectedTime.hourOfPeriod.toString();
@@ -759,11 +782,10 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
           beforZerominute +
           " " +
           AM_PM; //picked_s.periodOffset.toString();
-      setState(() {
-
-      });
+      setState(() {});
     }
   }
+
   Future<void> _selectToTime(
       BuildContext context, TextEditingController F_datecontroller) async {
     print("LoginDetails" +
@@ -778,18 +800,17 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
           builder: (BuildContext context, Widget child) {
             return MediaQuery(
               data:
-              MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
+                  MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
               child: child,
             );
           });
       //final TimeOfDay picked_s = TimeOfDay.now();
 
-      if (picked_s != null)// && picked_s != selectedTime)
+      if (picked_s != null) // && picked_s != selectedTime)
       {
-       // selectedTime = picked_s;
+        // selectedTime = picked_s;
 
-        String AM_PM =
-        picked_s.periodOffset.toString() == "12" ? "PM" : "AM";
+        String AM_PM = picked_s.periodOffset.toString() == "12" ? "PM" : "AM";
         String beforZeroHour = picked_s.hourOfPeriod <= 9
             ? "0" + picked_s.hourOfPeriod.toString()
             : picked_s.hourOfPeriod.toString();
@@ -802,16 +823,12 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
             beforZerominute +
             " " +
             AM_PM; //picked_s.periodOffset.toString();
-        setState(() {
-
-        });
+        setState(() {});
       }
-
     } else {
       selectedTime = TimeOfDay.now();
 
-      String AM_PM =
-      selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
+      String AM_PM = selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
       String beforZeroHour = selectedTime.hourOfPeriod <= 9
           ? "0" + selectedTime.hourOfPeriod.toString()
           : selectedTime.hourOfPeriod.toString();
@@ -824,9 +841,7 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
           beforZerominute +
           " " +
           AM_PM; //picked_s.periodOffset.toString();
-      setState(() {
-
-      });
+      setState(() {});
     }
   }
 
@@ -841,7 +856,6 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
 
       if (_offlineLoggedInData.details[0].roleCode == 'admin' ||
           _offlineLoggedInData.details[0].roleCode == 'hradmin') {
-
         setState(() {
           isvisible_Out_time = true;
         });
@@ -862,7 +876,7 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
         setState(() {
           isvisible_Out_time = true;
           String AM_PM =
-          selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
+              selectedTime.periodOffset.toString() == "12" ? "PM" : "AM";
           String beforZeroHour = selectedTime.hourOfPeriod <= 9
               ? "0" + selectedTime.hourOfPeriod.toString()
               : selectedTime.hourOfPeriod.toString();
@@ -870,11 +884,8 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
               ? "0" + selectedTime.minute.toString()
               : selectedTime.minute.toString();
 
-          _eventControllerIn_Time.text = beforZeroHour +
-              ":" +
-              beforZerominute +
-              " " +
-              AM_PM;
+          _eventControllerIn_Time.text =
+              beforZeroHour + ":" + beforZerominute + " " + AM_PM;
           /*_eventControllerOut_Time.text = beforZeroHour +
               ":" +
               beforZerominute +
@@ -911,7 +922,7 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
     });
   }
 */
- /* Future<List<Address>> _getAddress(double lat, double lang) async {
+  /* Future<List<Address>> _getAddress(double lat, double lang) async {
     final coordinates = new Coordinates(lat, lang);
     List<Address> add =
     await Geocoder.local.findAddressesFromCoordinates(coordinates);
@@ -919,8 +930,10 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
   }*/
 
   void _onSaveAttendanceResponseSuccess(AttendanceSaveCallResponseState state) {
-    print("AttendanceSave23" + " Message : " + state.response.details[0].column2);
-    navigateTo(context, AttendanceListScreen.routeName, clearAllStack: true);
+    print(
+        "AttendanceSave23" + " Message : " + state.response.details[0].column2);
+    Navigator.of(context).pop();
+    // navigateTo(context, AttendanceListScreen.routeName, clearAllStack: true);
     /* _FollowupBloc
       ..add(AttendanceCallEvent(AttendanceApiRequest(
           pkID: "",
@@ -934,22 +947,18 @@ class _AttendanceAdd_EditScreenState extends BaseState<AttendanceAdd_EditScreen>
   }
 
   void _onLocationAddressSucessResponse(LocationAddressResponseState state) {
-    if(state.locationAddressResponse.results.length!=0)
-      {
-        for(var i=0;i<state.locationAddressResponse.results.length;i++)
-          {
-            Address = state.locationAddressResponse.results[i].formattedAddress;
-            Latitude = state.locationAddressResponse.results[i].geometry.location.lat.toString();
-            Longitude = state.locationAddressResponse.results[i].geometry.location.lng.toString();
-
-          }
+    if (state.locationAddressResponse.results.length != 0) {
+      for (var i = 0; i < state.locationAddressResponse.results.length; i++) {
+        Address = state.locationAddressResponse.results[i].formattedAddress;
+        Latitude = state
+            .locationAddressResponse.results[i].geometry.location.lat
+            .toString();
+        Longitude = state
+            .locationAddressResponse.results[i].geometry.location.lng
+            .toString();
       }
+    }
 
-    setState(() {
-
-    });
+    setState(() {});
   }
-
-
-
 }

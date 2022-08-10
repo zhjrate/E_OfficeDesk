@@ -187,6 +187,7 @@ CartFlutterLive     : [BaseURL(API)]:	http://208.109.14.134:86/ [WebURL]:http://
   static const END_POINT_LOAN_SEARCH_DETAILS = "Loan/Search";
   static const END_POINT_LOAN_DELETE_DETAILS = "Loan";
   static const END_POINT_LOAN_APPROVAL_LIST_DETAILS = "Loan/ByApprovalStatus";
+  static const END_POINT_LOAN_APPROVAL_SAVE_DETAILS = "Loan/";
 
   static const END_POINT_MISSED_PUNCH_LIST_DETAILS = "MissedPunch";
   static const END_POINT_MISSED_PUNCH_SEARCH_DETAILS = "MissedPunch/Search";
@@ -267,6 +268,10 @@ CartFlutterLive     : [BaseURL(API)]:	http://208.109.14.134:86/ [WebURL]:http://
   static const END_POINT_INQUIRY_SEARCH_BY_FILLTER = 'Inquiry/SearchList';
   static const END_POINT_TELECALLER_IMG_UPLOAD = "TeleCaller/UploadImage";
   static const END_POINT_TELECALLER_IMAGE_DELETE_BY_PK_ID = "TeleCaller/";
+  static const END_POINT_TO_DO_DELETE = "Todo";
+  static const END_POINT_ATTEND_VISIT_DELETE = "ComplaintVisit/CompaintDel";
+  static const END_POINT_SALES_BILL_BY_ID = "SalesBill/";
+  static const END_POINT_MISSED_PUNCH_APPROVAL_SAVE = "MissedPunch/";
 
   final http.Client httpClient;
 

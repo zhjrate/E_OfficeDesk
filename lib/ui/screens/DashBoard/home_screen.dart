@@ -16,6 +16,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
+import 'package:ntp/ntp.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/Dashboard/dashboard_user_rights_screen_bloc.dart';
 import 'package:soleoserp/firebase_options.dart';
@@ -94,6 +95,8 @@ class _HomeScreenState extends BaseState<HomeScreen>
 
   bool isPunchIn = false;
   bool isPunchOut = false;
+
+  bool isCurrentTime = true;
 
   DateTime selectedDate = DateTime.now();
   TimeOfDay selectedTime = TimeOfDay.now();
@@ -292,6 +295,7 @@ class _HomeScreenState extends BaseState<HomeScreen>
     super.initState();
     imageCache.clear();
     SystemChannels.textInput.invokeMethod('TextInput.hide');
+    getcurrentTimeInfoFromMaindfd();
     screenStatusBarColor = colorWhite;
     ABC = "Ruchit";
     Xyz(ABC);
@@ -477,6 +481,8 @@ class _HomeScreenState extends BaseState<HomeScreen>
 
   @override
   Widget buildBody(BuildContext context123) {
+    //getcurrentTimeInfoFromMain(context123);
+
     if (Platform.isAndroid) {
       // Android-specific code
 
@@ -594,19 +600,17 @@ class _HomeScreenState extends BaseState<HomeScreen>
                                 Expanded(
                                   flex: 1,
                                   child: InkWell(
-                                    onTap: () => isPunchIn == true
-                                        ? showCommonDialogWithSingleOption(
-                                            context,
-                                            _offlineLoggedInData.details[0].employeeName +
-                                                " \n Punch In : " +
-                                                PuchInTime.text,
-                                            positiveButtonTitle: "OK")
-                                        : _dashBoardScreenBloc.add(AttendanceSaveCallEvent(
-                                            AttendanceSaveApiRequest(
+                                    onTap: () => isCurrentTime == true
+                                        ? isPunchIn == true
+                                            ? showCommonDialogWithSingleOption(
+                                                context, _offlineLoggedInData.details[0].employeeName + " \n Punch In : " + PuchInTime.text,
+                                                positiveButtonTitle: "OK")
+                                            : _dashBoardScreenBloc.add(AttendanceSaveCallEvent(AttendanceSaveApiRequest(
                                                 EmployeeID: _offlineLoggedInData
                                                     .details[0].employeeID
                                                     .toString(),
-                                                PresenceDate: selectedDate.year.toString() +
+                                                PresenceDate: selectedDate.year
+                                                        .toString() +
                                                     "-" +
                                                     selectedDate.month
                                                         .toString() +
@@ -614,14 +618,24 @@ class _HomeScreenState extends BaseState<HomeScreen>
                                                     selectedDate.day.toString(),
                                                 TimeIn: selectedTime.hour.toString() +
                                                     ":" +
-                                                    selectedTime.minute.toString(),
+                                                    selectedTime.minute
+                                                        .toString(),
                                                 TimeOut: "",
                                                 Latitude: Latitude,
                                                 LocationAddress: Address,
                                                 Longitude: Longitude,
                                                 Notes: "",
                                                 LoginUserID: LoginUserID,
-                                                CompanyId: CompanyID.toString()))),
+                                                CompanyId:
+                                                    CompanyID.toString())))
+                                        : showCommonDialogWithSingleOption(
+                                            context, "Your Device DateTime is not correct as per current DateTime , Kindly Update Your Device Time !",
+                                            positiveButtonTitle: "OK",
+                                            onTapOfPositiveButton: () {
+                                            navigateTo(
+                                                context, HomeScreen.routeName,
+                                                clearAllStack: true);
+                                          }),
                                     child: Card(
                                       elevation: 5,
                                       color: PuchInTime.text == ""
@@ -723,7 +737,17 @@ class _HomeScreenState extends BaseState<HomeScreen>
                                 Expanded(
                                   flex: 1,
                                   child: InkWell(
-                                    onTap: () => punchoutLogic(),
+                                    onTap: () => isCurrentTime == true
+                                        ? punchoutLogic()
+                                        : showCommonDialogWithSingleOption(
+                                            context,
+                                            "Your Device DateTime is not correct as per current DateTime , Kindly Update Your Device Time !",
+                                            positiveButtonTitle: "OK",
+                                            onTapOfPositiveButton: () {
+                                            navigateTo(
+                                                context, HomeScreen.routeName,
+                                                clearAllStack: true);
+                                          }),
                                     child: Card(
                                       elevation: 5,
                                       color: PuchOutTime.text == ""
@@ -1544,14 +1568,10 @@ class _HomeScreenState extends BaseState<HomeScreen>
             "http://demo.sharvayainfotech.in/images/contact.png";
         arr_ALL_Name_ID_For_Lead.add(all_name_id);*/
 
-        if (_offlineLoggedInData
-                    .details[0].serialKey
-                    .toUpperCase() ==
+        if (_offlineLoggedInData.details[0].serialKey.toUpperCase() ==
                 "SW0T-GLA5-IND7-AS71" ||
             _offlineLoggedInData.details[0].serialKey.toUpperCase() ==
-                "SI08-SB94-MY45-RY15" ||
-            _offlineLoggedInData.details[0].serialKey.toUpperCase() ==
-                "TEST-0000-SI0F-0208") {
+                "SI08-SB94-MY45-RY15") {
           ALL_Name_ID all_name_id1 = ALL_Name_ID();
           all_name_id1.Name = "Quick Follow-up";
           all_name_id1.Name1 =
@@ -1576,14 +1596,18 @@ class _HomeScreenState extends BaseState<HomeScreen>
         }
       } else if (response.menuRightsResponse.details[i].menuName ==
           "pgExternalLeads") {
-        if (_offlineLoggedInData.details[0].serialKey.toLowerCase() !=
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Portal Leads";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/users.png";
+        arr_ALL_Name_ID_For_Lead.add(all_name_id);
+        /* if (_offlineLoggedInData.details[0].serialKey.toLowerCase() !=
             "dol2-6uh7-ph03-in5h") {
           ALL_Name_ID all_name_id = ALL_Name_ID();
           all_name_id.Name = "Portal Leads";
           all_name_id.Name1 =
               "http://demo.sharvayainfotech.in/images/users.png";
           arr_ALL_Name_ID_For_Lead.add(all_name_id);
-        }
+        }*/
       } else if (response.menuRightsResponse.details[i].menuName ==
           "pgTeleCaller") {
         /*  if (_offlineLoggedInData.details[0].serialKey.toLowerCase() !=
@@ -1802,6 +1826,10 @@ class _HomeScreenState extends BaseState<HomeScreen>
         all_name_id.Name = "To-Do";
         all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/Task.png";
         arr_ALL_Name_ID_For_Office.add(all_name_id);
+        ALL_Name_ID all_name_id2 = ALL_Name_ID();
+        all_name_id2.Name = "Office Task";
+        all_name_id2.Name1 = "http://demo.sharvayainfotech.in/images/Task.png";
+        arr_ALL_Name_ID_For_Office.add(all_name_id2);
       }
 
       ///------------------------------------Support_________________________________________________________
@@ -2056,6 +2084,30 @@ class _HomeScreenState extends BaseState<HomeScreen>
           break;
         }
       }
+    }
+  }
+
+  void getcurrentTimeInfoFromMaindfd() async {
+    DateTime startDate = await NTP.now();
+    print('NTP DateTime: ${startDate} ${DateTime.now()}');
+
+    var now = startDate;
+    var formatter = new DateFormat('yyyy-MM-ddTHH:mm');
+    String currentday = formatter.format(now);
+    String PresentDate1 = formatter.format(DateTime.now());
+    print(
+        'NTP DateTime123456: ${DateTime.parse(currentday)} ${DateTime.parse(PresentDate1)}');
+
+    if (DateTime.parse(currentday) != DateTime.parse(PresentDate1)) {
+      //  navigateTo(context, AttendanceListScreen.routeName, clearAllStack: true);
+      /*return showCommonDialogWithSingleOption(context,
+          "Your Device DateTime is not correct as per current DateTime , Kindly Update Your Device Time !",
+          positiveButtonTitle: "OK", onTapOfPositiveButton: () {
+            navigateTo(context, HomeScreen.routeName, clearAllStack: true);
+          });*/
+      isCurrentTime = false;
+    } else {
+      isCurrentTime = true;
     }
   }
 }

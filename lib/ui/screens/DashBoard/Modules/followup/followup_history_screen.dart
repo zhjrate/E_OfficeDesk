@@ -15,10 +15,9 @@ import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
 
-
 class FollowupHistoryScreenArguments {
-  String InqNo,CustomerID;
-  FollowupHistoryScreenArguments(this.InqNo,this.CustomerID);
+  String InqNo, CustomerID;
+  FollowupHistoryScreenArguments(this.InqNo, this.CustomerID);
 }
 
 class FollowupHistoryScreen extends BaseStatefulWidget {
@@ -44,7 +43,7 @@ class _FollowupHistoryScreenState extends BaseState<FollowupHistoryScreen>
   double sizeboxsize = 12;
   double _fontSize_Label = 9;
   double _fontSize_Title = 11;
-  int label_color = 0xFF504F4F;//0x66666666;
+  int label_color = 0xFF504F4F; //0x66666666;
   int title_color = 0xFF000000;
 
   @override
@@ -58,8 +57,12 @@ class _FollowupHistoryScreenState extends BaseState<FollowupHistoryScreen>
     screenStatusBarColor = colorPrimary;
     _FollowupBloc = FollowupBloc(baseBloc);
     InqNo = widget.arguments.InqNo;
-    CustomerID= widget.arguments.CustomerID;
-    _FollowupBloc..add(FollowupHistoryListRequestCallEvent(FollowupHistoryListRequest(InquiryNo: InqNo,CompanyId: CompanyID.toString(),CustomerID: CustomerID)));
+    CustomerID = widget.arguments.CustomerID;
+    _FollowupBloc
+      ..add(FollowupHistoryListRequestCallEvent(FollowupHistoryListRequest(
+          InquiryNo: InqNo,
+          CompanyId: CompanyID.toString(),
+          CustomerID: CustomerID)));
   }
 
   @override
@@ -93,7 +96,8 @@ class _FollowupHistoryScreenState extends BaseState<FollowupHistoryScreen>
       children: [
         NewGradientAppBar(
           title: Text('Followup History'),
-          gradient: LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
+          gradient:
+              LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
         ),
         Expanded(
           child: Container(
@@ -103,9 +107,7 @@ class _FollowupHistoryScreenState extends BaseState<FollowupHistoryScreen>
               top: 25,
             ),
             child: Column(
-              children: [
-                Expanded(child: _buildInquiryList())
-              ],
+              children: [Expanded(child: _buildInquiryList())],
             ),
           ),
         ),
@@ -117,7 +119,7 @@ class _FollowupHistoryScreenState extends BaseState<FollowupHistoryScreen>
 
   ///builds inquiry list
   Widget _buildInquiryList() {
-    if (_searchCustomerListResponse.details.length!=0) {
+    if (_searchCustomerListResponse != null) {
       return ListView.builder(
         itemBuilder: (context, index) {
           return _buildSearchInquiryListItem(index);
@@ -125,18 +127,15 @@ class _FollowupHistoryScreenState extends BaseState<FollowupHistoryScreen>
         shrinkWrap: true,
         itemCount: _searchCustomerListResponse.details.length,
       );
-    }
-    else{
+    } else {
       return Container(
         alignment: Alignment.center,
-        child:   Lottie.asset(
-            NO_DATA_ANIMATED
-          /*height: 200,
+        child: Lottie.asset(NO_DATA_ANIMATED
+            /*height: 200,
               width: 200*/
-        ),);
+            ),
+      );
     }
-
-
   }
 
   ///builds row item view of inquiry list
@@ -145,147 +144,122 @@ class _FollowupHistoryScreenState extends BaseState<FollowupHistoryScreen>
 
     return Container(
       margin: EdgeInsets.all(5),
-
       child: InkWell(
-        onTap: () {
-
-        },
-
-
-          child: Container(
-            padding: EdgeInsets.all(15),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
-              gradient: LinearGradient(
-                colors: [
-                  Color(0xffffff8d),
-                  Color(0xffffff8d),
-                  Color(0xffb9f6ca),
-
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+        onTap: () {},
+        child: Container(
+          padding: EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(25),
+            gradient: LinearGradient(
+              colors: [
+                Color(0xffffff8d),
+                Color(0xffffff8d),
+                Color(0xffb9f6ca),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                        children: <Widget>[
-
-                          Text("Contact No1.",
-                              style: TextStyle(
-                                  fontStyle:
-                                  FontStyle.italic,
-                                  color: Color(label_color),
-                                  fontSize: _fontSize_Label,
-                                  letterSpacing: .3)),
-
-                          SizedBox(
-                            width: 5,
-                          ),
-                          Text(
-                              model
-                                  .contactNo1 ==
-                                  ""
-                                  ? "N/A"
-                                  :model
-                                  .contactNo1,
-                              style: TextStyle(
-                                  color: Color(title_color),
-                                  fontSize: _fontSize_Title,
-                                  letterSpacing: .3))
-                        ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text("Contact No1.",
+                          style: TextStyle(
+                              fontStyle: FontStyle.italic,
+                              color: Color(label_color),
+                              fontSize: _fontSize_Label,
+                              letterSpacing: .3)),
+                      SizedBox(
+                        width: 5,
                       ),
-                    ),
-
-
-                  ],
-                ),
-                SizedBox(
-                  height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
-                ),
-                Row(crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-
-                      Expanded(
-                        child: _buildTitleWithValueView(
-                            "Followup Date",
-                            model.followupDate.getFormattedDate(
-                                fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                toFormat: "dd-MM-yyyy") ??
-                                "-"),
-                      ),
-                      Expanded(
-                        child: _buildTitleWithValueView(
-                            "Next.Followup Date",
-                            model.nextFollowupDate.getFormattedDate(
-                                fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                toFormat: "dd-MM-yyyy") ??
-                                "-"),
-                      ),
-
-
-                    ]),
-
-                SizedBox(
-                  height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
-                ),
-                Row(children: [
-                  Expanded(
-                    child: _buildTitleWithValueView(
-                        "Followup Type", model.inquiryStatus ?? "-"),
+                      Text(model.contactNo1 == "" ? "N/A" : model.contactNo1,
+                          style: TextStyle(
+                              color: Color(title_color),
+                              fontSize: _fontSize_Title,
+                              letterSpacing: .3))
+                    ],
                   ),
-                  Expanded(
-                    child: _buildTitleWithValueView(
-                        "Lead #",
-                        model.inquiryNo == "" || model.inquiryNo == null
-                            ? '-'
-                            : model.inquiryNo),
-                  ),
-                ]),
-                SizedBox(
-                  height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
                 ),
-                _buildTitleWithValueView(
-                    "Notes", /*model.referenceName ?? "-" */
-                    model.meetingNotes == "" || model.meetingNotes == null
+              ],
+            ),
+            SizedBox(
+              height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
+            ),
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(
+                child: _buildTitleWithValueView(
+                    "Followup Date",
+                    model.followupDate.getFormattedDate(
+                            fromFormat: "yyyy-MM-ddTHH:mm:ss",
+                            toFormat: "dd-MM-yyyy") ??
+                        "-"),
+              ),
+              Expanded(
+                child: _buildTitleWithValueView(
+                    "Next Followup Date",
+                    model.nextFollowupDate.getFormattedDate(
+                            fromFormat: "yyyy-MM-ddTHH:mm:ss",
+                            toFormat: "dd-MM-yyyy") ??
+                        "-"),
+              ),
+            ]),
+            SizedBox(
+              height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
+            ),
+            Row(children: [
+              Expanded(
+                child: _buildTitleWithValueView(
+                    "Followup Type", model.inquiryStatus ?? "-"),
+              ),
+              Expanded(
+                child: _buildTitleWithValueView(
+                    "Lead #",
+                    model.inquiryNo == "" || model.inquiryNo == null
                         ? '-'
-                        : model.meetingNotes),
-
-                SizedBox(
-                  height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
-                ),
-              /* Row(children: [
+                        : model.inquiryNo),
+              ),
+            ]),
+            SizedBox(
+              height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
+            ),
+            _buildTitleWithValueView(
+                "Notes",
+                /*model.referenceName ?? "-" */
+                model.meetingNotes == "" || model.meetingNotes == null
+                    ? '-'
+                    : model.meetingNotes),
+            SizedBox(
+              height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
+            ),
+            /* Row(children: [
                   Expanded(
                    // child: _buildTitleWithValueView("No Followup", model.noFollowup.toString()),
                     child: _buildTitleWithValueView("No Followup", model.noFollowup.toString() == "false" ? 'no' : "yes"),
                   ),
                   Expanded(
                     child: _buildTitleWithValueView(
-                        "Closer Reason", *//*model.noFollClosureName ?? "-" *//*
+                        "Closer Reason", */ /*model.noFollClosureName ?? "-" */ /*
                         model.noFollClosureName == "--Not Available--" ||
                             model.noFollClosureName == null ? '-' : model
                             .noFollClosureName),
                   ),
                 ]), */
-                _buildTitleWithValueView(
-                    "Created By", /*model.referenceName ?? "-" */
-                    model.employeeName == "" || model.employeeName == null
-                        ? '-'
-                        : model.employeeName),
-
-                SizedBox(
-                  height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
-                ),
-              ]),
-          ),
-
+            _buildTitleWithValueView(
+                "Created By",
+                /*model.referenceName ?? "-" */
+                model.employeeName == "" || model.employeeName == null
+                    ? '-'
+                    : model.employeeName),
+            SizedBox(
+              height: DEFAULT_HEIGHT_BETWEEN_WIDGET,
+            ),
+          ]),
+        ),
       ),
     );
   }
@@ -296,22 +270,28 @@ class _FollowupHistoryScreenState extends BaseState<FollowupHistoryScreen>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-            title,
-            style:TextStyle(fontSize: _fontSize_Label,color: Color(0xFF504F4F),/*fontWeight: FontWeight.bold,*/fontStyle: FontStyle.italic)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        ),
+        Text(title,
+            style: TextStyle(
+                fontSize: _fontSize_Label,
+                color: Color(0xFF504F4F),
+                /*fontWeight: FontWeight.bold,*/ fontStyle: FontStyle
+                    .italic) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            ),
         SizedBox(
           height: 3,
         ),
-        Text(
-            value,
-            style:TextStyle(fontSize: _fontSize_Title,color: colorPrimary)// baseTheme.textTheme.headline2.copyWith(color: colorBlack),
-        )
+        Text(value,
+            style: TextStyle(
+                fontSize: _fontSize_Title,
+                color:
+                    colorPrimary) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+            )
       ],
     );
   }
 
-  void _onSearchInquiryListCallSuccess(FollowupHistoryListResponse followupHistoryListResponse) {
+  void _onSearchInquiryListCallSuccess(
+      FollowupHistoryListResponse followupHistoryListResponse) {
     _searchCustomerListResponse = followupHistoryListResponse;
   }
 }

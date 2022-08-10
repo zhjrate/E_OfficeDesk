@@ -44,3 +44,10 @@ class MissedPunchApprovalListResponseState extends MissedPunchScreenStates {
 
   MissedPunchApprovalListResponseState(this.missedPunchApprovalListResponse);
 }
+
+class MissedPunchApprovalSaveResponseState extends MissedPunchScreenStates {
+  final MissedPunchApprovalSaveResponse missedPunchApprovalListResponse;
+
+  MissedPunchApprovalSaveResponseState(this.missedPunchApprovalListResponse);
+}
+
