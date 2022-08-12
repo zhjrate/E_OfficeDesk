@@ -129,11 +129,11 @@ class _Customer_ADD_EDITState extends BaseState<Customer_ADD_EDIT>
   List<ALL_Name_ID> _listFilteredCity = [];
 
   Function refreshList;
-  SearchDetails _searchDetails;
+  SearchCountryDetails _searchDetails;
   SearchDistrictDetails _searchDistrictDetails;
   SearchTalukaDetails _searchTalukaDetails;
 
-  SearchDetails _searchCountryDetails;
+  SearchCountryDetails _searchCountryDetails;
   SearchStateDetails _searchStateDetails;
   SearchCityDetails _searchCityDetails;
 
@@ -1850,7 +1850,7 @@ class _Customer_ADD_EDITState extends BaseState<Customer_ADD_EDIT>
             arguments: CountryArguments(sw))
         .then((value) {
       if (value != null) {
-        _searchDetails = SearchDetails();
+        _searchDetails = SearchCountryDetails();
         _searchDetails = value;
         print("CountryName IS From SearchList" + _searchDetails.countryCode);
         edt_QualifiedCountryCode.text = _searchDetails.countryCode;

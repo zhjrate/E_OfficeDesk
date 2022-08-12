@@ -181,7 +181,7 @@ class _ExternalLeadAddEditScreenState
   bool isqualified = false;
   bool isDisqualified = false;
   bool isInProcess = false;
-  SearchDetails _searchDetails;
+  SearchCountryDetails _searchDetails;
   ProductSearchDetails _productSearchDetails;
 
   SearchStateDetails _searchStateDetails;
@@ -2922,7 +2922,7 @@ class _ExternalLeadAddEditScreenState
             arguments: CountryArguments(sw))
         .then((value) {
       if (value != null) {
-        _searchDetails = SearchDetails();
+        _searchDetails = SearchCountryDetails();
         _searchDetails = value;
         print("CountryName IS From SearchList" + _searchDetails.countryCode);
         edt_QualifiedCountryCode.text = _searchDetails.countryCode;

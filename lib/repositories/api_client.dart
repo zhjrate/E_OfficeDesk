@@ -272,6 +272,7 @@ CartFlutterLive     : [BaseURL(API)]:	http://208.109.14.134:86/ [WebURL]:http://
   static const END_POINT_ATTEND_VISIT_DELETE = "ComplaintVisit/CompaintDel";
   static const END_POINT_SALES_BILL_BY_ID = "SalesBill/";
   static const END_POINT_MISSED_PUNCH_APPROVAL_SAVE = "MissedPunch/";
+  static const END_POINT_SALES_ORDER_BANK_DETIALS = "SalesOrder/BankDetails";
 
   final http.Client httpClient;
 

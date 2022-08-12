@@ -137,7 +137,7 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
   List<ALL_Name_ID> _listFilteredCity = [];
 
   Function refreshList;
-  SearchDetails _searchDetails;
+  SearchCountryDetails _searchDetails;
   SearchStateDetails _searchStateDetails;
   SearchDistrictDetails _searchDistrictDetails;
   SearchTalukaDetails _searchTalukaDetails;
@@ -1987,7 +1987,7 @@ class _QuickInquiryScreenState extends BaseState<QuickInquiryScreen>
             arguments: CountryArguments(sw))
         .then((value) {
       if (value != null) {
-        _searchDetails = SearchDetails();
+        _searchDetails = SearchCountryDetails();
         _searchDetails = value;
         print("CountryName IS From SearchList" + _searchDetails.countryCode);
         edt_CountryID.text = _searchDetails.countryCode;

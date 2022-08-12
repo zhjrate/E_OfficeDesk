@@ -196,7 +196,7 @@ class _SearchCountryScreen extends BaseState<SearchCountryScreen>
         refreshList = myState;
         return ListView.builder(
           itemBuilder: (context, index) {
-            SearchDetails _model = SearchDetails();
+            SearchCountryDetails _model = SearchCountryDetails();
             _model.countryName = _listFilteredCountry[index].Name;
             _model.countryCode = _listFilteredCountry[index].Name1;
 

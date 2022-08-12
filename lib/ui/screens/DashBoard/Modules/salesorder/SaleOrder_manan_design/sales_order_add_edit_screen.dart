@@ -6,13 +6,28 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/salesorder/salesorder_bloc.dart';
+import 'package:soleoserp/models/api_requests/SalesOrder/bank_details_list_request.dart';
+import 'package:soleoserp/models/api_requests/quotation_project_list_request.dart';
+import 'package:soleoserp/models/api_requests/quotation_terms_condition_request.dart';
+import 'package:soleoserp/models/api_responses/all_employee_List_response.dart';
+import 'package:soleoserp/models/api_responses/city_api_response.dart';
+import 'package:soleoserp/models/api_responses/company_details_response.dart';
+import 'package:soleoserp/models/api_responses/country_list_response.dart';
+import 'package:soleoserp/models/api_responses/customer_label_value_response.dart';
+import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
+import 'package:soleoserp/models/api_responses/state_list_response.dart';
 import 'package:soleoserp/models/common/all_name_id_list.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/image_resources.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/search_city_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/search_country_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/search_state_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/customer_search/customer_search_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
 import 'package:soleoserp/utils/general_utils.dart';
+import 'package:soleoserp/utils/shared_pref_helper.dart';
 
 class SaleOrderNewAddEditScreen extends BaseStatefulWidget {
   static const routeName = '/SaleOrderNewAddEditScreen';
@@ -26,6 +41,10 @@ class _SaleOrderNewAddEditScreenState
     with BasicScreen, WidgetsBindingObserver, TickerProviderStateMixin {
   SalesOrderBloc _salesOrderBloc;
 
+  SearchDetails searchCustomerDetails;
+  SearchCountryDetails _searchDetails;
+  SearchStateDetails _searchStateDetails;
+  SearchCityDetails _searchCityDetails;
   bool _isForUpdate;
 
   DateTime selectedDate = DateTime.now();
@@ -54,6 +73,8 @@ class _SaleOrderNewAddEditScreenState
 
   TextEditingController _controller_order_no = TextEditingController();
   TextEditingController _controller_customer_name = TextEditingController();
+  TextEditingController _controller_customer_pkID = TextEditingController();
+
   TextEditingController _controller_order_date = TextEditingController();
   TextEditingController _controller_rev_order_date = TextEditingController();
   TextEditingController _controller_PINO = TextEditingController();
@@ -63,6 +84,8 @@ class _SaleOrderNewAddEditScreenState
   TextEditingController _controller_select_inquiry = TextEditingController();
   TextEditingController _controller_inquiry_no = TextEditingController();
   TextEditingController _controller_sales_executive = TextEditingController();
+  TextEditingController _controller_sales_executiveID = TextEditingController();
+
   TextEditingController _controller_reference_no = TextEditingController();
   TextEditingController _controller_reference_date = TextEditingController();
   TextEditingController _controller_work_order_date = TextEditingController();
@@ -79,6 +102,8 @@ class _SaleOrderNewAddEditScreenState
   TextEditingController _contrller_terms_and_condition =
       TextEditingController();
   TextEditingController _contrller_select_terms_and_condition =
+      TextEditingController();
+  TextEditingController _contrller_select_terms_and_conditionID =
       TextEditingController();
   TextEditingController _contrller_delivery_terms = TextEditingController();
   TextEditingController _contrller_payment_terms = TextEditingController();
@@ -116,10 +141,17 @@ class _SaleOrderNewAddEditScreenState
       TextEditingController();
   TextEditingController _controller_address = TextEditingController();
   TextEditingController _controller_area = TextEditingController();
-  TextEditingController _controller_country = TextEditingController();
+  TextEditingController edt_QualifiedCountry = TextEditingController();
+  TextEditingController edt_QualifiedCountryCode = TextEditingController();
+
+  TextEditingController edt_QualifiedState = TextEditingController();
+  TextEditingController edt_QualifiedStateCode = TextEditingController();
+  TextEditingController edt_QualifiedCity = TextEditingController();
+  TextEditingController edt_QualifiedCityCode = TextEditingController();
+  TextEditingController edt_QualifiedPinCode = TextEditingController();
+
   TextEditingController _controller_state = TextEditingController();
   TextEditingController _controller_city = TextEditingController();
-  TextEditingController _controller_pincode = TextEditingController();
 
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Sales_Order_Bank_Name = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Sales_Order_Select_Inquiry = [];
@@ -127,12 +159,47 @@ class _SaleOrderNewAddEditScreenState
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Sales_Order_Select_Currency = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Terms_And_Condition = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Email_Subject = [];
+  List<ALL_Name_ID> arr_ALL_Name_ID_For_ProjectList = [];
+
+  TextEditingController _controller_projectName = TextEditingController();
+  TextEditingController _controller_projectID = TextEditingController();
+
+  CompanyDetailsResponse _offlineCompanyData;
+  LoginUserDetialsResponse _offlineLoggedInData;
+  ALL_EmployeeList_Response _offlineFollowerEmployeeListData;
+
+  int CompanyID = 0;
+  String LoginUserID = "";
+  bool isAllEditable = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _salesOrderBloc = SalesOrderBloc(baseBloc);
+    _offlineLoggedInData = SharedPrefHelper.instance.getLoginUserData();
+    _offlineCompanyData = SharedPrefHelper.instance.getCompanyData();
+    CompanyID = _offlineCompanyData.details[0].pkId;
+    LoginUserID = _offlineLoggedInData.details[0].userID;
+    _offlineFollowerEmployeeListData =
+        SharedPrefHelper.instance.getALLEmployeeList();
+
+    _onFollowerEmployeeListByStatusCallSuccess(
+        _offlineFollowerEmployeeListData);
+
+    _salesOrderBloc.add(SaleOrderBankDetailsListRequestEvent(
+        SaleOrderBankDetailsListRequest(
+            CompanyId: CompanyID.toString(),
+            pkID: "",
+            LoginUserID: LoginUserID)));
+    _salesOrderBloc.add(QuotationProjectListCallEvent(
+        QuotationProjectListRequest(
+            CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
+
+    _salesOrderBloc.add(QuotationTermsConditionCallEvent(
+        QuotationTermsConditionRequest(
+            CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
+    _isForUpdate = false;
   }
 
   @override
@@ -142,10 +209,25 @@ class _SaleOrderNewAddEditScreenState
       child: BlocConsumer<SalesOrderBloc, SalesOrderStates>(
         builder: (BuildContext context, SalesOrderStates state) {
           //handle states
+          if (state is BankDetailsListResponseState) {
+            _onBankDetailsList(state);
+          }
+
+          if (state is QuotationProjectListResponseState) {
+            _OnProjectList(state);
+          }
+          if (state is QuotationTermsCondtionResponseState) {
+            _OnTermsAndConditionResponse(state);
+          }
           return super.build(context);
         },
         buildWhen: (oldState, currentState) {
           //return true for state for which builder method should be called
+          if (currentState is BankDetailsListResponseState ||
+              currentState is QuotationProjectListResponseState ||
+              currentState is QuotationTermsCondtionResponseState) {
+            return true;
+          }
           return false;
         },
         listener: (BuildContext context, SalesOrderStates state) {
@@ -574,7 +656,42 @@ class _SaleOrderNewAddEditScreenState
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           createTextLabel("Search Customer *", 10.0, 0.0),
-          createTextFormField(_controller_customer_name, "Search Customer")
+          Card(
+            elevation: 5,
+            color: colorLightGray,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Container(
+              padding: EdgeInsets.only(left: 20, right: 20),
+              width: double.maxFinite,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                        controller: _controller_customer_name,
+                        enabled: false,
+                        decoration: InputDecoration(
+                          hintText: "Search customer",
+                          labelStyle: TextStyle(
+                            color: Color(0xFF000000),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFF000000),
+                        ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                        ),
+                  ),
+                  Icon(
+                    Icons.search,
+                    color: colorGrayDark,
+                  )
+                ],
+              ),
+            ),
+          )
         ],
       ),
     );
@@ -616,6 +733,150 @@ class _SaleOrderNewAddEditScreenState
                         Expanded(
                           child: TextField(
                             controller: controllerForLeft,
+                            enabled: false,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(bottom: 7),
+                              hintText: hintTextvalue,
+                              hintStyle:
+                                  TextStyle(fontSize: 13, color: colorGrayDark),
+                              labelStyle: TextStyle(
+                                color: Color(0xFF000000),
+                              ),
+                              border: InputBorder.none,
+                            ),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF000000),
+                            ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+                            ,
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color: colorGrayDark,
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget CustomDropDownWithID1(String Category,
+      {bool enable1,
+      Icon icon,
+      String title,
+      String hintTextvalue,
+      TextEditingController controllerForLeft,
+      TextEditingController controllerForID,
+      List<ALL_Name_ID> Custom_values1}) {
+    return Container(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => showcustomdialogWithID(
+                values: arr_ALL_Name_ID_For_ProjectList,
+                context1: context,
+                controller: controllerForLeft,
+                controllerID: controllerForID,
+                lable: title),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /*SizedBox(
+                  height: 5,
+                ),*/
+                Card(
+                  elevation: 3,
+                  color: colorLightGray,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Container(
+                    height: 40,
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    width: double.maxFinite,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: controllerForLeft,
+                            enabled: false,
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.only(bottom: 7),
+                              hintText: hintTextvalue,
+                              hintStyle:
+                                  TextStyle(fontSize: 13, color: colorGrayDark),
+                              labelStyle: TextStyle(
+                                color: Color(0xFF000000),
+                              ),
+                              border: InputBorder.none,
+                            ),
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF000000),
+                            ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+                            ,
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color: colorGrayDark,
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget CustomDropDownWithMultiID1(
+    String Category, {
+    bool enable1,
+    Icon icon,
+    String title,
+    String hintTextvalue,
+  }) {
+    return Container(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => showcustomdialogWithMultipleID(
+                values: arr_ALL_Name_ID_For_Terms_And_Condition,
+                context1: context,
+                controller: _contrller_select_terms_and_condition,
+                controllerID: _contrller_select_terms_and_conditionID,
+                controller2: _contrller_terms_and_condition,
+                lable: "Select Term & Condition "),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /*SizedBox(
+                  height: 5,
+                ),*/
+                Card(
+                  elevation: 3,
+                  color: colorLightGray,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Container(
+                    height: 40,
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    width: double.maxFinite,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _contrller_select_terms_and_condition,
                             enabled: false,
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.only(bottom: 7),
@@ -935,15 +1196,16 @@ class _SaleOrderNewAddEditScreenState
   }
 
   Future<void> _onTapOfSearchView() async {
-    /*if (_isForUpdate == false) {
-    navigateTo(context, SearchInquiryCustomerScreen.routeName).then((value) {
-      if (value != null) {
-        _searchInquiryListResponse = value;
-        _controller_customer_name.text = _searchInquiryListResponse.label;
-        _controller_customer_pkID.text = _searchInquiryListResponse.value.toString();
-      }
-    });
-  }*/
+    if (_isForUpdate == false) {
+      navigateTo(context, SearchInquiryCustomerScreen.routeName).then((value) {
+        if (value != null) {
+          searchCustomerDetails = value;
+          _controller_customer_name.text = searchCustomerDetails.label;
+          _controller_customer_pkID.text =
+              searchCustomerDetails.value.toString();
+        }
+      });
+    }
   }
 
   mandetoryDetails() {
@@ -953,12 +1215,6 @@ class _SaleOrderNewAddEditScreenState
 
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
-        // boxShadow: [
-        //   BoxShadow(
-        //       color: Colors.grey, blurRadius: 3.0, offset: Offset(2, 2),
-        //       spreadRadius: 1.0
-        //   ),
-        // ]
       ),
       child: Theme(
         data: ThemeData().copyWith(
@@ -1135,14 +1391,7 @@ class _SaleOrderNewAddEditScreenState
                         SizedBox(
                           height: 3,
                         ),
-                        CustomDropDown1("Sales Executive",
-                            enable1: false,
-                            title: "Sales Executive",
-                            hintTextvalue: "Tap to Select Sales Person ",
-                            icon: Icon(Icons.arrow_drop_down),
-                            controllerForLeft: _controller_sales_executive,
-                            Custom_values1:
-                                arr_ALL_Name_ID_For_Sales_Order_Sales_Executive),
+                        _buildEmplyeeListView(),
                         SizedBox(
                           height: 10,
                         ),
@@ -1150,14 +1399,14 @@ class _SaleOrderNewAddEditScreenState
                         SizedBox(
                           height: 3,
                         ),
-                        CustomDropDown1("Project",
+                        CustomDropDownWithID1("Project",
                             enable1: false,
                             title: "Select Project",
                             hintTextvalue: "Tap to Select Projects",
                             icon: Icon(Icons.arrow_drop_down),
-                            controllerForLeft: _controller_currency,
-                            Custom_values1:
-                                arr_ALL_Name_ID_For_Sales_Order_Select_Currency),
+                            controllerForLeft: _controller_projectName,
+                            controllerForID: _controller_projectID,
+                            Custom_values1: arr_ALL_Name_ID_For_ProjectList),
                         SizedBox(
                           height: 10,
                         ),
@@ -1342,15 +1591,13 @@ class _SaleOrderNewAddEditScreenState
                         SizedBox(
                           height: 3,
                         ),
-                        CustomDropDown1("Terms & Conditions",
-                            enable1: false,
-                            title: "Terms & Conditions",
-                            hintTextvalue: "Tap to Select Terms & Conditions",
-                            icon: Icon(Icons.arrow_drop_down),
-                            controllerForLeft:
-                                _contrller_select_terms_and_condition,
-                            Custom_values1:
-                                arr_ALL_Name_ID_For_Terms_And_Condition),
+                        CustomDropDownWithMultiID1(
+                          "Terms & Conditions",
+                          enable1: false,
+                          title: "Terms & Conditions",
+                          hintTextvalue: "Tap to Select Terms & Conditions",
+                          icon: Icon(Icons.arrow_drop_down),
+                        ),
                         SizedBox(
                           height: 10,
                         ),
@@ -1916,9 +2163,6 @@ class _SaleOrderNewAddEditScreenState
                             Flexible(
                               child: createTextLabel("Area", 10.0, 0.0),
                             ),
-                            Flexible(
-                              child: createTextLabel("PinCode", 10.0, 0.0),
-                            ),
                           ],
                         ),
                         Row(
@@ -1929,10 +2173,6 @@ class _SaleOrderNewAddEditScreenState
                                 child: createTextFormField(
                                     _controller_area, "Enter Area",
                                     keyboardInput: TextInputType.text)),
-                            Flexible(
-                                // flex: 1,
-                                child: createTextFormField(
-                                    _controller_pincode, "Enter PinCode")),
                           ],
                         ),
                         SizedBox(
@@ -1940,30 +2180,22 @@ class _SaleOrderNewAddEditScreenState
                         ),
                         Row(
                           children: [
-                            Flexible(
-                              child: createTextLabel("City", 10.0, 0.0),
-                            ),
-                            Flexible(
-                              child: createTextLabel("State", 10.0, 0.0),
-                            )
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Flexible(
-                                child: createTextFormField(
-                                    _controller_city, "Select City")),
-                            Flexible(
-                                child: createTextFormField(
-                                    _controller_state, "Select State"))
+                            Expanded(flex: 1, child: QualifiedCountry()),
+                            Expanded(flex: 1, child: QualifiedState()),
                           ],
                         ),
                         SizedBox(
                           height: 5,
                         ),
-                        createTextLabel("Country", 10.0, 0.0),
-                        createTextFormField(
-                            _controller_state, "Tap to Select Country")
+                        Row(
+                          children: [
+                            Expanded(flex: 1, child: QualifiedCity()),
+                            Expanded(flex: 1, child: QualifiedPinCode()),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 5,
+                        ),
                       ],
                     ),
                   ),
@@ -2000,6 +2232,431 @@ class _SaleOrderNewAddEditScreenState
   space(double height) {
     return SizedBox(
       height: height,
+    );
+  }
+
+  void _onBankDetailsList(
+      BankDetailsListResponseState bankDetailsListResponseState) {
+    if (bankDetailsListResponseState.response.details.length != 0) {
+      arr_ALL_Name_ID_For_Sales_Order_Bank_Name.clear();
+      for (int i = 0;
+          i < bankDetailsListResponseState.response.details.length;
+          i++) {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+
+        all_name_id.Name =
+            bankDetailsListResponseState.response.details[i].bankName;
+        all_name_id.pkID =
+            bankDetailsListResponseState.response.details[i].pkID;
+        arr_ALL_Name_ID_For_Sales_Order_Bank_Name.add(all_name_id);
+      }
+    }
+  }
+
+  void _onFollowerEmployeeListByStatusCallSuccess(
+      ALL_EmployeeList_Response state) {
+    arr_ALL_Name_ID_For_Sales_Order_Sales_Executive.clear();
+    if (state.details != null) {
+      for (var i = 0; i < state.details.length; i++) {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = state.details[i].employeeName;
+        all_name_id.pkID = state.details[i].pkID;
+        arr_ALL_Name_ID_For_Sales_Order_Sales_Executive.add(all_name_id);
+      }
+    }
+  }
+
+  Widget _buildEmplyeeListView() {
+    return InkWell(
+      onTap: () {
+        // _onTapOfSearchView(context);
+        showcustomdialogWithID(
+            values: arr_ALL_Name_ID_For_Sales_Order_Sales_Executive,
+            context1: context,
+            controller: _controller_sales_executive,
+            controllerID: _controller_sales_executiveID,
+            lable: "Assign To");
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          /*SizedBox(
+                  height: 5,
+                ),*/
+          Card(
+            elevation: 3,
+            color: colorLightGray,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Container(
+              height: 40,
+              padding: EdgeInsets.only(left: 20, right: 20),
+              width: double.maxFinite,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _controller_sales_executive,
+                      enabled: false,
+                      decoration: InputDecoration(
+                        contentPadding: EdgeInsets.only(bottom: 7),
+                        hintText: "Tap to select executive",
+                        hintStyle:
+                            TextStyle(fontSize: 13, color: colorGrayDark),
+                        labelStyle: TextStyle(
+                          color: Color(0xFF000000),
+                        ),
+                        border: InputBorder.none,
+                      ),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF000000),
+                      ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+                      ,
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_drop_down,
+                    color: colorGrayDark,
+                  )
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  void _OnProjectList(QuotationProjectListResponseState state) {
+    if (state.response.details.length != 0) {
+      arr_ALL_Name_ID_For_ProjectList.clear();
+      for (var i = 0; i < state.response.details.length; i++) {
+        print("InquiryStatus : " + state.response.details[i].projectName);
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = state.response.details[i].projectName;
+        all_name_id.pkID = state.response.details[i].pkID;
+        arr_ALL_Name_ID_For_ProjectList.add(all_name_id);
+      }
+      /* showcustomdialogWithID(
+          values: arr_ALL_Name_ID_For_ProjectList,
+          context1: context,
+          controller: _controller_projectName,
+          controllerID: _controller_projectID,
+          lable: "Select Project ");*/
+    }
+  }
+
+  void _OnTermsAndConditionResponse(QuotationTermsCondtionResponseState state) {
+    if (state.response.details.length != 0) {
+      arr_ALL_Name_ID_For_Terms_And_Condition.clear();
+      for (var i = 0; i < state.response.details.length; i++) {
+        print("InquiryStatus : " + state.response.details[i].tNCHeader);
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = state.response.details[i].tNCHeader;
+        all_name_id.pkID = state.response.details[i].pkID;
+        all_name_id.Name1 = state.response.details[i].tNCContent;
+
+        arr_ALL_Name_ID_For_Terms_And_Condition.add(all_name_id);
+      }
+      /* showcustomdialogWithMultipleID(
+          values: arr_ALL_Name_ID_For_Terms_And_Condition,
+          context1: context,
+          controller: edt_TermConditionHeader,
+          controllerID: edt_TermConditionHeaderID,
+          controller2: edt_TermConditionFooter,
+          lable: "Select Term & Condition ");*/
+    }
+  }
+
+  Widget QualifiedCountry() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(left: 10, right: 10),
+          child: Text("Country *",
+              style: TextStyle(
+                  fontSize: 12,
+                  color: colorPrimary,
+                  fontWeight: FontWeight
+                      .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+              ),
+        ),
+        SizedBox(
+          height: 5,
+        ),
+        InkWell(
+            onTap: () =>
+                _onTapOfSearchCountryView(_searchDetails == null ? "" : ""),
+            child: Card(
+              elevation: 5,
+              color: colorLightGray,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15)),
+              child: Container(
+                padding: EdgeInsets.only(left: 20, right: 20),
+                width: double.maxFinite,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                          enabled: false,
+                          keyboardType: TextInputType.number,
+                          textInputAction: TextInputAction.next,
+                          controller: edt_QualifiedCountry,
+                          decoration: InputDecoration(
+                            //contentPadding: EdgeInsets.only(bottom: 10),
+
+                            hintText: "Country",
+                            labelStyle: TextStyle(
+                              color: Color(0xFF000000),
+                            ),
+                            border: InputBorder.none,
+                          ),
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Color(0xFF000000),
+                          ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                          ),
+                    ),
+                  ],
+                ),
+              ),
+            )),
+      ],
+    );
+  }
+
+  _onTapOfSearchCountryView(String sw) {
+    navigateTo(context, SearchCountryScreen.routeName,
+            arguments: CountryArguments(sw))
+        .then((value) {
+      if (value != null) {
+        _searchDetails = SearchCountryDetails();
+        _searchDetails = value;
+        print("CountryName IS From SearchList" + _searchDetails.countryCode);
+        edt_QualifiedCountryCode.text = /*_searchDetails.countryCode*/ "";
+        edt_QualifiedCountry.text = _searchDetails.countryName;
+      }
+    });
+  }
+
+  Widget QualifiedState() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(left: 10, right: 10),
+          child: Text("State * ",
+              style: TextStyle(
+                  fontSize: 12,
+                  color: colorPrimary,
+                  fontWeight: FontWeight
+                      .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+              ),
+        ),
+        SizedBox(
+          height: 5,
+        ),
+        InkWell(
+          onTap: () {
+            _onTapOfSearchStateView(
+                _searchDetails == null ? "" : _searchDetails.countryCode);
+          },
+          /*=> isAllEditable==true?_onTapOfSearchStateView(
+              _searchDetails == null ? "" : _searchDetails.countryCode):Container(),*/
+          child: Card(
+            elevation: 5,
+            color: colorLightGray,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Container(
+              padding: EdgeInsets.only(left: 20, right: 20),
+              width: double.maxFinite,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                        enabled: false,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                        controller: edt_QualifiedState,
+                        decoration: InputDecoration(
+                          //contentPadding: EdgeInsets.only(bottom: 10),
+
+                          hintText: "State",
+                          labelStyle: TextStyle(
+                            color: Color(0xFF000000),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Color(0xFF000000),
+                        ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Future<void> _onTapOfSearchStateView(String sw1) async {
+    navigateTo(context, SearchStateScreen.routeName,
+            arguments: StateArguments(sw1))
+        .then((value) {
+      if (value != null) {
+        _searchStateDetails = value;
+        edt_QualifiedStateCode.text = _searchStateDetails.value.toString();
+        edt_QualifiedState.text = _searchStateDetails.label.toString();
+      }
+    });
+  }
+
+  Widget QualifiedCity() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(left: 10, right: 10),
+          child: Text("City * ",
+              style: TextStyle(
+                  fontSize: 12,
+                  color: colorPrimary,
+                  fontWeight: FontWeight
+                      .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+              ),
+        ),
+        SizedBox(
+          height: 5,
+        ),
+        InkWell(
+          onTap: () {
+            _onTapOfSearchCityView(edt_QualifiedStateCode.text == null
+                ? ""
+                : edt_QualifiedStateCode.text);
+          },
+          /*=> isAllEditable==true?_onTapOfSearchCityView(_searchStateDetails == null
+              ? ""
+              : _searchStateDetails.value.toString()):Container(),*/
+          child: Card(
+            elevation: 5,
+            color: colorLightGray,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+            child: Container(
+              padding: EdgeInsets.only(left: 20, right: 20),
+              width: double.maxFinite,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                        enabled: false,
+                        keyboardType: TextInputType.number,
+                        textInputAction: TextInputAction.next,
+                        controller: edt_QualifiedCity,
+                        decoration: InputDecoration(
+                          //contentPadding: EdgeInsets.only(bottom: 10),
+
+                          hintText: "City",
+                          labelStyle: TextStyle(
+                            color: Color(0xFF000000),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Color(0xFF000000),
+                        ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )
+      ],
+    );
+  }
+
+  Future<void> _onTapOfSearchCityView(String talukaCode) async {
+    navigateTo(context, SearchCityScreen.routeName,
+            arguments: CityArguments(talukaCode))
+        .then((value) {
+      if (value != null) {
+        _searchCityDetails = value;
+        edt_QualifiedCityCode.text = _searchCityDetails.cityCode.toString();
+        edt_QualifiedCity.text = _searchCityDetails.cityName.toString();
+      }
+    });
+  }
+
+  Widget QualifiedPinCode() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(left: 10, right: 10),
+          child: Text("PinCode",
+              style: TextStyle(
+                  fontSize: 12,
+                  color: colorPrimary,
+                  fontWeight: FontWeight
+                      .bold) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+              ),
+        ),
+        SizedBox(
+          height: 5,
+        ),
+        Card(
+          elevation: 5,
+          color: colorLightGray,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: Container(
+            padding: EdgeInsets.only(left: 20, right: 20),
+            width: double.maxFinite,
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                      maxLength: 6,
+                      keyboardType: TextInputType.number,
+                      textInputAction: TextInputAction.next,
+                      controller: edt_QualifiedPinCode,
+                      decoration: InputDecoration(
+                        //contentPadding: EdgeInsets.only(bottom: 10),
+                        counterText: "",
+                        hintText: "PinCode",
+                        labelStyle: TextStyle(
+                          color: Color(0xFF000000),
+                        ),
+                        border: InputBorder.none,
+                      ),
+                      style: TextStyle(
+                        fontSize: 15,
+                        color: Color(0xFF000000),
+                      ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                      ),
+                ),
+              ],
+            ),
+          ),
+        )
+      ],
     );
   }
 }

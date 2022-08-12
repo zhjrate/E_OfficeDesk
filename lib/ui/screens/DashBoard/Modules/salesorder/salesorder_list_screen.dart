@@ -243,27 +243,6 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
             context: context, UserName: "KISHAN", RolCode: LoginUserID),
       ),
     );
-
-    return Column(
-      children: [
-        getCommonAppBar(context, baseTheme, localizations.inquiry),
-        Expanded(
-          child: Container(
-            padding: EdgeInsets.only(
-              left: DEFAULT_SCREEN_LEFT_RIGHT_MARGIN2,
-              right: DEFAULT_SCREEN_LEFT_RIGHT_MARGIN2,
-              top: 25,
-            ),
-            child: Column(
-              children: [
-                _buildSearchView(),
-                Expanded(child: _buildInquiryList())
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
   }
 
   ///builds header and title view

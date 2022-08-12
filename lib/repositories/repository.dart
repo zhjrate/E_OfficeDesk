@@ -8,6 +8,7 @@ import 'package:soleoserp/models/api_requests/Loan/loan_approval_save_request.da
 import 'package:soleoserp/models/api_requests/MissedPunch/missed_punch_approval_add_edit_request.dart';
 import 'package:soleoserp/models/api_requests/MissedPunch/missed_punch_approval_request.dart';
 import 'package:soleoserp/models/api_requests/SalesBill/sales_bill_search_by_id_request.dart';
+import 'package:soleoserp/models/api_requests/SalesOrder/bank_details_list_request.dart';
 import 'package:soleoserp/models/api_requests/ToDo_request/to_do_delete_request.dart';
 import 'package:soleoserp/models/api_requests/all_employee_list_request.dart';
 import 'package:soleoserp/models/api_requests/attend_visit_list_request.dart';
@@ -174,6 +175,7 @@ import 'package:soleoserp/models/api_requests/transection_mode_list_request.dart
 import 'package:soleoserp/models/api_responses/AttendVisit/attend_visit_delete_response.dart';
 import 'package:soleoserp/models/api_responses/Loan/loan_approval_save_response.dart';
 import 'package:soleoserp/models/api_responses/MissedPunch/missed_punch_add_edit_response.dart';
+import 'package:soleoserp/models/api_responses/SaleOrder/bank_details_list_response.dart';
 import 'package:soleoserp/models/api_responses/ToDo_delete_response/to_do_delete_response.dart';
 import 'package:soleoserp/models/api_responses/all_employee_List_response.dart';
 import 'package:soleoserp/models/api_responses/attend_visit_list_response.dart';
@@ -3690,6 +3692,21 @@ class Repository {
 
       TelecallerNewpaginationResponse response =
           TelecallerNewpaginationResponse.fromJson(json);
+
+      return response;
+    } on ErrorResponseException catch (e) {
+      rethrow;
+    }
+  }
+
+
+  Future<BankDetailsListResponse> getBankDetailsAPI(
+      SaleOrderBankDetailsListRequest request) async {
+    try {
+      Map<String, dynamic> json = await apiClient.apiCallPost(
+          ApiClient.END_POINT_SALES_ORDER_BANK_DETIALS, request.toJson());
+      BankDetailsListResponse response =
+      BankDetailsListResponse.fromJson(json);
 
       return response;
     } on ErrorResponseException catch (e) {

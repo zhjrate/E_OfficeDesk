@@ -1,5 +1,5 @@
 class CountryListResponse {
-  List<SearchDetails> details;
+  List<SearchCountryDetails> details;
   int totalCount;
 
   CountryListResponse({this.details, this.totalCount});
@@ -8,7 +8,7 @@ class CountryListResponse {
     if (json['details'] != null) {
       details = [];
       json['details'].forEach((v) {
-        details.add(new SearchDetails.fromJson(v));
+        details.add(new SearchCountryDetails.fromJson(v));
       });
     }
     totalCount = json['TotalCount'];
@@ -24,7 +24,7 @@ class CountryListResponse {
   }
 }
 
-class SearchDetails {
+class SearchCountryDetails {
   int rowNum;
   String countryCode;
   String countryName;
@@ -33,16 +33,16 @@ class SearchDetails {
   String countryISO;
   bool activeFlag;
 
-  SearchDetails(
+  SearchCountryDetails(
       {this.rowNum,
-        this.countryCode,
-        this.countryName,
-        this.currencyName,
-        this.currencySymbol,
-        this.countryISO,
-        this.activeFlag});
+      this.countryCode,
+      this.countryName,
+      this.currencyName,
+      this.currencySymbol,
+      this.countryISO,
+      this.activeFlag});
 
-  SearchDetails.fromJson(Map<String, dynamic> json) {
+  SearchCountryDetails.fromJson(Map<String, dynamic> json) {
     rowNum = json['RowNum'];
     countryCode = json['CountryCode'];
     countryName = json['CountryName'];

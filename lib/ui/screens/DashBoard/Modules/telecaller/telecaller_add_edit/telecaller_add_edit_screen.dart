@@ -163,8 +163,8 @@ class _TeleCallerAddEditScreenState extends BaseState<TeleCallerAddEditScreen>
   bool isqualified = false;
   bool isDisqualified = false;
   bool isInProcess = false;
-  SearchDetails _searchDetails;
-  SearchDetails _searchDetails123;
+  SearchCountryDetails _searchDetails;
+  SearchCountryDetails _searchDetails123;
 
   ProductSearchDetails _productSearchDetails;
 
@@ -3653,7 +3653,7 @@ class _TeleCallerAddEditScreenState extends BaseState<TeleCallerAddEditScreen>
             arguments: CountryArguments(sw))
         .then((value) {
       if (value != null) {
-        _searchDetails = SearchDetails();
+        _searchDetails = SearchCountryDetails();
         _searchDetails = value;
         print("CountryName IS From SearchList" + _searchDetails.countryCode);
         edt_QualifiedCountryCode.text = /*_searchDetails.countryCode*/ "";
