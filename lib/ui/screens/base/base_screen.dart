@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
-import 'package:loading_animations/loading_animations.dart';
-import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
+import 'dart:math' as math;
 
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:lottie/lottie.dart';
+import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:soleoserp/blocs/base/base_bloc.dart';
 import 'package:soleoserp/models/common/globals.dart';
 import 'package:soleoserp/repositories/custom_exception.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/localizations/app_localizations.dart';
 import 'package:soleoserp/utils/general_utils.dart';
-import 'package:soleoserp/utils/shared_pref_helper.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 abstract class BaseStatefulWidget extends StatefulWidget
     with WidgetsBindingObserver {}
@@ -31,12 +31,30 @@ mixin BasicScreen<Screen extends BaseStatefulWidget> on BaseState<Screen> {
   ///top bar related declarations
   Color screenStatusBarColor;
   GlobalKey appBarKey = GlobalKey();
+  final rnd = math.Random();
+  Color tempcol;
+/*  List<Color> colors123 = [
+    Colors.red,
+    Colors.green,
+    Colors.yellow,
+    Colors.blueAccent
+  ];
+  RandomColor _randomColor = RandomColor();
+
+  Color _color;*/
 
   ///initializes base bloc
   @override
   initState() {
     super.initState();
     baseBloc = BaseBloc();
+    tempcol = Color.fromRGBO(
+      rnd.nextInt(255),
+      rnd.nextInt(255),
+      rnd.nextInt(255),
+      1,
+    );
+    //_color = _randomColor.randomColor(colorBrightness: ColorBrightness.light);
   }
 
   ///listens base blocs states
@@ -44,6 +62,7 @@ mixin BasicScreen<Screen extends BaseStatefulWidget> on BaseState<Screen> {
   @override
   Widget build(BuildContext context) {
     Globals.context = context;
+
     localizations = AppLocalizations.of(context);
     baseTheme = Theme.of(context).copyWith(
         primaryColor: colorPrimaryDark,
@@ -107,28 +126,24 @@ mixin BasicScreen<Screen extends BaseStatefulWidget> on BaseState<Screen> {
               builder: (BuildContext context,
                   void Function(void Function()) setState) {
                 /*return AppBar(
-                  backgroundColor: screenStatusBarColor ?? Colors.transparent*//*== null ? Colors.transparent:Colors.transparent*//*,
+                  backgroundColor: screenStatusBarColor ?? Colors.transparent*/ /*== null ? Colors.transparent:Colors.transparent*/ /*,
                   elevation: 0,
                 );*/
-                if(screenStatusBarColor == colorWhite)
-                  {
-                   /* return NewGradientAppBar(
+                if (screenStatusBarColor == colorWhite) {
+                  /* return NewGradientAppBar(
                         title: Text('Flutter'),
                         gradient: LinearGradient(colors: [Colors.transparent, Colors.transparent, Colors.transparent])
                     );*/
-                    return AppBar(
-                      backgroundColor: Colors.white,
-                          elevation: 0,
-                    );
-                  }
-                else
-                  {
-                    return NewGradientAppBar(
-                        title: Text('Flutter'),
-                        gradient: LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red])
-                    );
-                  }
-
+                  return AppBar(
+                    backgroundColor: Colors.white,
+                    elevation: 0,
+                  );
+                } else {
+                  return NewGradientAppBar(
+                      title: Text('Flutter'),
+                      gradient: LinearGradient(
+                          colors: [Colors.blue, Colors.purple, Colors.red]));
+                }
               },
             ),
           ),
@@ -152,21 +167,177 @@ mixin BasicScreen<Screen extends BaseStatefulWidget> on BaseState<Screen> {
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Visibility(
-              visible: _showProgressDialog,
+              visible: true, //_showProgressDialog,
               child: Container(
-                width: double.maxFinite,
-                height: double.maxFinite,
-                color: Colors.black26,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(colorPrimary),
-                    /*  LoadingBouncingGrid.square(
-                      borderColor: Color(0xFFF27442),
-                      size: 50.0,
-                    ),*/
+                  width: double.maxFinite,
+                  height: double.maxFinite,
+                  color: Colors.black26,
+                  child: ListView(
+                    children: [
+                      Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          color: Colors.white,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                child: Lottie.asset(
+                                    'assets/lang/loader_json.json',
+                                    width: 100,
+                                    height: 100),
+                              ),
+                            ],
+                          )),
+                      Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          color: Colors.white,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                child: Lottie.asset(
+                                    'assets/lang/sample_kishan_one.json',
+                                    width: 100,
+                                    height: 100),
+                              ),
+                            ],
+                          )),
+                      Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          color: Colors.white,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                child: Lottie.asset(
+                                    'assets/lang/sample_kishan_two.json',
+                                    width: 100,
+                                    height: 100),
+                              ),
+                            ],
+                          )),
+                      Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          color: Colors.white,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                child: Lottie.asset(
+                                    'assets/lang/sample_kishan_three.json',
+                                    width: 100,
+                                    height: 100),
+                              ),
+                            ],
+                          )),
+                      Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          color: Colors.white,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                child: Lottie.asset(
+                                    'assets/lang/sample_kishan_four.json',
+                                    width: 100,
+                                    height: 100),
+                              ),
+                            ],
+                          )),
+                      Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          color: Colors.white,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                child: Lottie.asset(
+                                    'assets/lang/sample_kishan_five.json',
+                                    width: 100,
+                                    height: 100),
+                              ),
+                            ],
+                          )),
+                    ],
+                  )
+
+                  /*  Center(
+                  child: Container(
+                    height: 200,
+                    width: 200,
+                    padding: EdgeInsets.all(10),
+                    child: Card(
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                        color: Colors.white,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Container(
+                                child: Lottie.asset(
+                                    'assets/lang/loader_json.json',
+                                    width: 100,
+                                    height: 100),
+                              ),
+                            ),
+                            Text(
+                              "Loading...",
+                              style: TextStyle(color: Colors.black),
+                            ),
+                            SizedBox(
+                              height: 20,
+                            )
+                          ],
+                        )),
                   ),
-                ),
-              ),
+                ),*/
+                  /*CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(
+                      rnd.nextInt(255),
+                      rnd.nextInt(255),
+                      rnd.nextInt(255),
+                      1,
+                    )),
+                  ),*/
+                  /* LoadingBouncingGrid.circle(
+                    borderColor: Color.fromRGBO(
+                      rnd.nextInt(255),
+                      rnd.nextInt(255),
+                      rnd.nextInt(255),
+                      1,
+                    ),
+                    backgroundColor: Color.fromRGBO(
+                      rnd.nextInt(255),
+                      rnd.nextInt(255),
+                      rnd.nextInt(255),
+                      1,
+                    ),
+                    borderSize: 1,
+                    size: 100.0,
+                  ),*/
+
+                  ),
             );
           },
           key: _progressBarKey,

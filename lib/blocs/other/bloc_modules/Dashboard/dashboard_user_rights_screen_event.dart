@@ -97,3 +97,10 @@ class EmployeeListCallEvent extends DashBoardScreenEvents {
 
   EmployeeListCallEvent(this.pageNo,this.employeeListRequest);
 }
+
+class APITokenUpdateRequestEvent extends DashBoardScreenEvents
+{
+  final APITokenUpdateRequest apiTokenUpdateRequest;
+  APITokenUpdateRequestEvent(this.apiTokenUpdateRequest);
+}
+

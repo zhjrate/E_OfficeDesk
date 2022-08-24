@@ -26,6 +26,7 @@ import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
 import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/general_utils.dart';
+import 'package:soleoserp/utils/offline_db_helper.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -237,8 +238,10 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
             // Add your onPressed code here!
+            await _onTapOfDeleteALLProduct();
+
             navigateTo(context, SalesBillAddEditScreen.routeName,
                 clearAllStack: true);
           },
@@ -503,9 +506,9 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
                           Expanded(
                             child: _buildTitleWithValueView(
                                 "Invoice Date",
-                                model.createdDate.getFormattedDate(
+                                model.invoiceDate.getFormattedDate(
                                         fromFormat: "yyyy-MM-ddTHH:mm:ss",
-                                        toFormat: "dd/MM/yyyy") ??
+                                        toFormat: "dd-MM-yyyy") ??
                                     "-"),
                           ),
                           Expanded(
@@ -897,5 +900,9 @@ class _SalesBillListScreenState extends BaseState<SalesBillListScreen>
 
   void _onSearchSalesBillResponse(SalesBillSearchByIDResponseState state) {
     _quotationListResponse = state.response;
+  }
+
+  Future<void> _onTapOfDeleteALLProduct() async {
+    await OfflineDbHelper.getInstance().deleteALLSalesBillProduct();
   }
 }

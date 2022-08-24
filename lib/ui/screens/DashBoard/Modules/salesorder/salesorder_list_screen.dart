@@ -601,7 +601,18 @@ class _SalesOrderListScreenState extends BaseState<SalesOrderListScreen>
                 FlatButton(
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0)),
-                  onPressed: () {},
+                  onPressed: () {
+                    navigateTo(context, SaleOrderNewAddEditScreen.routeName,
+                            arguments:
+                                AddUpdateSalesOrderNewScreenArguments(model))
+                        .then((value) {
+                      _SalesOrderBloc.add(SalesOrderListCallEvent(
+                          1,
+                          SalesOrderListApiRequest(
+                              CompanyId: CompanyID.toString(),
+                              LoginUserID: LoginUserID)));
+                    });
+                  },
                   child: Column(
                     children: <Widget>[
                       Icon(

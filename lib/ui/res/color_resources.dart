@@ -46,6 +46,7 @@ const colorHalfDay = const Color(0xffF5CB49);
 const colorAbsentfDay = const Color(0xffBF0C0C);
 const colorfullDay = const Color(0xff26d9b6);
 const colorgreenforicon = const Color(0xffafd034);
+const colorPink = const Color(0xFFE7C6FF);
 
 
 const Map<int, Color> materialColorAccentCodes = {

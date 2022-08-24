@@ -8,9 +8,8 @@ abstract class DashBoardScreenStates extends BaseStates {
 
 class MenuRightsScreenInitialState extends DashBoardScreenStates {}
 
-
-class MenuRightsEventResponseState extends DashBoardScreenStates{
- MenuRightsResponse menuRightsResponse;
+class MenuRightsEventResponseState extends DashBoardScreenStates {
+  MenuRightsResponse menuRightsResponse;
   MenuRightsEventResponseState(this.menuRightsResponse);
 }
 /*class CustomerCategoryCallEventResponseState extends DashBoardScreenStates{
@@ -31,11 +30,13 @@ class MenuRightsEventResponseState extends DashBoardScreenStates{
   InquiryLeadStatusListCallResponseState(this.inquiryStatusListResponse);
 }*/
 
-class FollowerEmployeeListByStatusCallResponseState extends DashBoardScreenStates {
+class FollowerEmployeeListByStatusCallResponseState
+    extends DashBoardScreenStates {
   final FollowerEmployeeListResponse response;
 
   FollowerEmployeeListByStatusCallResponseState(this.response);
 }
+
 /*class FollowupTypeListCallResponseState extends DashBoardScreenStates {
   final FollowupTypeListResponse followupTypeListResponse;
 
@@ -88,5 +89,11 @@ class EmployeeListResponseState extends DashBoardScreenStates {
   final EmployeeListResponse employeeListResponse;
   final int newPage;
 
-  EmployeeListResponseState(this.newPage,this.employeeListResponse);
+  EmployeeListResponseState(this.newPage, this.employeeListResponse);
+}
+
+class APITokenUpdateState extends DashBoardScreenStates {
+  final String apiresponse;
+
+  APITokenUpdateState(this.apiresponse);
 }

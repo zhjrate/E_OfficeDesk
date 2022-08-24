@@ -17,7 +17,7 @@ import 'error_response_exception.dart';
 class ApiClient {
   ///set apis' base url here
 
-  static const BASE_URL = 'http://208.109.14.134:83/';
+  static const BASE_URL = 'http://122.169.111.101:108/';
 
   /// General Flutter Test SerialKey = TEST-0000-SI0F-0208 / ID : admin / Pwd : Sharvaya / SiteURL : 122.169.11.101:3346
 
@@ -273,6 +273,15 @@ CartFlutterLive     : [BaseURL(API)]:	http://208.109.14.134:86/ [WebURL]:http://
   static const END_POINT_SALES_BILL_BY_ID = "SalesBill/";
   static const END_POINT_MISSED_PUNCH_APPROVAL_SAVE = "MissedPunch/";
   static const END_POINT_SALES_ORDER_BANK_DETIALS = "SalesOrder/BankDetails";
+  static const END_POINT_SALES_BILL_EMAIL_CONTENT =
+      "Quatation/0/GeneralEmailList";
+  static const END_POINT_SALES_BILL_INQ_QT_SO_NO_LIST_API =
+      "SalesBill/CustomerIDToModuleDetails";
+
+  /******************************Material Inward******************************/
+  static const END_POINT_MATERIAL_INWARD_LIST = 'Inward';
+  static const END_POINT_MATERIAL_OUTWARD_LIST = 'Outward';
+  static const API_TOKEN_UPDATE = 'Common/UserWiseTokenUpdate';
 
   final http.Client httpClient;
 

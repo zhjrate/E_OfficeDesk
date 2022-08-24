@@ -24,8 +24,17 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../../home_screen.dart';
 
+class AddUpdateDailyActivityListScreenArguments {
+  String ListDate;
+
+  AddUpdateDailyActivityListScreenArguments(this.ListDate);
+}
+
 class DailyActivityListScreen extends BaseStatefulWidget {
   static const routeName = '/DailyActivityListScreen';
+  final AddUpdateDailyActivityListScreenArguments arguments;
+
+  DailyActivityListScreen(this.arguments);
 
   @override
   _DailyActivityListScreenState createState() =>
@@ -76,6 +85,7 @@ class _DailyActivityListScreenState extends BaseState<DailyActivityListScreen>
   String TotalCount = "";
   double totduration = 0.00;
   final TextEditingController TASKTOTALDURATION = TextEditingController();
+  bool _isForUpdate;
 
   @override
   void initState() {
@@ -109,14 +119,29 @@ class _DailyActivityListScreenState extends BaseState<DailyActivityListScreen>
         "-" +
         selectedDate.day.toString();
 
-    _dailyActivityScreenBloc
-      ..add(DailyActivityListCallEvent(
-          1,
-          DailyActivityListRequest(
-              CompanyId: CompanyID,
-              LoginUserID: LoginUserID,
-              EmployeeID: edt_FollowupEmployeeUserID.text,
-              ActivityDate: edt_FollowupStatusReverse.text)));
+    _isForUpdate = widget.arguments != null;
+    if (_isForUpdate) {
+      edt_FollowupStatus.text = widget.arguments.ListDate
+          .getFormattedDate(fromFormat: "yyyy-MM-dd", toFormat: "dd-MM-yyyy");
+      _dailyActivityScreenBloc
+        ..add(DailyActivityListCallEvent(
+            1,
+            DailyActivityListRequest(
+                CompanyId: CompanyID,
+                LoginUserID: LoginUserID,
+                EmployeeID: edt_FollowupEmployeeUserID.text,
+                ActivityDate: widget.arguments.ListDate)));
+    } else {
+      _dailyActivityScreenBloc
+        ..add(DailyActivityListCallEvent(
+            1,
+            DailyActivityListRequest(
+                CompanyId: CompanyID,
+                LoginUserID: LoginUserID,
+                EmployeeID: edt_FollowupEmployeeUserID.text,
+                ActivityDate: edt_FollowupStatusReverse.text)));
+    }
+
     canLaunch('tel:123').then((bool result) {
       setState(() {
         _hasCallSupport = result;
@@ -234,13 +259,7 @@ class _DailyActivityListScreenState extends BaseState<DailyActivityListScreen>
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async {
-                    _dailyActivityScreenBloc.add(DailyActivityListCallEvent(
-                        1,
-                        DailyActivityListRequest(
-                            CompanyId: CompanyID,
-                            LoginUserID: LoginUserID,
-                            EmployeeID: edt_FollowupEmployeeUserID.text,
-                            ActivityDate: edt_FollowupStatusReverse.text)));
+                    baseBloc.refreshScreen();
                   },
                   child: Container(
                     padding: EdgeInsets.only(
@@ -274,7 +293,13 @@ class _DailyActivityListScreenState extends BaseState<DailyActivityListScreen>
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
             // Add your onPressed code here!
-            navigateTo(context, DailyActivityAddEditScreen.routeName);
+            // navigateTo(context, DailyActivityAddEditScreen.routeName);
+            navigateTo(context, DailyActivityAddEditScreen.routeName,
+                    arguments: AddUpdateDailyActivityRequestScreenArguments(
+                        null, edt_FollowupStatusReverse.text))
+                .then((value) {
+              setState(() {});
+            });
           },
           child: const Icon(Icons.add),
           backgroundColor: colorPrimary,
@@ -665,16 +690,25 @@ class _DailyActivityListScreenState extends BaseState<DailyActivityListScreen>
     /* _inquiryListResponse.details
         .removeWhere((element) => element.customerID == state.id);*/
 
-    print("CustomerDeleted" +
+    /* print("CustomerDeleted" +
         state.dailyActivityDeleteResponse.details[0].column1.toString() +
         "");
     //baseBloc.refreshScreen();
-    navigateTo(context, DailyActivityListScreen.routeName, clearAllStack: true);
+    navigateTo(context, DailyActivityListScreen.routeName, clearAllStack: true);*/
+
+    _dailyActivityScreenBloc.add(DailyActivityListCallEvent(
+        1,
+        DailyActivityListRequest(
+            CompanyId: CompanyID,
+            LoginUserID: LoginUserID,
+            EmployeeID: edt_FollowupEmployeeUserID.text,
+            ActivityDate: edt_FollowupStatusReverse.text)));
   }
 
   void _onTapOfEditCustomer(DailyActivityDetails model) {
     navigateTo(context, DailyActivityAddEditScreen.routeName,
-            arguments: AddUpdateDailyActivityRequestScreenArguments(model))
+            arguments: AddUpdateDailyActivityRequestScreenArguments(
+                model, model.createdDate))
         .then((value) {
       _dailyActivityScreenBloc.add(DailyActivityListCallEvent(
           1,

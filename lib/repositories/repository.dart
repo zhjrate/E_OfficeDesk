@@ -5,12 +5,17 @@ import 'package:http/http.dart' as http;
 import 'package:soleoserp/models/api_requests/AttendVisit/attend_visit_delete_request.dart';
 import 'package:soleoserp/models/api_requests/InquiryShareModel.dart';
 import 'package:soleoserp/models/api_requests/Loan/loan_approval_save_request.dart';
+import 'package:soleoserp/models/api_requests/ManageProductionRequest/MaterialInwardRequest/material_inward_list_request.dart';
+import 'package:soleoserp/models/api_requests/ManageProductionRequest/MaterialOutward/material_outward_list_request.dart';
 import 'package:soleoserp/models/api_requests/MissedPunch/missed_punch_approval_add_edit_request.dart';
 import 'package:soleoserp/models/api_requests/MissedPunch/missed_punch_approval_request.dart';
+import 'package:soleoserp/models/api_requests/SalesBill/sale_bill_email_content_request.dart';
+import 'package:soleoserp/models/api_requests/SalesBill/sales_bill_inq_QT_SO_NO_list_Request.dart';
 import 'package:soleoserp/models/api_requests/SalesBill/sales_bill_search_by_id_request.dart';
 import 'package:soleoserp/models/api_requests/SalesOrder/bank_details_list_request.dart';
 import 'package:soleoserp/models/api_requests/ToDo_request/to_do_delete_request.dart';
 import 'package:soleoserp/models/api_requests/all_employee_list_request.dart';
+import 'package:soleoserp/models/api_requests/api_token/api_token_update_request.dart';
 import 'package:soleoserp/models/api_requests/attend_visit_list_request.dart';
 import 'package:soleoserp/models/api_requests/attend_visit_save_request.dart';
 import 'package:soleoserp/models/api_requests/attendance_employee_list_request.dart';
@@ -174,7 +179,11 @@ import 'package:soleoserp/models/api_requests/todo_list_request.dart';
 import 'package:soleoserp/models/api_requests/transection_mode_list_request.dart';
 import 'package:soleoserp/models/api_responses/AttendVisit/attend_visit_delete_response.dart';
 import 'package:soleoserp/models/api_responses/Loan/loan_approval_save_response.dart';
+import 'package:soleoserp/models/api_responses/ManageProductionResponse/Material%20Outward/material_outward_list_response.dart';
+import 'package:soleoserp/models/api_responses/ManageProductionResponse/MaterialInward/material_inward_list_response.dart';
 import 'package:soleoserp/models/api_responses/MissedPunch/missed_punch_add_edit_response.dart';
+import 'package:soleoserp/models/api_responses/SaleBill/sale_bill_email_content_response.dart';
+import 'package:soleoserp/models/api_responses/SaleBill/sales_bill_INQ_QT_SO_NO_list_response.dart';
 import 'package:soleoserp/models/api_responses/SaleOrder/bank_details_list_response.dart';
 import 'package:soleoserp/models/api_responses/ToDo_delete_response/to_do_delete_response.dart';
 import 'package:soleoserp/models/api_responses/all_employee_List_response.dart';
@@ -3039,8 +3048,7 @@ class Repository {
   Future<ExpenseUploadImageResponse> getuploadImage(
       File imagesfiles,
       ExpenseUploadImageAPIRequest
-          expenseUploadImageAPIRequest /*String expenseID, String companyId, String loginUserId, String fileName, String type, String pkID,*/
-      ) async {
+          expenseUploadImageAPIRequest /*String expenseID, String companyId, String loginUserId, String fileName, String type, String pkID,*/) async {
     try {
       Map<String, dynamic> json = await apiClient.apiCallPostMultipart(
           ApiClient.END_POINT_EXPENSE_UPLOAD,
@@ -3699,16 +3707,90 @@ class Repository {
     }
   }
 
-
   Future<BankDetailsListResponse> getBankDetailsAPI(
       SaleOrderBankDetailsListRequest request) async {
     try {
       Map<String, dynamic> json = await apiClient.apiCallPost(
           ApiClient.END_POINT_SALES_ORDER_BANK_DETIALS, request.toJson());
-      BankDetailsListResponse response =
-      BankDetailsListResponse.fromJson(json);
+      BankDetailsListResponse response = BankDetailsListResponse.fromJson(json);
 
       return response;
+    } on ErrorResponseException catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<SaleBillEmailContentResponse> getEmailContentAPI(
+      SalesBillEmailContentRequest request) async {
+    try {
+      Map<String, dynamic> json = await apiClient.apiCallPost(
+          ApiClient.END_POINT_SALES_BILL_EMAIL_CONTENT, request.toJson());
+      SaleBillEmailContentResponse response =
+          SaleBillEmailContentResponse.fromJson(json);
+
+      return response;
+    } on ErrorResponseException catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<SalesBill_INQ_QT_SO_NO_ListResponse> getINQ_QT_SO_NO_API(
+      SaleBill_INQ_QT_SO_NO_ListRequest request) async {
+    try {
+      Map<String, dynamic> json = await apiClient.apiCallPost(
+          ApiClient.END_POINT_SALES_BILL_INQ_QT_SO_NO_LIST_API,
+          request.toJson());
+      SalesBill_INQ_QT_SO_NO_ListResponse response =
+          SalesBill_INQ_QT_SO_NO_ListResponse.fromJson(json);
+
+      return response;
+    } on ErrorResponseException catch (e) {
+      rethrow;
+    }
+  }
+
+  /****************************************Manage Accounts*****************************************/
+  Future<MaterialInwardListResponse> materialInwardListAPI(
+      int pageNo, MaterialInwardListRequest materialInwardListRequest) async {
+    try {
+      Map<String, dynamic> json = await apiClient.apiCallPost(
+          ApiClient.END_POINT_MATERIAL_INWARD_LIST +
+              "/" +
+              pageNo.toString() +
+              "-10",
+          materialInwardListRequest.toJson());
+      MaterialInwardListResponse response =
+          MaterialInwardListResponse.fromJson(json);
+      return response;
+    } on ErrorResponseException catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<MaterialOutwardListResponse> materialOutwardListAPI(
+      int pageNo, MaterialOutwardListRequest materialOutwardListRequest) async {
+    try {
+      Map<String, dynamic> json = await apiClient.apiCallPost(
+          ApiClient.END_POINT_MATERIAL_OUTWARD_LIST +
+              "/" +
+              pageNo.toString() +
+              "-10",
+          materialOutwardListRequest.toJson());
+      MaterialOutwardListResponse response =
+          MaterialOutwardListResponse.fromJson(json);
+      return response;
+    } on ErrorResponseException catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<String> getAPIUpdateTokenAPI(
+      APITokenUpdateRequest apiTokenUpdateRequest) async {
+    try {
+      Map<String, dynamic> json = await apiClient.apiCallPost(
+          ApiClient.API_TOKEN_UPDATE, apiTokenUpdateRequest.toJson());
+
+      return json.toString();
     } on ErrorResponseException catch (e) {
       rethrow;
     }

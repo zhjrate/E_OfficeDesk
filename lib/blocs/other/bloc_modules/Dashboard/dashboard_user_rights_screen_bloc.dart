@@ -2,40 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:soleoserp/blocs/base/base_bloc.dart';
 import 'package:soleoserp/models/api_requests/all_employee_list_request.dart';
+import 'package:soleoserp/models/api_requests/api_token/api_token_update_request.dart';
 import 'package:soleoserp/models/api_requests/attendance_list_request.dart';
 import 'package:soleoserp/models/api_requests/attendance_save_request.dart';
-import 'package:soleoserp/models/api_requests/closer_reason_list_request.dart';
-import 'package:soleoserp/models/api_requests/customer_category_request.dart';
-import 'package:soleoserp/models/api_requests/customer_source_list_request.dart';
-import 'package:soleoserp/models/api_requests/designation_list_request.dart';
 import 'package:soleoserp/models/api_requests/employee_list_request.dart';
-import 'package:soleoserp/models/api_requests/expense_type_request.dart';
 import 'package:soleoserp/models/api_requests/follower_employee_list_request.dart';
-import 'package:soleoserp/models/api_requests/followup_type_list_request.dart';
 import 'package:soleoserp/models/api_requests/inquiry_status_list_request.dart';
-import 'package:soleoserp/models/api_requests/leave_request_type_request.dart';
 import 'package:soleoserp/models/api_requests/menu_rights_request.dart';
 import 'package:soleoserp/models/api_responses/all_employee_List_response.dart';
 import 'package:soleoserp/models/api_responses/attendance_response_list.dart';
 import 'package:soleoserp/models/api_responses/attendance_save_response.dart';
-import 'package:soleoserp/models/api_responses/closer_reason_list_response.dart';
-import 'package:soleoserp/models/api_responses/customer_category_list.dart';
-import 'package:soleoserp/models/api_responses/customer_source_response.dart';
-import 'package:soleoserp/models/api_responses/designation_list_response.dart';
 import 'package:soleoserp/models/api_responses/employee_list_response.dart';
-import 'package:soleoserp/models/api_responses/expense_type_response.dart';
 import 'package:soleoserp/models/api_responses/follower_employee_list_response.dart';
-import 'package:soleoserp/models/api_responses/followup_type_list_response.dart';
 import 'package:soleoserp/models/api_responses/inquiry_status_list_response.dart';
-import 'package:soleoserp/models/api_responses/leave_request_type_response.dart';
 import 'package:soleoserp/models/api_responses/menu_rights_response.dart';
 import 'package:soleoserp/repositories/repository.dart';
 
 part 'dashboard_user_rights_screen_event.dart';
-
 part 'dashboard_user_rights_screen_state.dart';
 
-class DashBoardScreenBloc extends Bloc<DashBoardScreenEvents, DashBoardScreenStates> {
+class DashBoardScreenBloc
+    extends Bloc<DashBoardScreenEvents, DashBoardScreenStates> {
   Repository userRepository = Repository.getInstance();
   BaseBloc baseBloc;
 
@@ -70,27 +57,20 @@ class DashBoardScreenBloc extends Bloc<DashBoardScreenEvents, DashBoardScreenSta
       yield* _mapALLEmployeeNameListCallEventToState(event);
     }
 
-    if(event is AttendanceCallEvent){
+    if (event is AttendanceCallEvent) {
       yield* _mapAttendanceCallEventToState(event);
-
     }
 
-    if(event is AttendanceSaveCallEvent)
-      {
-        yield* _mapAttendanceSaveCallEventToState(event);
+    if (event is AttendanceSaveCallEvent) {
+      yield* _mapAttendanceSaveCallEventToState(event);
+    }
 
-      }
-
-    if(event is EmployeeListCallEvent)
-      {
-        yield* _mapBankVoucherListCallEventToState(event);
-
-      }
-    /* if(event is FollowupTypeListByNameCallEvent)
-    {
-      yield* _mapFollowupTypeListCallEventToState(event);
-
-    }*/
+    if (event is EmployeeListCallEvent) {
+      yield* _mapBankVoucherListCallEventToState(event);
+    }
+    if (event is APITokenUpdateRequestEvent) {
+      yield* _map_api_token_updateEventState(event);
+    }
 /*    if(event is CloserReasonTypeListByNameCallEvent)
     {
       yield* _mapCloserReasonStatusListCallEventToState(event);
@@ -105,8 +85,6 @@ class DashBoardScreenBloc extends Bloc<DashBoardScreenEvents, DashBoardScreenSta
       yield* _mapExpenseTypeCallEventToState(event);
 
     }*/
-
-
   }
 
   Stream<DashBoardScreenStates> _mapMenuRightsCallEventToState(
@@ -117,8 +95,8 @@ class DashBoardScreenBloc extends Bloc<DashBoardScreenEvents, DashBoardScreenSta
       // CustomerCategoryResponse loginResponse =
 
       /* List<CustomerCategoryResponse> customercategoryresponse*/
-      MenuRightsResponse respo = await userRepository.menu_rights_api(
-          event.menuRightsRequest);
+      MenuRightsResponse respo =
+          await userRepository.menu_rights_api(event.menuRightsRequest);
       //print("TypeErrorSolved : " + respo.toString());
       //CustomerCategoryResponseFromJson(respo);
       yield MenuRightsEventResponseState(respo);
@@ -173,7 +151,6 @@ class DashBoardScreenBloc extends Bloc<DashBoardScreenEvents, DashBoardScreenSta
     }
   }*/
 
-
 /*  Stream<DashBoardScreenStates> _mapDesignationListCallEventToState(
       DesignationCallEvent event) async* {
     try {
@@ -208,9 +185,8 @@ class DashBoardScreenBloc extends Bloc<DashBoardScreenEvents, DashBoardScreenSta
       FollowerEmployeeListCallEvent event) async* {
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
-      FollowerEmployeeListResponse response =
-      await userRepository.getFollowerEmployeeList(
-          event.followerEmployeeListRequest);
+      FollowerEmployeeListResponse response = await userRepository
+          .getFollowerEmployeeList(event.followerEmployeeListRequest);
       yield FollowerEmployeeListByStatusCallResponseState(response);
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
@@ -286,7 +262,7 @@ class DashBoardScreenBloc extends Bloc<DashBoardScreenEvents, DashBoardScreenSta
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
       ALL_EmployeeList_Response response =
-      await userRepository.getALLEmployeeList(event.allEmployeeNameRequest);
+          await userRepository.getALLEmployeeList(event.allEmployeeNameRequest);
       yield ALL_EmployeeNameListResponseState(response);
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
@@ -304,8 +280,8 @@ class DashBoardScreenBloc extends Bloc<DashBoardScreenEvents, DashBoardScreenSta
       // CustomerCategoryResponse loginResponse =
 
       /* List<CustomerCategoryResponse> customercategoryresponse*/
-      Attendance_List_Response respo = await userRepository.getAttendanceList(
-          event.attendanceApiRequest);
+      Attendance_List_Response respo =
+          await userRepository.getAttendanceList(event.attendanceApiRequest);
 
       yield AttendanceListCallResponseState(respo);
     } catch (error, stacktrace) {
@@ -320,9 +296,10 @@ class DashBoardScreenBloc extends Bloc<DashBoardScreenEvents, DashBoardScreenSta
       AttendanceSaveCallEvent event) async* {
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
-      AttendanceSaveResponse respo =  await userRepository.DashBoardattendanceSave(event.attendanceSaveApiRequest);
+      AttendanceSaveResponse respo =
+          await userRepository.DashBoardattendanceSave(
+              event.attendanceSaveApiRequest);
       yield AttendanceSaveCallResponseState(respo);
-
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
       print(stacktrace);
@@ -336,18 +313,33 @@ class DashBoardScreenBloc extends Bloc<DashBoardScreenEvents, DashBoardScreenSta
     try {
       baseBloc.emit(ShowProgressIndicatorState(true));
 
-      EmployeeListResponse response =
-      await userRepository.getEmployeeListWithOneImage(event.pageNo,event.employeeListRequest);
-      yield EmployeeListResponseState(event.pageNo,response);
-
+      EmployeeListResponse response = await userRepository
+          .getEmployeeListWithOneImage(event.pageNo, event.employeeListRequest);
+      yield EmployeeListResponseState(event.pageNo, response);
     } catch (error, stacktrace) {
       baseBloc.emit(ApiCallFailureState(error));
       print(stacktrace);
     } finally {
-      await Future.delayed(const Duration(milliseconds: 500), (){});
+      await Future.delayed(const Duration(milliseconds: 500), () {});
       baseBloc.emit(ShowProgressIndicatorState(false));
     }
   }
 
+  Stream<DashBoardScreenStates> _map_api_token_updateEventState(
+      APITokenUpdateRequestEvent event) async* {
+    try {
+      baseBloc.emit(ShowProgressIndicatorState(true));
 
+      String response = await userRepository
+          .getAPIUpdateTokenAPI(event.apiTokenUpdateRequest);
+
+      yield APITokenUpdateState(response);
+    } catch (error, stacktrace) {
+      baseBloc.emit(ApiCallFailureState(error));
+      print(stacktrace);
+    } finally {
+      await Future.delayed(const Duration(milliseconds: 500), () {});
+      baseBloc.emit(ShowProgressIndicatorState(false));
+    }
+  }
 }

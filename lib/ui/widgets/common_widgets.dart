@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:ntp/ntp.dart';
 import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
@@ -17,6 +18,22 @@ import 'package:soleoserp/ui/screens/DashBoard/Modules/Attend_Visit/Attend_Visit
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Complaint/complaint_pagination_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerList/customer_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Installation/installation_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/CashVoucher/CashVoucherAddEdit/cash_voucher_add_edit.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/CreditNote/credit_note_add_edit/credit_note_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/DebitNote/debit_note_add_edit/debit_note_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/ExpenseVoucher/expense_voucher_add_edit/expense_voucher_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/JournalVoucher/journal_voucher_add_edit_screen/journal_voucher_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/PettyCashVoucher/petty_cash_voucher_add_edit/petty_cash_voucher_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/InspectionCheckList/inspection_check_list_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/JobCardInward/job_card_inward_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/JobCardOutward/job_card_outward_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/MaterialConsumption/material_consumption_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/MaterialIndent/material_indent_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/MaterialInward/material_inward_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/MaterialOutward/material_outward_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/SiteSurvey/site_survey_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/StoreInward/store_inward_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/StoreOutward/store_outward_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/OfficeTODO/office_to_do.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/attendance/employee_attendance_list.dart';
@@ -1165,12 +1182,9 @@ makeDashboardItem(
               clearAllStack: true);
         } else if (title == "To-Do") {
           navigateTo(context, ToDoListScreen.routeName, clearAllStack: true);
-        } else if (title == "Office Task")
-          {
-            navigateTo(context, OfficeToDoScreen.routeName, clearAllStack: true);
-          }
-
-        else if (title == "Quotation") {
+        } else if (title == "Office Task") {
+          navigateTo(context, OfficeToDoScreen.routeName, clearAllStack: true);
+        } else if (title == "Quotation") {
           navigateTo(context, QuotationListScreen.routeName,
               clearAllStack: true);
         } else if (title == "SalesOrder") {
@@ -1182,9 +1196,6 @@ makeDashboardItem(
         } else if (title == "BankVoucher") {
           navigateTo(context, BankVoucherListScreen.routeName,
               clearAllStack: true);
-        } else if (title == "CashVoucher") {
-          showCommonDialogWithSingleOption(context, "Coming Soon !",
-              positiveButtonTitle: "OK");
         } else if (title == "Complaint") {
           navigateTo(context, ComplaintPaginationListScreen.routeName,
               clearAllStack: true);
@@ -1256,7 +1267,57 @@ makeDashboardItem(
         } else if (title == "Purchase Bill") {
           showCommonDialogWithSingleOption(context, "Coming Soon !",
               positiveButtonTitle: "OK");
+        } else if (title == "CashVoucher") {
+          navigateTo(context, CashVoucherAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Credit Note") {
+          navigateTo(context, CreditNoteAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Debit Note") {
+          navigateTo(context, DebitNoteAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Petty Cash") {
+          navigateTo(context, PettyCashVoucherAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Exp.Voucher") {
+          navigateTo(context, ExpenseVoucherAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Journal Voucher") {
+          navigateTo(context, JournalVoucherAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Material Inward") {
+          navigateTo(context, MaterialInwardListScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Material Outward") {
+          navigateTo(context, MaterialOutwardListScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Store Inward") {
+          navigateTo(context, StoreInwardAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Store Outward") {
+          navigateTo(context, StoreOutwardAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Material Consumption") {
+          navigateTo(context, MaterialConsumptionAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Inspection Check List") {
+          navigateTo(context, InspectionCheckListAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Job Card Inward") {
+          navigateTo(context, JobCardInwardAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Job Card Outward") {
+          navigateTo(context, JobCardOutwardAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Material Indent") {
+          navigateTo(context, MaterialIndentAddEditScreen.routeName,
+              clearAllStack: true);
+        } else if (title == "Site Survey") {
+          navigateTo(context, SiteSurveyAddEditScreen.routeName,
+              clearAllStack: true);
         }
+
+        //
       },
       child: Center(
         child: Container(
@@ -1446,9 +1507,6 @@ Widget build_Drawer({BuildContext context, String UserName, String RolCode}) {
           ),
           currentAccountPictureSize: const Size.square(85),
         ),
-
-
-
         Expanded(
           child: ListView(
             padding: EdgeInsets.zero,
@@ -3545,6 +3603,85 @@ showcustomdialogWithMultipleID(
   );
 }
 
+Widget EditText(BuildContext context,
+    {String title: "",
+    String hint: "",
+    TextInputAction textInputAction: TextInputAction.next,
+    bool obscureText: false,
+    EdgeInsetsGeometry contentPadding:
+        const EdgeInsets.only(top: 0, bottom: 10),
+    int maxLength: 1000,
+    TextAlign textAlign: TextAlign.left,
+    TextEditingController controller,
+    TextInputType keyboardType,
+    FormFieldValidator<String> validator,
+    int maxLines: 1,
+    Function(String) onSubmitted,
+    Function(String) onTextChanged,
+    TextStyle titleTextStyle,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    TextStyle inputTextStyle,
+    List<TextInputFormatter> inputFormatter,
+    bool readOnly: false,
+    double radius: 10,
+    double boxheight: 35,
+    Color cardColor: colorLightGray,
+    double FontSize: 13,
+    double HintFontSize: 13,
+    double elivation: 3,
+    Function onPressed,
+    Widget suffixIcon}) {
+  return GestureDetector(
+    onTap: onPressed,
+    child: Card(
+        elevation: elivation,
+        color: cardColor,
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(radius)),
+        child: Container(
+          height: boxheight,
+          padding: EdgeInsets.only(left: 20),
+          child: Row(
+            children: [
+              Expanded(
+                flex: 1,
+                child: TextFormField(
+                  textCapitalization: textCapitalization,
+                  inputFormatters: inputFormatter,
+                  keyboardType: keyboardType,
+                  style: inputTextStyle,
+                  textAlign: textAlign,
+                  maxLines: maxLines,
+                  cursorColor: colorPrimaryLight,
+                  textInputAction: textInputAction,
+                  obscureText: obscureText,
+                  readOnly: readOnly,
+                  maxLength: maxLength,
+                  controller: controller,
+                  obscuringCharacter: "*",
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    hintStyle:
+                        TextStyle(color: colorGrayDark, fontSize: HintFontSize),
+                    isDense: true,
+                    border: InputBorder.none,
+                    suffixIconConstraints:
+                        BoxConstraints(maxHeight: 30, maxWidth: 30),
+                    contentPadding: EdgeInsets.only(bottom: 10, top: 15),
+                    counterText: "",
+                  ),
+                  validator: validator,
+                  onChanged: onTextChanged,
+                  onFieldSubmitted: onSubmitted,
+                ),
+              ),
+              Container(margin: EdgeInsets.only(right: 10), child: suffixIcon)
+            ],
+          ),
+        )),
+  );
+}
+
 class CustomAnimatedPadding extends StatelessWidget {
   final Widget child;
 
@@ -3558,4 +3695,198 @@ class CustomAnimatedPadding extends StatelessWidget {
         duration: const Duration(milliseconds: 300),
         child: child);
   }
+}
+
+Widget customAppBar(context, String title) {
+  return NewGradientAppBar(
+    gradient: LinearGradient(colors: [Colors.blue, Colors.purple, Colors.red]),
+    leading: IconButton(
+      icon: Icon(
+        Icons.arrow_back_ios,
+        color: Colors.white,
+        size: 15,
+      ),
+      onPressed: () => Navigator.of(context).pop(),
+    ),
+    actions: <Widget>[
+      IconButton(
+          icon: Icon(
+            Icons.water_damage_sharp,
+            color: colorWhite,
+            size: 20,
+          ),
+          onPressed: () {
+            //_onTapOfLogOut();
+            navigateTo(context, HomeScreen.routeName, clearAllStack: true);
+          })
+    ],
+    title: Text(
+      title,
+      style: TextStyle(fontSize: 17, fontWeight: FontWeight.normal),
+    ),
+  );
+}
+
+Widget space(double height, double width) {
+  return SizedBox(
+    height: height,
+    width: width,
+  );
+}
+
+Widget customTextLabel(String labelName,
+    {Alignment alignment = Alignment.centerLeft,
+    double leftPad = 0,
+    double rightPad = 0,
+    double bottomPad = 0,
+    double topPad = 0}) {
+  return Align(
+    alignment: alignment,
+    child: Container(
+      padding: EdgeInsets.only(
+          left: leftPad, right: rightPad, bottom: bottomPad, top: topPad),
+      child: Row(
+        children: [
+          Text(labelName,
+              style: TextStyle(
+                  fontSize: 10,
+                  color: colorBlack,
+                  fontWeight: FontWeight.bold)),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget customExpansionTileType1(String title, Column column, Icon icon,
+    {Color color = Colors.white70, String image = ""}) {
+  return Container(
+    child: Card(
+      // margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.0)),
+      elevation: 2,
+      child: Container(
+        decoration: BoxDecoration(
+          color: Color(0xff362d8b),
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Theme(
+          data: ThemeData().copyWith(
+            visualDensity: VisualDensity(horizontal: -1.5, vertical: -1.5),
+            dividerColor: Colors.transparent,
+          ),
+          child: ListTileTheme(
+            dense: true,
+            child: ExpansionTile(
+              iconColor: Colors.white,
+              collapsedIconColor: Colors.white,
+              title: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
+              ),
+
+              leading: Container(
+                  child: image != "" ? Image.asset(image, width: 27) : icon),
+
+              children: [
+                Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        color: color,
+                        borderRadius: BorderRadius.only(
+                            bottomRight: Radius.circular(15),
+                            bottomLeft: Radius.circular(15))),
+                    child: column),
+              ], // children:
+            ),
+          ),
+        ),
+        // height: 60,
+      ),
+    ),
+  );
+}
+
+Widget commonalertbox(String msg, BuildContext context,
+    {GestureTapCallback onTapofPositive, bool useRootNavigator = true}) {
+  showDialog(
+      context: context,
+      builder: (BuildContext ab) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          elevation: 10,
+          actions: [
+            SizedBox(
+              height: 20,
+            ),
+            Container(
+              margin: EdgeInsets.only(left: 30, right: 30),
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.blue, width: 2.00),
+              ),
+              alignment: Alignment.center,
+              child: Text(
+                "Alert!",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.blue,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Container(
+              alignment: Alignment.center,
+              //margin: EdgeInsets.only(left: 10),
+              child: Text(
+                msg,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
+            Divider(
+              height: 1.00,
+              thickness: 2.00,
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            GestureDetector(
+              onTap: onTapofPositive ??
+                  () {
+                    Navigator.of(context, rootNavigator: useRootNavigator)
+                        .pop();
+                  },
+              child: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  "Ok",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+          ],
+        );
+      });
 }

@@ -39,6 +39,24 @@ import 'package:soleoserp/ui/screens/DashBoard/Modules/Installation/installation
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Installation/installation_search_customer_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Installation/installation_state_search.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Installation/search_installation.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/CashVoucher/CashVoucherAddEdit/cash_voucher_add_edit.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/CreditNote/credit_note_add_edit/credit_note_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/DebitNote/debit_note_add_edit/debit_note_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/ExpenseVoucher/expense_voucher_add_edit/expense_voucher_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/JournalVoucher/journal_voucher_add_edit_screen/journal_voucher_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageAccounts/PettyCashVoucher/petty_cash_voucher_add_edit/petty_cash_voucher_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/InspectionCheckList/inspection_check_list_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/JobCardInward/job_card_inward_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/JobCardOutward/job_card_outward_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/MaterialConsumption/material_consumption_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/MaterialIndent/material_indent_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/MaterialInward/material_inward_add_edit.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/MaterialInward/material_inward_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/MaterialOutward/material_outward_add_edit.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/MaterialOutward/material_outward_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/SiteSurvey/site_survey_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/StoreInward/store_inward_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/ManageProduction/StoreOutward/store_outward_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/OfficeTODO/office_to_do.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/OfficeTODO/office_to_do_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/ToDo/to_do_add_edit_screen.dart';
@@ -119,7 +137,14 @@ import 'package:soleoserp/ui/screens/DashBoard/Modules/salary_upad/salary_upad_l
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salary_upad/salary_upad_list/salary_upad_search_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sale_bill_list/sales_bill_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sale_bill_list/search_sales_bill_sceen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sales_bill_add_edit/module_no_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sales_bill_add_edit/sale_bill_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sales_bill_add_edit/sale_bill_db/sale_bill_other_charges_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sales_bill_add_edit/sale_bill_db/sale_bill_product_list.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sales_bill_add_edit/sale_bill_db/sales_bill_product_add_edit_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/SaleOrder_manan_design/saleorderdb/saleorder_other_charges_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/SaleOrder_manan_design/saleorderdb/saleorder_product_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/SaleOrder_manan_design/saleorderdb/salesorder_product_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/SaleOrder_manan_design/sales_order_add_edit_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/salesorder_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/search_salesorder_screen.dart';
@@ -396,7 +421,8 @@ class MyApp extends StatefulWidget {
       case MapScreen.routeName:
         return getMaterialPageRoute(MapScreen());
       case DailyActivityListScreen.routeName:
-        return getMaterialPageRoute(DailyActivityListScreen());
+        return getMaterialPageRoute(
+            DailyActivityListScreen(settings.arguments));
       case SearchDailyActivityScreen.routeName:
         return getMaterialPageRoute(SearchDailyActivityScreen());
       //InquiryProductListScreen
@@ -538,12 +564,14 @@ class MyApp extends StatefulWidget {
         return getMaterialPageRoute(ProductionActivityAdd(settings.arguments));
       case QuickFollowupListScreen.routeName:
         return getMaterialPageRoute(QuickFollowupListScreen());
+
       case QuickFollowUpAddEditScreen.routeName:
         return getMaterialPageRoute(
             QuickFollowUpAddEditScreen(settings.arguments));
 
       case TeleCallerNewListScreen.routeName:
         return getMaterialPageRoute(TeleCallerNewListScreen());
+
       case TeleCallerAddEditNewScreen.routeName:
         return getMaterialPageRoute(
             TeleCallerAddEditNewScreen(settings.arguments));
@@ -580,12 +608,78 @@ class MyApp extends StatefulWidget {
       case OfficeToDoAddEditScreen.routeName:
         return getMaterialPageRoute(
             OfficeToDoAddEditScreen(settings.arguments));
+
       case SalesBillAddEditScreen.routeName:
         return getMaterialPageRoute(SalesBillAddEditScreen(settings.arguments));
-      case SaleOrderNewAddEditScreen.routeName:
-        return getMaterialPageRoute(SaleOrderNewAddEditScreen());
+      case SaleBillProductListScreen.routeName:
+        return getMaterialPageRoute(
+            SaleBillProductListScreen(settings.arguments));
 
-      //SalesBillAddEditScreen
+      case AddSaleBillProductScreen.routeName:
+        return getMaterialPageRoute(
+            AddSaleBillProductScreen(settings.arguments));
+
+      case SaleBillOtherChargeScreen.routeName:
+        return getMaterialPageRoute(
+            SaleBillOtherChargeScreen(settings.arguments));
+      //
+
+      case SaleOrderNewAddEditScreen.routeName:
+        return getMaterialPageRoute(
+            SaleOrderNewAddEditScreen(settings.arguments));
+
+      case SalesOrderProductListScreen.routeName:
+        return getMaterialPageRoute(
+            SalesOrderProductListScreen(settings.arguments));
+
+      case AddSalesOrderProductScreen.routeName:
+        return getMaterialPageRoute(
+            AddSalesOrderProductScreen(settings.arguments));
+      case SalesOrderOtherChargeScreen.routeName:
+        return getMaterialPageRoute(
+            SalesOrderOtherChargeScreen(settings.arguments));
+      case ModuleNoListScreen.routeName:
+        return getMaterialPageRoute(ModuleNoListScreen(settings.arguments));
+      case CreditNoteAddEditScreen.routeName:
+        return getMaterialPageRoute(CreditNoteAddEditScreen());
+
+      case CashVoucherAddEditScreen.routeName:
+        return getMaterialPageRoute(CashVoucherAddEditScreen());
+
+      case DebitNoteAddEditScreen.routeName:
+        return getMaterialPageRoute(DebitNoteAddEditScreen());
+      case PettyCashVoucherAddEditScreen.routeName:
+        return getMaterialPageRoute(PettyCashVoucherAddEditScreen());
+      case ExpenseVoucherAddEditScreen.routeName:
+        return getMaterialPageRoute(ExpenseVoucherAddEditScreen());
+      case JournalVoucherAddEditScreen.routeName:
+        return getMaterialPageRoute(JournalVoucherAddEditScreen());
+      case MaterialInwardListScreen.routeName:
+        return getMaterialPageRoute(MaterialInwardListScreen());
+      case MaterialInwardAddEdit.routeName:
+        return getMaterialPageRoute(MaterialInwardAddEdit());
+      case MaterialOutwardListScreen.routeName:
+        return getMaterialPageRoute(MaterialOutwardListScreen());
+      case MaterialOutwardAddEdit.routeName:
+        return getMaterialPageRoute(MaterialOutwardAddEdit());
+      case StoreInwardAddEditScreen.routeName:
+        return getMaterialPageRoute(StoreInwardAddEditScreen());
+      case StoreOutwardAddEditScreen.routeName:
+        return getMaterialPageRoute(StoreOutwardAddEditScreen());
+      case MaterialConsumptionAddEditScreen.routeName:
+        return getMaterialPageRoute(MaterialConsumptionAddEditScreen());
+      case InspectionCheckListAddEditScreen.routeName:
+        return getMaterialPageRoute(InspectionCheckListAddEditScreen());
+      case JobCardInwardAddEditScreen.routeName:
+        return getMaterialPageRoute(JobCardInwardAddEditScreen());
+      case JobCardOutwardAddEditScreen.routeName:
+        return getMaterialPageRoute(JobCardOutwardAddEditScreen());
+      case MaterialIndentAddEditScreen.routeName:
+        return getMaterialPageRoute(MaterialIndentAddEditScreen());
+      case SiteSurveyAddEditScreen.routeName:
+        return getMaterialPageRoute(SiteSurveyAddEditScreen());
+
+      //
       default:
         return null;
     }

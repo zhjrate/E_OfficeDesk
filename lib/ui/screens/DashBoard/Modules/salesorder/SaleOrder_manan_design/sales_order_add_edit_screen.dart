@@ -15,22 +15,39 @@ import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/country_list_response.dart';
 import 'package:soleoserp/models/api_responses/customer_label_value_response.dart';
 import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
+import 'package:soleoserp/models/api_responses/salesorder_list_response.dart';
 import 'package:soleoserp/models/api_responses/state_list_response.dart';
 import 'package:soleoserp/models/common/all_name_id_list.dart';
+import 'package:soleoserp/models/common/sales_order_table.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/image_resources.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/search_city_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/search_country_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/search_state_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/customer_search/customer_search_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/SaleOrder_manan_design/saleorderdb/saleorder_other_charges_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/SaleOrder_manan_design/saleorderdb/saleorder_product_list_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
+import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/general_utils.dart';
+import 'package:soleoserp/utils/offline_db_helper.dart';
 import 'package:soleoserp/utils/shared_pref_helper.dart';
+
+class AddUpdateSalesOrderNewScreenArguments {
+  SalesOrderDetails editModel;
+
+  AddUpdateSalesOrderNewScreenArguments(this.editModel);
+}
 
 class SaleOrderNewAddEditScreen extends BaseStatefulWidget {
   static const routeName = '/SaleOrderNewAddEditScreen';
+
+  final AddUpdateSalesOrderNewScreenArguments arguments;
+
+  SaleOrderNewAddEditScreen(this.arguments);
+
   @override
   _SaleOrderNewAddEditScreenState createState() =>
       _SaleOrderNewAddEditScreenState();
@@ -81,6 +98,8 @@ class _SaleOrderNewAddEditScreenState
   TextEditingController _controller_PI_date = TextEditingController();
   TextEditingController _controller_rev_PI_date = TextEditingController();
   TextEditingController _controller_bank_name = TextEditingController();
+  TextEditingController _controller_bank_ID = TextEditingController();
+
   TextEditingController _controller_select_inquiry = TextEditingController();
   TextEditingController _controller_inquiry_no = TextEditingController();
   TextEditingController _controller_sales_executive = TextEditingController();
@@ -168,9 +187,16 @@ class _SaleOrderNewAddEditScreenState
   LoginUserDetialsResponse _offlineLoggedInData;
   ALL_EmployeeList_Response _offlineFollowerEmployeeListData;
 
+  int pkID = 0;
   int CompanyID = 0;
   String LoginUserID = "";
   bool isAllEditable = false;
+  SalesOrderDetails _editModel;
+
+  String SalesOrderNo = "";
+  final TextEditingController edt_HeaderDisc = TextEditingController();
+  List<SalesOrderTable> _inquiryProductList = [];
+  final TextEditingController edt_StateCode = TextEditingController();
 
   @override
   void initState() {
@@ -199,7 +225,26 @@ class _SaleOrderNewAddEditScreenState
     _salesOrderBloc.add(QuotationTermsConditionCallEvent(
         QuotationTermsConditionRequest(
             CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
-    _isForUpdate = false;
+    _isForUpdate = widget.arguments != null;
+
+    if (_isForUpdate) {
+      _editModel = widget.arguments.editModel;
+      fillData();
+    } else {
+      print("dljsf" + _offlineLoggedInData.details[0].CityCode.toString());
+      _searchStateDetails = SearchStateDetails();
+      edt_QualifiedCountry.text = "India";
+      edt_QualifiedCountryCode.text = "IND";
+      _searchStateDetails.value = _offlineLoggedInData.details[0].stateCode;
+      edt_QualifiedState.text = _offlineLoggedInData.details[0].StateName;
+      edt_QualifiedStateCode.text =
+          _offlineLoggedInData.details[0].stateCode.toString();
+
+      edt_QualifiedCity.text = _offlineLoggedInData.details[0].CityName;
+      edt_QualifiedCityCode.text =
+          _offlineLoggedInData.details[0].CityCode.toString();
+      edt_StateCode.text = _offlineLoggedInData.details[0].stateCode.toString();
+    }
   }
 
   @override
@@ -209,15 +254,15 @@ class _SaleOrderNewAddEditScreenState
       child: BlocConsumer<SalesOrderBloc, SalesOrderStates>(
         builder: (BuildContext context, SalesOrderStates state) {
           //handle states
-          if (state is BankDetailsListResponseState) {
-            _onBankDetailsList(state);
-          }
 
           if (state is QuotationProjectListResponseState) {
             _OnProjectList(state);
           }
           if (state is QuotationTermsCondtionResponseState) {
             _OnTermsAndConditionResponse(state);
+          }
+          if (state is BankDetailsListResponseState) {
+            _onBankDetailsList(state);
           }
           return super.build(context);
         },
@@ -285,6 +330,8 @@ class _SaleOrderNewAddEditScreenState
                       mandetoryDetails(),
                       space(10),
                       productDetails(),
+                      space(10),
+                      productOtherCharges(),
                       space(20),
                       basicInformation(),
                       space(10),
@@ -747,7 +794,8 @@ class _SaleOrderNewAddEditScreenState
                             style: TextStyle(
                               fontSize: 14,
                               color: Color(0xFF000000),
-                            ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+                            )
+                            // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
                             ,
                           ),
                         ),
@@ -780,7 +828,7 @@ class _SaleOrderNewAddEditScreenState
         children: [
           InkWell(
             onTap: () => showcustomdialogWithID(
-                values: arr_ALL_Name_ID_For_ProjectList,
+                values: Custom_values1,
                 context1: context,
                 controller: controllerForLeft,
                 controllerID: controllerForID,
@@ -819,7 +867,8 @@ class _SaleOrderNewAddEditScreenState
                             style: TextStyle(
                               fontSize: 14,
                               color: Color(0xFF000000),
-                            ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+                            )
+                            // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
                             ,
                           ),
                         ),
@@ -891,7 +940,8 @@ class _SaleOrderNewAddEditScreenState
                             style: TextStyle(
                               fontSize: 14,
                               color: Color(0xFF000000),
-                            ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+                            )
+                            // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
                             ,
                           ),
                         ),
@@ -1203,6 +1253,8 @@ class _SaleOrderNewAddEditScreenState
           _controller_customer_name.text = searchCustomerDetails.label;
           _controller_customer_pkID.text =
               searchCustomerDetails.value.toString();
+
+          edt_StateCode.text = searchCustomerDetails.stateCode.toString();
         }
       });
     }
@@ -1251,13 +1303,19 @@ class _SaleOrderNewAddEditScreenState
                 height: 10,
               ),
               createTextLabel("Bank Name", 10.0, 0.0),
-              CustomDropDown1("BankName",
+              SizedBox(
+                height: 5,
+              ),
+              // BankDetails(context),
+              CustomDropDownWithID1("BankName",
                   enable1: false,
-                  title: "Bank Name",
-                  hintTextvalue: "Tap to Select Bank Name",
+                  title: "Select Bank",
+                  hintTextvalue: "Tap to Select Bank",
                   icon: Icon(Icons.arrow_drop_down),
                   controllerForLeft: _controller_bank_name,
+                  controllerForID: _controller_bank_ID,
                   Custom_values1: arr_ALL_Name_ID_For_Sales_Order_Bank_Name),
+
               SizedBox(
                 height: 15,
               ),
@@ -1293,8 +1351,63 @@ class _SaleOrderNewAddEditScreenState
   productDetails() {
     return Container(
         margin: EdgeInsets.only(left: 5, right: 5),
-        child: getCommonButton(baseTheme, () {}, "Add Product Details",
+        child: getCommonButton(baseTheme, () {
+          if (_controller_customer_name.text != "") {
+            // print("INWWWE" + InquiryNo.toString());
+            navigateTo(context, SalesOrderProductListScreen.routeName,
+                arguments: AddSalesOrderProductListArgument(
+                    SalesOrderNo, edt_StateCode.text, edt_HeaderDisc.text));
+          } else {
+            showCommonDialogWithSingleOption(
+                context, "Customer name is required To view Product !",
+                positiveButtonTitle: "OK");
+          }
+        }, "Add Product Details",
             radius: 18, backGroundColor: Color(0xff362d8b)));
+  }
+
+  productOtherCharges() {
+    return Visibility(
+      visible: true,
+      child: Container(
+        margin: EdgeInsets.all(10),
+        alignment: Alignment.bottomCenter,
+        child: getCommonButton(baseTheme, () async {
+          //  _onTapOfDeleteALLContact();
+          //  navigateTo(context, InquiryProductListScreen.routeName);
+          await getInquiryProductDetails();
+          if (_inquiryProductList.length != 0) {
+            print("HeaderDiscll" + edt_HeaderDisc.text.toString());
+            navigateTo(context, SalesOrderOtherChargeScreen.routeName,
+                    arguments: SalesOrderOtherChargesScreenArguments(
+                        int.parse(
+                            edt_StateCode == null ? 0 : edt_StateCode.text),
+                        _editModel,
+                        edt_HeaderDisc.text))
+                .then((value) {
+              if (value == null) {
+                print("HeaderDiscount From QTOtherCharges 0.00");
+              } else {
+                print("HeaderDiscount From QTOtherCharges $value");
+                edt_HeaderDisc.text = value;
+              }
+            });
+          } else {
+            showCommonDialogWithSingleOption(context,
+                "Atleast one product is required to view other charges !",
+                positiveButtonTitle: "OK");
+          }
+        }, "Other Charges", width: 600, backGroundColor: Color(0xff4d62dc)),
+      ),
+    );
+  }
+
+  Future<void> getInquiryProductDetails() async {
+    _inquiryProductList.clear();
+    List<SalesOrderTable> temp =
+        await OfflineDbHelper.getInstance().getSalesOrderProduct();
+    _inquiryProductList.addAll(temp);
+    setState(() {});
   }
 
   basicInformation() {
@@ -2311,7 +2424,8 @@ class _SaleOrderNewAddEditScreenState
                       style: TextStyle(
                         fontSize: 14,
                         color: Color(0xFF000000),
-                      ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+                      )
+                      // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
                       ,
                     ),
                   ),
@@ -2658,5 +2772,46 @@ class _SaleOrderNewAddEditScreenState
         )
       ],
     );
+  }
+
+  void fillData() async {
+    /* pkID = _editModel.pkID;
+    edt_InquiryDate.text = _editModel.quotationDate.getFormattedDate(
+        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
+    edt_ReverseInquiryDate.text = _editModel.quotationDate.getFormattedDate(
+        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "yyyy-MM-dd");
+    edt_CustomerName.text = _editModel.customerName.toString();
+    edt_CustomerpkID.text = _editModel.customerID.toString();*/
+    pkID = _editModel.pkID;
+    _controller_order_no.text = _editModel.orderNo.toString();
+    _controller_order_date.text = _editModel.orderDate.getFormattedDate(
+        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
+    _controller_rev_order_date.text = _editModel.orderDate.getFormattedDate(
+        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "yyyy-MM-dd");
+
+    _controller_customer_name.text = _editModel.customerName.toString();
+    _controller_customer_pkID.text = _editModel.customerID.toString();
+  }
+
+  BankDetails(BuildContext context) {
+    return EditText(context,
+        hint: "Select Bank Name",
+        radius: 10,
+        readOnly: true,
+        controller: _controller_bank_name,
+        boxheight: 40, onPressed: () {
+      showcustomdialogWithID(
+          values: arr_ALL_Name_ID_For_Sales_Order_Bank_Name,
+          context1: context,
+          controller: _controller_bank_name,
+          controllerID: _controller_bank_ID,
+          lable: "Bank Details");
+    },
+        inputTextStyle: TextStyle(fontSize: 15),
+        suffixIcon: Icon(
+          Icons.arrow_drop_down,
+          color: colorGrayDark,
+          size: 32,
+        ));
   }
 }

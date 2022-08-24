@@ -21,6 +21,7 @@ import 'package:overlay_support/overlay_support.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/Dashboard/dashboard_user_rights_screen_bloc.dart';
 import 'package:soleoserp/firebase_options.dart';
 import 'package:soleoserp/models/api_requests/all_employee_list_request.dart';
+import 'package:soleoserp/models/api_requests/api_token/api_token_update_request.dart';
 import 'package:soleoserp/models/api_requests/attendance_list_request.dart';
 import 'package:soleoserp/models/api_requests/attendance_save_request.dart';
 import 'package:soleoserp/models/api_requests/follower_employee_list_request.dart';
@@ -39,6 +40,9 @@ import 'package:soleoserp/ui/res/dimen_resources.dart';
 import 'package:soleoserp/ui/res/image_resources.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/followup/followup_pagination_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/inquiry_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/quotation/quotation_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sale_bill_list/sales_bill_list_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salesorder/salesorder_list_screen.dart';
 import 'package:soleoserp/ui/screens/authentication/first_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
@@ -140,7 +144,9 @@ class _HomeScreenState extends BaseState<HomeScreen>
 */
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print("message Id - onMessage ${message.messageId}");
+      print("message Id - onMessage ${message.messageId}" +
+          " TItle : " +
+          message.notification.title);
       if (Globals.objectedNotifications.contains(message.messageId)) {
         return;
       }
@@ -153,21 +159,33 @@ class _HomeScreenState extends BaseState<HomeScreen>
           databody: message.data['body']);
 
       if (message != null) {
+        print("pushbbbh" + message.data['title'].toString());
         showOverlayNotification((context) {
           return Container(
-            height: 115,
+            height: 70,
             margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 60),
             child: Container(
-              height: 115,
+              height: 70,
               child: Card(
+                color: colorBlack,
                 margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                 child: InkWell(
                   onTap: () {
                     if (message.notification.title == "Inquiry") {
                       navigateTo(context, InquiryListScreen.routeName,
                           clearAllStack: true);
-                    } else if (message.notification.title == "Followup") {
+                    } else if (message.notification.title == "FollowUp") {
                       navigateTo(context, FollowupListScreen.routeName,
+                          clearAllStack: true);
+                    } else if (message.data['title'] == "Quotation") {
+                      navigateTo(Globals.context, QuotationListScreen.routeName,
+                          clearAllStack: true);
+                    } else if (message.data['title'] == "Sales Order") {
+                      navigateTo(
+                          Globals.context, SalesOrderListScreen.routeName,
+                          clearAllStack: true);
+                    } else if (message.data['title'] == "Sales Invoice") {
+                      navigateTo(Globals.context, SalesBillListScreen.routeName,
                           clearAllStack: true);
                     }
 
@@ -175,16 +193,26 @@ class _HomeScreenState extends BaseState<HomeScreen>
                   },
                   child: ListTile(
                     leading: ClipOval(
-                      child: Image.asset(
-                        IMG_LOGO,
-                        height: 60,
-                        width: 60,
-                      ),
+                        child: Icon(
+                      Icons.notifications_active,
+                      color: colorWhite,
+                    )),
+                    title: Text(
+                      pushNotification.title,
+                      style: TextStyle(
+                          fontSize: 10,
+                          color: colorWhite,
+                          fontWeight: FontWeight.bold),
                     ),
-                    title: Text(pushNotification.title),
-                    subtitle: Text(pushNotification.body),
+                    subtitle: Text(
+                      pushNotification.body,
+                      overflow: TextOverflow.ellipsis,
+                      softWrap: true,
+                      style: TextStyle(fontSize: 10, color: colorWhite),
+                    ),
                     trailing: IconButton(
                         icon: Icon(Icons.close),
+                        color: colorWhite,
                         onPressed: () {
                           OverlaySupportEntry.of(context).dismiss();
                         }),
@@ -214,8 +242,17 @@ class _HomeScreenState extends BaseState<HomeScreen>
           InquiryListScreen.routeName,
           arguments: MessageArguments(message, true),
         );
-      } else if (message.data['title'] == "Followup") {
+      } else if (message.data['title'] == "FollowUp") {
         navigateTo(Globals.context, FollowupListScreen.routeName,
+            clearAllStack: true);
+      } else if (message.data['title'] == "Quotation") {
+        navigateTo(Globals.context, QuotationListScreen.routeName,
+            clearAllStack: true);
+      } else if (message.data['title'] == "Sales Order") {
+        navigateTo(Globals.context, SalesOrderListScreen.routeName,
+            clearAllStack: true);
+      } else if (message.data['title'] == "Sales Invoice") {
+        navigateTo(Globals.context, SalesBillListScreen.routeName,
             clearAllStack: true);
       }
     });
@@ -247,8 +284,17 @@ class _HomeScreenState extends BaseState<HomeScreen>
 
       if (intialMessage.data['title'] == "Inquiry") {
         navigateTo(context, InquiryListScreen.routeName, clearAllStack: true);
-      } else if (intialMessage.data['title'] == "Followup") {
+      } else if (intialMessage.data['title'] == "FollowUp") {
         navigateTo(context, FollowupListScreen.routeName, clearAllStack: true);
+      } else if (intialMessage.data['title'] == "Quotation") {
+        navigateTo(Globals.context, QuotationListScreen.routeName,
+            clearAllStack: true);
+      } else if (intialMessage.data['title'] == "Sales Order") {
+        navigateTo(Globals.context, SalesOrderListScreen.routeName,
+            clearAllStack: true);
+      } else if (intialMessage.data['title'] == "Sales Invoice") {
+        navigateTo(Globals.context, SalesBillListScreen.routeName,
+            clearAllStack: true);
       }
     }
   }
@@ -348,6 +394,21 @@ class _HomeScreenState extends BaseState<HomeScreen>
           CompanyId: CompanyID.toString(),
           OrgCode: "",
           LoginUserID: LoginUserID,)));*/
+    var TokenString = pushNotificationService.getTokenAsString();
+
+    print("lfjflfj" + TokenString.toString());
+
+    FirebaseMessaging.instance.getToken().then((token) {
+      final tokenStr = token.toString();
+      // do whatever you want with the token here
+
+      print("sfjsdfj" + tokenStr);
+      _dashBoardScreenBloc
+        ..add(APITokenUpdateRequestEvent(APITokenUpdateRequest(
+            CompanyId: CompanyID.toString(),
+            UserID: LoginUserID,
+            TokenNo: tokenStr)));
+    });
 
     _dashBoardScreenBloc
       ..add(MenuRightsCallEvent(MenuRightsRequest(
@@ -431,6 +492,10 @@ class _HomeScreenState extends BaseState<HomeScreen>
       child: BlocConsumer<DashBoardScreenBloc, DashBoardScreenStates>(
         builder: (BuildContext context, DashBoardScreenStates state) {
           //handle states
+
+          if (state is APITokenUpdateState) {
+            _OnTokenUpdateResponse(state);
+          }
           if (state is MenuRightsEventResponseState) {
             _onDashBoardCallSuccess(state, context);
           }
@@ -453,7 +518,8 @@ class _HomeScreenState extends BaseState<HomeScreen>
         buildWhen: (oldState, currentState) {
           //return true for state for which builder method should be called
 
-          if (currentState is MenuRightsEventResponseState ||
+          if (currentState is APITokenUpdateState ||
+              currentState is MenuRightsEventResponseState ||
               currentState is FollowerEmployeeListByStatusCallResponseState ||
               currentState is ALL_EmployeeNameListResponseState ||
               currentState is AttendanceListCallResponseState ||
@@ -1689,6 +1755,75 @@ class _HomeScreenState extends BaseState<HomeScreen>
         all_name_id.Name1 =
             "http://dolphin.sharvayainfotech.in/images/Worklog.png";
         arr_ALL_Name_ID_For_Production.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgInward") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Material Inward";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/Inward.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgOutward") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Material Outward";
+        all_name_id.Name1 =
+            "http://demo.sharvayainfotech.in/images/Outward.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgMaterialMovementInward") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Store Inward";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/inbox.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgMaterialMovementOutward") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Store Outward";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/outbox.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgMaterialConsumption") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Material Consumption";
+        all_name_id.Name1 =
+            "http://demo.sharvayainfotech.in/images/consumption.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgInspection") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Inspection Check List";
+        all_name_id.Name1 =
+            "http://demo.sharvayainfotech.in/images/inspection.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgJobCardInward") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Job Card Inward";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/inbox.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgJobCardOutward") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Job Card Outward";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/outbox.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgIndent") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Material Indent";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/indent.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgSiteSurvey") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Site Survey";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/survey.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id);
+
+        ALL_Name_ID all_name_id2 = ALL_Name_ID();
+        all_name_id2.Name = "Site Survey Report";
+        all_name_id2.Name1 =
+            "http://demo.sharvayainfotech.in/images/survey.png";
+        arr_ALL_Name_ID_For_Production.add(all_name_id2);
       }
 
       ///-------------------------------------Account---------------------------------------------------------
@@ -1704,6 +1839,38 @@ class _HomeScreenState extends BaseState<HomeScreen>
         ALL_Name_ID all_name_id = ALL_Name_ID();
         all_name_id.Name = "CashVoucher";
         all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/money.png";
+        arr_ALL_Name_ID_For_Account.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgCreditNote") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Credit Note";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/credit.png";
+        arr_ALL_Name_ID_For_Account.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgDebitNote") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Debit Note";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/debit.png";
+        arr_ALL_Name_ID_For_Account.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgPettyCash") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Petty Cash";
+        all_name_id.Name1 = "http://demo.sharvayainfotech.in/images/petty.png";
+        arr_ALL_Name_ID_For_Account.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgExpenseVoucher") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Exp.Voucher";
+        all_name_id.Name1 =
+            "http://demo.sharvayainfotech.in/images/expenses.png";
+        arr_ALL_Name_ID_For_Account.add(all_name_id);
+      } else if (response.menuRightsResponse.details[i].menuName ==
+          "pgJournalVoucher") {
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = "Journal Voucher";
+        all_name_id.Name1 =
+            "http://demo.sharvayainfotech.in/images/journal.png";
         arr_ALL_Name_ID_For_Account.add(all_name_id);
       }
 
@@ -2108,6 +2275,12 @@ class _HomeScreenState extends BaseState<HomeScreen>
       isCurrentTime = false;
     } else {
       isCurrentTime = true;
+    }
+  }
+
+  void _OnTokenUpdateResponse(APITokenUpdateState state) {
+    if (state.apiresponse != "") {
+      print("APDdfd" + " API Token Response : " + state.apiresponse);
     }
   }
 }

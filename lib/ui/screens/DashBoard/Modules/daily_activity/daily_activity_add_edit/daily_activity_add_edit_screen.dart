@@ -33,8 +33,9 @@ import 'package:soleoserp/utils/shared_pref_helper.dart';
 
 class AddUpdateDailyActivityRequestScreenArguments {
   DailyActivityDetails editModel;
+  String ListDate;
 
-  AddUpdateDailyActivityRequestScreenArguments(this.editModel);
+  AddUpdateDailyActivityRequestScreenArguments(this.editModel, this.ListDate);
 }
 
 class DailyActivityAddEditScreen extends BaseStatefulWidget {
@@ -100,6 +101,7 @@ class _DailyActivityAddEditScreenState
   FocusNode AmountFocusNode, FromLocationFocusNode;
   int _currentValue = 1;
   int _currentMinutes = 0;
+  String _ListDate = "";
 
   @override
   void initState() {
@@ -127,7 +129,7 @@ class _DailyActivityAddEditScreenState
         "-" +
         selectedDate.day.toString();
 
-    _isForUpdate = widget.arguments != null;
+    _isForUpdate = widget.arguments.editModel != null;
     edt_ExpenseType.addListener(() {
       if (edt_ExpenseType.text == "Petrol") {
         FromLocationFocusNode.requestFocus();
@@ -138,8 +140,15 @@ class _DailyActivityAddEditScreenState
 
     if (_isForUpdate) {
       _editModel = widget.arguments.editModel;
+
       fillData(_editModel);
     } else {
+      _ListDate = widget.arguments.ListDate;
+      edt_ExpenseDateController.text = _ListDate.getFormattedDate(
+          fromFormat: "yyyy-MM-dd", toFormat: "dd-MM-yyyy");
+      edt_ReverseExpenseDateController.text = _ListDate;
+
+      print("LsiDate" + _ListDate.toString());
       edt_ExpenseAmount.text = "1";
       edt_Mibutes.text = "0";
     }
@@ -449,7 +458,11 @@ class _DailyActivityAddEditScreenState
   }
 
   Future<bool> _onBackPressed() {
-    navigateTo(context, DailyActivityListScreen.routeName, clearAllStack: true);
+    // navigateTo(context, DailyActivityListScreen.routeName, clearAllStack: true);
+    navigateTo(context, DailyActivityListScreen.routeName,
+            arguments: AddUpdateDailyActivityListScreenArguments(
+                edt_ReverseExpenseDateController.text))
+        .then((value) {});
   }
 
   /*Future<int> deleteFile(File file123) async {
@@ -1100,8 +1113,13 @@ class _DailyActivityAddEditScreenState
 
     showCommonDialogWithSingleOption(context, Msg, positiveButtonTitle: "OK",
         onTapOfPositiveButton: () {
+      /* navigateTo(context, DailyActivityListScreen.routeName,
+          clearAllStack: true);*/
+
       navigateTo(context, DailyActivityListScreen.routeName,
-          clearAllStack: true);
+              arguments: AddUpdateDailyActivityListScreenArguments(
+                  edt_ReverseExpenseDateController.text))
+          .then((value) {});
     });
     //navigateTo(context, routeName)
   }

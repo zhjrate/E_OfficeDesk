@@ -30,7 +30,7 @@ class SearchDetails {
   String customerType;
   int stateCode;
   String stateName;
- // bool erpClosing;
+  // bool erpClosing;
   double erpClosing;
   String countryCode;
   String countryName;
@@ -38,35 +38,42 @@ class SearchDetails {
   String emailAddress;
   String ContactNo1;
   String inquiryNo;
+  String CityName;
+  int CityCode;
 
-  SearchDetails(
-      {this.label,
-        this.value,
-        this.customerType,
-        this.stateCode,
-        this.stateName,
-        this.erpClosing,
-        this.countryCode,
-        this.countryName,
-        this.customerSourceName,
-        this.emailAddress,
-        this.ContactNo1,
-        this.inquiryNo,
-      });
+  SearchDetails({
+    this.label,
+    this.value,
+    this.customerType,
+    this.stateCode,
+    this.stateName,
+    this.erpClosing,
+    this.countryCode,
+    this.countryName,
+    this.customerSourceName,
+    this.emailAddress,
+    this.ContactNo1,
+    this.inquiryNo,
+    this.CityName,
+    this.CityCode,
+  });
 
   SearchDetails.fromJson(Map<String, dynamic> json) {
-    label = json['label']==null?"":json['label'];
-    value = json['value']==null?0:json['value'];
-    customerType = json['CustomerType']==null?"":json['CustomerType'];
-    stateCode = json['StateCode']==null?0:json['StateCode'];
-    stateName = json['StateName']==null?"":json['StateName'];
+    label = json['label'] == null ? "" : json['label'];
+    value = json['value'] == null ? 0 : json['value'];
+    customerType = json['CustomerType'] == null ? "" : json['CustomerType'];
+    stateCode = json['StateCode'] == null ? 0 : json['StateCode'];
+    stateName = json['StateName'] == null ? "" : json['StateName'];
     erpClosing = json['ErpClosing'];
-    countryCode = json['CountryCode']==null?"":json['CountryCode'];
-    countryName = json['CountryName']==null?"":json['CountryName'];
-    customerSourceName = json['CustomerSourceName']==null?"":json['CustomerSourceName'];
-    emailAddress = json['EmailAddress']==null?"":json['EmailAddress'];
-    ContactNo1=json['ContactNo1']==null?"":json['ContactNo1'];
-    inquiryNo = json['inquiryNo']==null?"":json['inquiryNo'];
+    countryCode = json['CountryCode'] == null ? "" : json['CountryCode'];
+    countryName = json['CountryName'] == null ? "" : json['CountryName'];
+    customerSourceName =
+        json['CustomerSourceName'] == null ? "" : json['CustomerSourceName'];
+    emailAddress = json['EmailAddress'] == null ? "" : json['EmailAddress'];
+    ContactNo1 = json['ContactNo1'] == null ? "" : json['ContactNo1'];
+    inquiryNo = json['inquiryNo'] == null ? "" : json['inquiryNo'];
+    CityName = json['CityName'] == null ? "" : json['CityName'];
+    CityCode = json['CityCode'] == null ? 0 : json['CityCode'];
   }
 
   Map<String, dynamic> toJson() {
@@ -83,6 +90,9 @@ class SearchDetails {
     data['EmailAddress'] = this.emailAddress;
     data['ContactNo1'] = this.ContactNo1;
     data['inquiryNo'] = this.inquiryNo;
+    data['CityName'] = this.CityName;
+    data['CityCode'] = this.CityCode;
+
     return data;
   }
 }

@@ -8,20 +8,33 @@ import 'package:new_gradient_app_bar/new_gradient_app_bar.dart';
 import 'package:open_file/open_file.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:soleoserp/blocs/other/bloc_modules/salesbill/salesbill_bloc.dart';
+import 'package:soleoserp/models/api_requests/SalesBill/sale_bill_email_content_request.dart';
+import 'package:soleoserp/models/api_requests/SalesBill/sales_bill_inq_QT_SO_NO_list_Request.dart';
+import 'package:soleoserp/models/api_requests/bank_drop_down_request.dart';
+import 'package:soleoserp/models/api_requests/quotation_terms_condition_request.dart';
 import 'package:soleoserp/models/api_responses/city_api_response.dart';
+import 'package:soleoserp/models/api_responses/company_details_response.dart';
 import 'package:soleoserp/models/api_responses/customer_label_value_response.dart';
+import 'package:soleoserp/models/api_responses/login_user_details_api_response.dart';
 import 'package:soleoserp/models/api_responses/sales_bill_list_response.dart';
 import 'package:soleoserp/models/api_responses/state_list_response.dart';
 import 'package:soleoserp/models/common/all_name_id_list.dart';
+import 'package:soleoserp/models/common/sales_bill_table.dart';
 import 'package:soleoserp/ui/res/color_resources.dart';
 import 'package:soleoserp/ui/res/image_resources.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/search_city_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/Customer/CustomerAdd_Edit/search_state_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/Modules/inquiry/customer_search/customer_search_screen.dart';
+import 'package:soleoserp/ui/screens/DashBoard/Modules/salebill/sales_bill_add_edit/sale_bill_db/sale_bill_other_charges_screen.dart';
 import 'package:soleoserp/ui/screens/DashBoard/home_screen.dart';
 import 'package:soleoserp/ui/screens/base/base_screen.dart';
 import 'package:soleoserp/ui/widgets/common_widgets.dart';
+import 'package:soleoserp/utils/date_time_extensions.dart';
 import 'package:soleoserp/utils/general_utils.dart';
+import 'package:soleoserp/utils/offline_db_helper.dart';
+import 'package:soleoserp/utils/shared_pref_helper.dart';
+
+import 'module_no_list_screen.dart';
 
 class AddUpdateSaleBillScreenArguments {
   SaleBillDetails editModel;
@@ -59,12 +72,20 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
   TextEditingController _controller_PINO = TextEditingController();
   TextEditingController _controller_PI_date = TextEditingController();
   TextEditingController _controller_rev_PI_date = TextEditingController();
+  TextEditingController _controller_AC_name = TextEditingController();
+  TextEditingController _controller_AC_ID = TextEditingController();
   TextEditingController _controller_bank_name = TextEditingController();
+  TextEditingController _controller_bank_ID = TextEditingController();
+
   TextEditingController _controller_select_inquiry = TextEditingController();
+  TextEditingController _controller_select_Multiinquiry =
+      TextEditingController();
+
   TextEditingController _controller_inquiry_no = TextEditingController();
   TextEditingController _controller_sales_executive = TextEditingController();
   TextEditingController _controller_supplier_ref_no = TextEditingController();
   TextEditingController _controller_reference_date = TextEditingController();
+
   TextEditingController _controller_work_Due_date = TextEditingController();
   TextEditingController _controller_work_Due_date_Reverse =
       TextEditingController();
@@ -89,8 +110,11 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
       TextEditingController();
   TextEditingController _contrller_select_terms_and_condition =
       TextEditingController();
-
+  TextEditingController _contrller_select_terms_and_conditionID =
+      TextEditingController();
   TextEditingController _controller_select_email_subject =
+      TextEditingController();
+  TextEditingController _controller_select_email_subject_ID =
       TextEditingController();
   TextEditingController _contrller_email_subject = TextEditingController();
   TextEditingController _contrller_email_introcuction = TextEditingController();
@@ -123,15 +147,33 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
   TextEditingController _controller_LR_date = TextEditingController();
   TextEditingController _controller_LR_date_Reveres = TextEditingController();
 
+  TextEditingController edt_StateCode = TextEditingController();
+
+  TextEditingController edt_HeaderDisc = TextEditingController();
+
+  List<ALL_Name_ID> arr_ALL_Name_ID_For_Sales_Order_AC_Name = [];
+
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Sales_Order_Bank_Name = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Sales_Order_Select_Inquiry = [];
+
+  List<ALL_Name_ID> arr_ALL_Name_ID_For_INQ_QT_SO_List = [];
+  List<ALL_Name_ID> arr_ALL_Name_ID_For_INQ_QT_SO_Filter_List = [];
+
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Sales_Order_Sales_Executive = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Sales_Order_Select_Project = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Terms_And_Condition = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_Email_Subject = [];
   List<ALL_Name_ID> arr_ALL_Name_ID_For_ModeOfTransfer = [];
+  List<SaleBillTable> _inquiryProductList = [];
 
   DateTime selectedDate = DateTime.now();
+
+  DateTime selectedInvoiceDate = DateTime.now();
+  DateTime selectedRefDate = DateTime.now();
+  DateTime selectedDueDate = DateTime.now();
+  DateTime selectedLRDate = DateTime.now();
+  DateTime selectedDeliveryDate = DateTime.now();
+
   TimeOfDay selectedTime = TimeOfDay.now();
   double dateFontSize = 13;
   double CardViewHieght = 35;
@@ -142,16 +184,86 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
   List<File> MultipleVideoList = [];
   final imagepicker = ImagePicker();
 
+  CompanyDetailsResponse _offlineCompanyData;
+  LoginUserDetialsResponse _offlineLoggedInData;
+  int CompanyID = 0;
+  String LoginUserID = "";
+
+  String InquiryNo = "";
+
   @override
   void initState() {
     super.initState();
 
     salesBillBloc = SalesBillBloc(baseBloc);
+
+    _offlineLoggedInData = SharedPrefHelper.instance.getLoginUserData();
+    _offlineCompanyData = SharedPrefHelper.instance.getCompanyData();
+    CompanyID = _offlineCompanyData.details[0].pkId;
+    LoginUserID = _offlineLoggedInData.details[0].userID;
+
     _isForUpdate = widget.arguments != null;
+
+    getAccountNameAPI();
+
+    getSelectOptionList();
+
+    salesBillBloc.add(QuotationBankDropDownCallEvent(BankDropDownRequest(
+        CompanyID: CompanyID.toString(), LoginUserID: LoginUserID, pkID: "")));
+    salesBillBloc.add(QuotationTermsConditionCallEvent(
+        QuotationTermsConditionRequest(
+            CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
+
+    salesBillBloc.add(SalesBillEmailContentRequestEvent(
+        SalesBillEmailContentRequest(
+            CompanyId: CompanyID.toString(), LoginUserID: LoginUserID)));
+
+    _controller_select_inquiry.addListener(() {
+      setState(() {
+        if (_controller_customer_pkID.text != null ||
+            _controller_customer_pkID.text != "") {
+          if (_controller_select_inquiry.text == "Inquiry") {
+            salesBillBloc.add(SaleBill_INQ_QT_SO_NO_ListRequestEvent(
+                SaleBill_INQ_QT_SO_NO_ListRequest(
+                    CompanyId: CompanyID.toString(),
+                    CustomerID: _controller_customer_pkID.text.toString(),
+                    ModuleType: "Inquiry")));
+          } else if (_controller_select_inquiry.text == "Quotation") {
+            salesBillBloc.add(SaleBill_INQ_QT_SO_NO_ListRequestEvent(
+                SaleBill_INQ_QT_SO_NO_ListRequest(
+                    CompanyId: CompanyID.toString(),
+                    CustomerID: _controller_customer_pkID.text.toString(),
+                    ModuleType: "Quotation")));
+          } else if (_controller_select_inquiry.text == "SalesOrder") {
+            salesBillBloc.add(SaleBill_INQ_QT_SO_NO_ListRequestEvent(
+                SaleBill_INQ_QT_SO_NO_ListRequest(
+                    CompanyId: CompanyID.toString(),
+                    CustomerID: _controller_customer_pkID.text.toString(),
+                    ModuleType: "SalesOrder")));
+          }
+        } else {
+          showCommonDialogWithSingleOption(
+              context, "Customer name is required To view Option !",
+              positiveButtonTitle: "OK");
+        }
+      });
+    });
     if (_isForUpdate) {
       _editModel = widget.arguments.editModel;
       fillData();
-    } else {}
+    } else {
+      _controller_order_date.text = selectedDate.day.toString() +
+          "-" +
+          selectedDate.month.toString() +
+          "-" +
+          selectedDate.year.toString();
+      _controller_rev_order_date.text = selectedDate.year.toString() +
+          "-" +
+          selectedDate.month.toString() +
+          "-" +
+          selectedDate.day.toString();
+      edt_StateCode.text = "";
+    }
   }
 
   @override
@@ -160,15 +272,35 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
       create: (BuildContext context) => salesBillBloc,
       child: BlocConsumer<SalesBillBloc, SalesBillStates>(
         builder: (BuildContext context, SalesBillStates state) {
+          if (state is QuotationBankDropDownResponseState) {
+            _OnBankDetailsSucess(state);
+          }
+          if (state is QuotationTermsCondtionResponseState) {
+            _OnTermsAndConditionResponse(state);
+          }
+          if (state is SaleBillEmailContentResponseState) {
+            _OnEmailContentResponse(state);
+          }
           return super.build(context);
         },
         buildWhen: (oldState, currentState) {
+          if (currentState is QuotationBankDropDownResponseState ||
+              currentState is QuotationTermsCondtionResponseState ||
+              currentState is SaleBillEmailContentResponseState) {
+            return true;
+          }
           return false;
         },
         listener: (BuildContext context, SalesBillStates state) {
+          if (state is SalesBill_INQ_QT_SO_NO_ListResponseState) {
+            _OnINQ_QT_SO_NO_Response(state);
+          }
           return super.build(context);
         },
         listenWhen: (oldState, currentState) {
+          if (currentState is SalesBill_INQ_QT_SO_NO_ListResponseState) {
+            return true;
+          }
           return false;
         },
       ),
@@ -208,8 +340,8 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
                       children: [
                         //#CustomerInformation
                         MandatoryDetails(),
-                        ProductDetails(),
                         BasicInformation(),
+                        ProductDetails(),
                         EmailContent(),
                         TermsCondition(),
                         TransportDetails(),
@@ -235,6 +367,14 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
   void fillData() async {
     pkID = _editModel.pkID;
     print("PKID" + pkID.toString());
+
+    _controller_order_date.text = _editModel.invoiceDate.getFormattedDate(
+        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "dd-MM-yyyy");
+    _controller_rev_order_date.text = _editModel.invoiceDate.getFormattedDate(
+        fromFormat: "yyyy-MM-ddTHH:mm:ss", toFormat: "yyyy-MM-dd");
+
+    _controller_customer_name.text = _editModel.customerName.toString();
+    _controller_customer_pkID.text = _editModel.customerID.toString();
   }
 
   Widget BasicDetails() {}
@@ -434,6 +574,16 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
           _controller_customer_name.text = _searchInquiryListResponse.label;
           _controller_customer_pkID.text =
               _searchInquiryListResponse.value.toString();
+
+          edt_StateCode.text = _searchInquiryListResponse.stateCode.toString();
+          edt_QualifiedState.text =
+              _searchInquiryListResponse.stateName.toString();
+          edt_QualifiedStateCode.text =
+              _searchInquiryListResponse.stateCode.toString();
+          edt_QualifiedCity.text =
+              _searchInquiryListResponse.CityName.toString();
+          edt_QualifiedCityCode.text =
+              _searchInquiryListResponse.CityCode.toString();
         }
       });
     }
@@ -507,50 +657,209 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
     );
   }
 
-  Widget _buildPIDate() {
-    return InkWell(
-      onTap: () {
-        _selectDate(context, _controller_PI_date, _controller_rev_PI_date);
-      },
+  Widget CustomDropDownWithID1(String Category,
+      {bool enable1,
+      Icon icon,
+      String title,
+      String hintTextvalue,
+      TextEditingController controllerForLeft,
+      TextEditingController controllerForID,
+      List<ALL_Name_ID> Custom_values1}) {
+    return Container(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          /*  SizedBox(
-            height: 5,
-          ),*/
-          Card(
-            elevation: 3,
-            color: colorLightGray,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            child: Container(
-              height: 40,
-              padding: EdgeInsets.only(left: 20, right: 20),
-              width: double.maxFinite,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _controller_PI_date.text == null ||
-                              _controller_PI_date.text == ""
-                          ? "DD-MM-YYYY"
-                          : _controller_PI_date.text,
-                      style: baseTheme.textTheme.headline3.copyWith(
-                          color: _controller_PI_date.text == null ||
-                                  _controller_PI_date.text == ""
-                              ? colorGrayDark
-                              : colorBlack,
-                          fontSize: 15),
+          InkWell(
+            onTap: () => showcustomdialogWithID(
+                values: Custom_values1,
+                context1: context,
+                controller: controllerForLeft,
+                controllerID: controllerForID,
+                lable: "Select $Category"),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /*SizedBox(
+                  height: 5,
+                ),*/
+                Card(
+                  elevation: 3,
+                  color: colorLightGray,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Container(
+                    height: 40,
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    width: double.maxFinite,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                              controller: controllerForLeft,
+                              enabled: false,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(bottom: 7),
+                                hintText: hintTextvalue,
+                                labelStyle: TextStyle(
+                                  color: Color(0xFF000000),
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF000000),
+                              ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                              ),
+                        ),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color: colorGrayDark,
+                        )
+                      ],
                     ),
                   ),
-                  Icon(
-                    Icons.calendar_today_outlined,
-                    color: colorGrayDark,
-                  )
-                ],
-              ),
+                )
+              ],
             ),
-          )
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget CustomDropDownWithMultiID1(String Category,
+      {bool enable1,
+      Icon icon,
+      String title,
+      String hintTextvalue,
+      List<ALL_Name_ID> Custom_values1}) {
+    return Container(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => showcustomdialogWithMultipleID(
+                values: arr_ALL_Name_ID_For_Terms_And_Condition,
+                context1: context,
+                controller: _contrller_select_terms_and_condition,
+                controllerID: _contrller_select_terms_and_conditionID,
+                controller2: _contrller_terms_and_condition,
+                lable: "Select Term & Condition "),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /*SizedBox(
+                  height: 5,
+                ),*/
+                Card(
+                  elevation: 3,
+                  color: colorLightGray,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Container(
+                    height: 40,
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    width: double.maxFinite,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                              controller: _contrller_select_terms_and_condition,
+                              enabled: false,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(bottom: 7),
+                                hintText: hintTextvalue,
+                                labelStyle: TextStyle(
+                                  color: Color(0xFF000000),
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF000000),
+                              ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                              ),
+                        ),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color: colorGrayDark,
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget EmailSubjectWithMultiID1(String Category,
+      {bool enable1,
+      Icon icon,
+      String title,
+      String hintTextvalue,
+      List<ALL_Name_ID> Custom_values1}) {
+    return Container(
+      child: Column(
+        children: [
+          InkWell(
+            onTap: () => showcustomdialogWithMultipleID(
+                values: arr_ALL_Name_ID_For_Email_Subject,
+                context1: context,
+                controller: _controller_select_email_subject,
+                controllerID: _controller_select_email_subject_ID,
+                controller2: _contrller_email_subject,
+                lable: "Select Term & Condition "),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /*SizedBox(
+                  height: 5,
+                ),*/
+                Card(
+                  elevation: 3,
+                  color: colorLightGray,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15)),
+                  child: Container(
+                    height: 40,
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    width: double.maxFinite,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                              controller: _controller_select_email_subject,
+                              enabled: false,
+                              decoration: InputDecoration(
+                                contentPadding: EdgeInsets.only(bottom: 7),
+                                hintText: hintTextvalue,
+                                labelStyle: TextStyle(
+                                  color: Color(0xFF000000),
+                                ),
+                                border: InputBorder.none,
+                              ),
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Color(0xFF000000),
+                              ) // baseTheme.textTheme.headline2.copyWith(color: colorBlack),
+
+                              ),
+                        ),
+                        Icon(
+                          Icons.arrow_drop_down,
+                          color: colorGrayDark,
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -562,29 +871,179 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
       TextEditingController Rev_dateController) async {
     final DateTime picked = await showDatePicker(
         context: context,
-        initialDate: selectedDate,
+        initialDate: selectedInvoiceDate,
         firstDate: DateTime(2015, 8),
         lastDate: DateTime(2101));
     if (picked != null)
       setState(() {
-        selectedDate = picked;
-        F_datecontroller.text = selectedDate.day.toString() +
+        selectedInvoiceDate = picked;
+        selectedRefDate = picked;
+        selectedDueDate = picked;
+        selectedLRDate = picked;
+        selectedDeliveryDate = picked;
+        F_datecontroller.text = selectedInvoiceDate.day.toString() +
             "-" +
-            selectedDate.month.toString() +
+            selectedInvoiceDate.month.toString() +
             "-" +
-            selectedDate.year.toString();
-        Rev_dateController.text = selectedDate.year.toString() +
+            selectedInvoiceDate.year.toString();
+        Rev_dateController.text = selectedInvoiceDate.year.toString() +
             "-" +
-            selectedDate.month.toString() +
+            selectedInvoiceDate.month.toString() +
             "-" +
-            selectedDate.day.toString();
+            selectedInvoiceDate.day.toString();
+
+        _controller_reference_date.text = selectedInvoiceDate.day.toString() +
+            "-" +
+            selectedInvoiceDate.month.toString() +
+            "-" +
+            selectedInvoiceDate.year.toString();
+        _controller_rev_reference_date.text =
+            selectedInvoiceDate.year.toString() +
+                "-" +
+                selectedInvoiceDate.month.toString() +
+                "-" +
+                selectedInvoiceDate.day.toString();
+        _controller_work_Due_date.text = selectedInvoiceDate.day.toString() +
+            "-" +
+            selectedInvoiceDate.month.toString() +
+            "-" +
+            selectedInvoiceDate.year.toString();
+        _controller_work_Due_date_Reverse.text =
+            selectedInvoiceDate.year.toString() +
+                "-" +
+                selectedInvoiceDate.month.toString() +
+                "-" +
+                selectedInvoiceDate.day.toString();
+
+        _controller_LR_date.text = selectedInvoiceDate.day.toString() +
+            "-" +
+            selectedInvoiceDate.month.toString() +
+            "-" +
+            selectedInvoiceDate.year.toString();
+        _controller_LR_date_Reveres.text = selectedInvoiceDate.year.toString() +
+            "-" +
+            selectedInvoiceDate.month.toString() +
+            "-" +
+            selectedInvoiceDate.day.toString();
+        _controller_delivery_date.text = selectedInvoiceDate.day.toString() +
+            "-" +
+            selectedInvoiceDate.month.toString() +
+            "-" +
+            selectedInvoiceDate.year.toString();
+
+        _controller_rev_delivery_date.text =
+            selectedInvoiceDate.year.toString() +
+                "-" +
+                selectedInvoiceDate.month.toString() +
+                "-" +
+                selectedInvoiceDate.day.toString();
+      });
+  }
+
+  Future<void> _selectDueDate(
+      BuildContext context,
+      TextEditingController F_datecontroller,
+      TextEditingController Rev_dateController) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDueDate,
+        firstDate: selectedInvoiceDate,
+        lastDate: DateTime(2101));
+    if (picked != null)
+      setState(() {
+        selectedDueDate = picked;
+        F_datecontroller.text = selectedDueDate.day.toString() +
+            "-" +
+            selectedDueDate.month.toString() +
+            "-" +
+            selectedDueDate.year.toString();
+        Rev_dateController.text = selectedDueDate.year.toString() +
+            "-" +
+            selectedDueDate.month.toString() +
+            "-" +
+            selectedDueDate.day.toString();
+      });
+  }
+
+  Future<void> _selectRefDate(
+      BuildContext context,
+      TextEditingController F_datecontroller,
+      TextEditingController Rev_dateController) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedRefDate,
+        firstDate: selectedInvoiceDate,
+        lastDate: DateTime(2101));
+    if (picked != null)
+      setState(() {
+        selectedRefDate = picked;
+        F_datecontroller.text = selectedRefDate.day.toString() +
+            "-" +
+            selectedRefDate.month.toString() +
+            "-" +
+            selectedRefDate.year.toString();
+        Rev_dateController.text = selectedRefDate.year.toString() +
+            "-" +
+            selectedRefDate.month.toString() +
+            "-" +
+            selectedRefDate.day.toString();
+      });
+  }
+
+  Future<void> _selectLRDate(
+      BuildContext context,
+      TextEditingController F_datecontroller,
+      TextEditingController Rev_dateController) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedLRDate,
+        firstDate: selectedInvoiceDate,
+        lastDate: DateTime(2101));
+    if (picked != null)
+      setState(() {
+        selectedLRDate = picked;
+        F_datecontroller.text = selectedLRDate.day.toString() +
+            "-" +
+            selectedLRDate.month.toString() +
+            "-" +
+            selectedLRDate.year.toString();
+        Rev_dateController.text = selectedLRDate.year.toString() +
+            "-" +
+            selectedLRDate.month.toString() +
+            "-" +
+            selectedLRDate.day.toString();
+      });
+  }
+
+  Future<void> _selectDeliveryDate(
+      BuildContext context,
+      TextEditingController F_datecontroller,
+      TextEditingController Rev_dateController) async {
+    final DateTime picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDeliveryDate,
+        firstDate: selectedInvoiceDate,
+        lastDate: DateTime(2101));
+    if (picked != null)
+      setState(() {
+        selectedDeliveryDate = picked;
+        F_datecontroller.text = selectedDeliveryDate.day.toString() +
+            "-" +
+            selectedDeliveryDate.month.toString() +
+            "-" +
+            selectedDeliveryDate.year.toString();
+        Rev_dateController.text = selectedDeliveryDate.year.toString() +
+            "-" +
+            selectedDeliveryDate.month.toString() +
+            "-" +
+            selectedDeliveryDate.day.toString();
       });
   }
 
   Widget _buildReferenceDate() {
     return InkWell(
       onTap: () {
-        _selectDate(context, _controller_reference_date,
+        _selectRefDate(context, _controller_reference_date,
             _controller_rev_reference_date);
       },
       child: Column(
@@ -635,7 +1094,8 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
   Widget _buildLRDate() {
     return InkWell(
       onTap: () {
-        _selectDate(context, _controller_LR_date, _controller_LR_date_Reveres);
+        _selectLRDate(
+            context, _controller_LR_date, _controller_LR_date_Reveres);
       },
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -685,7 +1145,7 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
   Widget _buildDeliveryDate() {
     return InkWell(
       onTap: () {
-        _selectDate(
+        _selectDeliveryDate(
             context, _controller_delivery_date, _controller_rev_delivery_date);
       },
       child: Column(
@@ -736,7 +1196,7 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
   Widget _buildWorkOrdereDate() {
     return InkWell(
       onTap: () {
-        _selectDate(context, _controller_work_Due_date,
+        _selectDueDate(context, _controller_work_Due_date,
             _controller_work_Due_date_Reverse);
       },
       child: Column(
@@ -993,26 +1453,25 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
                         SizedBox(
                           height: 3,
                         ),
-                        CustomDropDown1("Email Subject",
+                        EmailSubjectWithMultiID1("Email Subject",
                             enable1: false,
                             title: "Email Subject",
                             hintTextvalue: "Tap to Select Subject",
                             icon: Icon(Icons.arrow_drop_down),
-                            controllerForLeft: _controller_select_email_subject,
                             Custom_values1: arr_ALL_Name_ID_For_Email_Subject),
                         SizedBox(
                           height: 10,
                         ),
                         createTextLabel("Subject", 10.0, 0.0),
                         createTextFormField(
-                            _contrller_email_subject, "Email Subject",
+                            _controller_select_email_subject, "Email Subject",
                             keyboardInput: TextInputType.text),
                         SizedBox(
                           height: 3,
                         ),
                         createTextLabel("Email Introduction", 10.0, 0.0),
                         createTextFormField(
-                            _contrller_email_introcuction, "Email Introduction",
+                            _contrller_email_subject, "Email Introduction",
                             minLines: 2,
                             maxLines: 5,
                             height: 70,
@@ -1093,13 +1552,11 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
                         SizedBox(
                           height: 3,
                         ),
-                        CustomDropDown1("Terms & Conditions",
+                        CustomDropDownWithMultiID1("Terms & Conditions",
                             enable1: false,
                             title: "Terms & Conditions",
                             hintTextvalue: "Tap to Select Terms & Conditions",
                             icon: Icon(Icons.arrow_drop_down),
-                            controllerForLeft:
-                                _contrller_select_terms_and_condition,
                             Custom_values1:
                                 arr_ALL_Name_ID_For_Terms_And_Condition),
                         SizedBox(
@@ -1201,7 +1658,7 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
                           children: [
                             Flexible(
                               // flex: 2,
-                              child: CustomDropDown1("Inquiry",
+                              child: CustomDropDown1("Option",
                                   enable1: false,
                                   title: "Select Option",
                                   hintTextvalue: "Tap to select",
@@ -1210,38 +1667,19 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
                                   Custom_values1:
                                       arr_ALL_Name_ID_For_Sales_Order_Select_Inquiry),
                             ),
-                            Flexible(
+                            /*  Flexible(
                                 // flex: 1,
-                                child: createTextFormField(
-                                    _controller_inquiry_no, "Inq/QT/SO No.")),
-                          ],
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Column(
-                          children: [
-                            createTextLabel("Sales Executive", 10.0, 0.0),
-                            CustomDropDown1("Sales Executive",
-                                enable1: false,
-                                title: "Sales Executive",
-                                hintTextvalue: "Tap to Select Sales Person ",
-                                icon: Icon(Icons.arrow_drop_down),
-                                controllerForLeft: _controller_sales_executive,
-                                Custom_values1:
-                                    arr_ALL_Name_ID_For_Sales_Order_Sales_Executive),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            createTextLabel("Project", 10.0, 0.0),
-                            CustomDropDown1("Project",
-                                enable1: false,
-                                title: "Select Project",
-                                hintTextvalue: "Tap to Select Projects",
-                                icon: Icon(Icons.arrow_drop_down),
-                                controllerForLeft: _controller_Project,
-                                Custom_values1:
-                                    arr_ALL_Name_ID_For_Sales_Order_Select_Project)
+                                child: CustomDropDown1("Select No.",
+                                    enable1: false,
+                                    title: "Select No",
+                                    hintTextvalue: "Tap to select",
+                                    icon: Icon(Icons.arrow_drop_down),
+                                    controllerForLeft:
+                                        _controller_select_Multiinquiry,
+                                    Custom_values1:
+                                        arr_ALL_Name_ID_For_INQ_QT_SO_List)),*/
+
+                            Flexible(child: ModuleNo(context))
                           ],
                         ),
                         SizedBox(
@@ -1393,13 +1831,14 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
 
                     ),
               ),
-              CustomDropDown1("Sales A/c*",
+              CustomDropDownWithID1("Sales A/c",
                   enable1: false,
                   title: "Sales A/c*",
                   hintTextvalue: "Tap to Select Sales A/c",
                   icon: Icon(Icons.arrow_drop_down),
-                  controllerForLeft: _controller_bank_name,
-                  Custom_values1: arr_ALL_Name_ID_For_Sales_Order_Bank_Name),
+                  controllerForLeft: _controller_AC_name,
+                  controllerForID: _controller_AC_ID,
+                  Custom_values1: arr_ALL_Name_ID_For_Sales_Order_AC_Name),
               SizedBox(
                 width: 20,
                 height: 15,
@@ -1416,12 +1855,13 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
 
                     ),
               ),
-              CustomDropDown1("BankName",
+              CustomDropDownWithID1("Bank Name",
                   enable1: false,
                   title: "Bank Name",
-                  hintTextvalue: "Tap to Select Bank Name",
+                  hintTextvalue: "Tap to Select Bank",
                   icon: Icon(Icons.arrow_drop_down),
                   controllerForLeft: _controller_bank_name,
+                  controllerForID: _controller_bank_ID,
                   Custom_values1: arr_ALL_Name_ID_For_Sales_Order_Bank_Name),
             ],
           ),
@@ -1437,7 +1877,30 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
         Container(
           margin: EdgeInsets.all(10),
           alignment: Alignment.bottomCenter,
-          child: getCommonButton(baseTheme, () {}, "Add Product + ",
+          child: getCommonButton(baseTheme, () {
+            if (_controller_customer_name.text != "") {
+              // print("INWWWE" + InquiryNo.toString());
+
+              for (int i = 0;
+                  i < arr_ALL_Name_ID_For_INQ_QT_SO_Filter_List.length;
+                  i++) {
+                print("sldsdf" +
+                    " Filter InqList : " +
+                    arr_ALL_Name_ID_For_INQ_QT_SO_Filter_List[i].Name +
+                    " ISChecked : " +
+                    arr_ALL_Name_ID_For_INQ_QT_SO_Filter_List[i]
+                        .isChecked
+                        .toString());
+              }
+              /* navigateTo(context, SaleBillProductListScreen.routeName,
+                  arguments: AddSalesBillProductListArgument(
+                      InquiryNo, edt_StateCode.text, edt_HeaderDisc.text));*/
+            } else {
+              showCommonDialogWithSingleOption(
+                  context, "Customer name is required To view Product !",
+                  positiveButtonTitle: "OK");
+            }
+          }, "Add Product + ",
               width: 600, backGroundColor: colorPrimary, radius: 20),
         ),
         Visibility(
@@ -1445,12 +1908,44 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
           child: Container(
             margin: EdgeInsets.all(10),
             alignment: Alignment.bottomCenter,
-            child: getCommonButton(baseTheme, () async {}, "Other Charges",
+            child: getCommonButton(baseTheme, () async {
+              await getInquiryProductDetails();
+              if (_inquiryProductList.length != 0) {
+                print("HeaderDiscll" + edt_HeaderDisc.text.toString());
+                navigateTo(context, SaleBillOtherChargeScreen.routeName,
+                        arguments: SaleOrderOtherChargesScreenArguments(
+                            int.parse(edt_StateCode.text == null
+                                ? 0
+                                : edt_StateCode.text),
+                            _editModel,
+                            edt_HeaderDisc.text))
+                    .then((value) {
+                  if (value == null) {
+                    print("HeaderDiscount From QTOtherCharges 0.00");
+                  } else {
+                    print("HeaderDiscount From QTOtherCharges $value");
+                    edt_HeaderDisc.text = value;
+                  }
+                });
+              } else {
+                showCommonDialogWithSingleOption(context,
+                    "Atleast one product is required to view other charges !",
+                    positiveButtonTitle: "OK");
+              }
+            }, "Other Charges",
                 width: 600, backGroundColor: colorPrimary, radius: 20),
           ),
         ),
       ],
     );
+  }
+
+  Future<void> getInquiryProductDetails() async {
+    _inquiryProductList.clear();
+    List<SaleBillTable> temp =
+        await OfflineDbHelper.getInstance().getSalesBillProduct();
+    _inquiryProductList.addAll(temp);
+    setState(() {});
   }
 
   TransportDetails() {
@@ -2172,5 +2667,112 @@ class _SalesBillAddEditScreenState extends BaseState<SalesBillAddEditScreen>
         ),
       ],
     );
+  }
+
+  void getAccountNameAPI() {
+    ALL_Name_ID all_name_id = ALL_Name_ID();
+    all_name_id.Name = "KISHAN RATHOD A/C";
+    all_name_id.pkID = 91769;
+    arr_ALL_Name_ID_For_Sales_Order_AC_Name.add(all_name_id);
+  }
+
+  void _OnBankDetailsSucess(QuotationBankDropDownResponseState state) {
+    arr_ALL_Name_ID_For_Sales_Order_Bank_Name.clear();
+    for (var i = 0; i < state.response.details.length; i++) {
+      ALL_Name_ID all_name_id = new ALL_Name_ID();
+      all_name_id.pkID = state.response.details[i].pkID;
+      all_name_id.Name = state.response.details[i].bankName;
+      arr_ALL_Name_ID_For_Sales_Order_Bank_Name.add(all_name_id);
+    }
+  }
+
+  void _OnTermsAndConditionResponse(QuotationTermsCondtionResponseState state) {
+    if (state.response.details.length != 0) {
+      arr_ALL_Name_ID_For_Terms_And_Condition.clear();
+      for (var i = 0; i < state.response.details.length; i++) {
+        print("InquiryStatus : " + state.response.details[i].tNCHeader);
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = state.response.details[i].tNCHeader;
+        all_name_id.pkID = state.response.details[i].pkID;
+        all_name_id.Name1 = state.response.details[i].tNCContent;
+
+        arr_ALL_Name_ID_For_Terms_And_Condition.add(all_name_id);
+      }
+    }
+  }
+
+  void _OnEmailContentResponse(SaleBillEmailContentResponseState state) {
+    if (state.response.details.length != 0) {
+      arr_ALL_Name_ID_For_Email_Subject.clear();
+      for (var i = 0; i < state.response.details.length; i++) {
+        print("InquiryStatus : " + state.response.details[i].contentData);
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = state.response.details[i].subject;
+        all_name_id.pkID = state.response.details[i].pkID;
+        all_name_id.Name1 = state.response.details[i].contentData;
+
+        arr_ALL_Name_ID_For_Email_Subject.add(all_name_id);
+      }
+    }
+  }
+
+  void getSelectOptionList() {
+    arr_ALL_Name_ID_For_Sales_Order_Select_Inquiry.clear();
+    for (var i = 0; i < 3; i++) {
+      ALL_Name_ID all_name_id = ALL_Name_ID();
+
+      if (i == 0) {
+        all_name_id.Name = "Inquiry";
+      } else if (i == 1) {
+        all_name_id.Name = "Quotation";
+      } else if (i == 2) {
+        all_name_id.Name = "SalesOrder";
+      }
+      arr_ALL_Name_ID_For_Sales_Order_Select_Inquiry.add(all_name_id);
+    }
+  }
+
+  void _OnINQ_QT_SO_NO_Response(
+      SalesBill_INQ_QT_SO_NO_ListResponseState state) {
+    arr_ALL_Name_ID_For_INQ_QT_SO_List.clear();
+
+    if (state.response.details.length != 0) {
+      for (int i = 0; i < state.response.details.length; i++) {
+        print("lsdfsdf" + " Order No " + state.response.details[i].orderNo);
+        ALL_Name_ID all_name_id = ALL_Name_ID();
+        all_name_id.Name = state.response.details[i].orderNo;
+        all_name_id.isChecked = false;
+        arr_ALL_Name_ID_For_INQ_QT_SO_List.add(all_name_id);
+      }
+    }
+  }
+
+  ModuleNo(BuildContext context) {
+    return EditText(context,
+        hint: "View Module No",
+        radius: 10,
+        readOnly: true,
+        boxheight: 40, onPressed: () {
+      if (_controller_select_inquiry.text != "") {
+        navigateTo(context, ModuleNoListScreen.routeName,
+                arguments: AddModuleNoScreenArguments(
+                    arr_ALL_Name_ID_For_INQ_QT_SO_List))
+            .then((value) {
+          setState(() {
+            arr_ALL_Name_ID_For_INQ_QT_SO_Filter_List = value;
+          });
+        });
+      } else {
+        showCommonDialogWithSingleOption(
+            context, "Customer name is required To view Option !",
+            positiveButtonTitle: "OK");
+      }
+    },
+        inputTextStyle: TextStyle(fontSize: 15),
+        suffixIcon: Icon(
+          Icons.arrow_drop_down,
+          color: colorGrayDark,
+          size: 32,
+        ));
   }
 }

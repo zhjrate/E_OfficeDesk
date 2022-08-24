@@ -1,4 +1,3 @@
-import 'package:expansion_tile_card/expansion_tile_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -177,18 +176,18 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
       onWillPop: _onBackPressed,
       child: Scaffold(
         //98E0FF
-        backgroundColor: Color(0xff98e0ff),
+        backgroundColor: Color(0xff1e6091),
         appBar: AppBar(
           elevation: 0.1,
           toolbarHeight: 100,
-          backgroundColor: Color(0xff98e0ff),
+          backgroundColor: Color(0xff1e6091),
           centerTitle: false,
           automaticallyImplyLeading: false,
           titleSpacing: 0,
           leadingWidth: 100,
           title: Text(
             "Office Task",
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+            style: TextStyle(color: colorWhite, fontWeight: FontWeight.bold),
           ),
           leading: Builder(
             builder: (BuildContext context) {
@@ -198,6 +197,7 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
                   NAV_ICON,
                   height: 48,
                   width: 48,
+                  color: colorWhite,
                 ),
                 onPressed: () {
                   Scaffold.of(context).openDrawer();
@@ -549,7 +549,7 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
             });
           },
           child: Card(
-              color: pressAttention == true ? Color(0xff0066ff) : Colors.white,
+              color: Color(0xffef6f6c),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               child: Container(
@@ -563,9 +563,7 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
                       "To-Do "+" ("+TotalTodoCount.toString()+")",
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: pressAttention == true
-                              ? Colors.white
-                              : Color(0xff0066ff),
+                          color: Colors.white,
                           fontSize: 18),
                     ),
                   ))),
@@ -583,7 +581,7 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
             });
           },
           child: Card(
-              color: pressAttention == true ? Colors.white : Color(0xff0066ff),
+              color:  Color(0xff39c3aa),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(15)),
               child: Container(
@@ -594,9 +592,7 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
                       "Completed ",
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: pressAttention == true
-                              ? Color(0xff0066ff)
-                              : Colors.white,
+                          color: Colors.white,
                           fontSize: 18),
                     ),
                   ))),
@@ -965,7 +961,9 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
                                 ClosingRemarks: _FollowupTodayListResponse.details[index].closingRemarks,
                                 CompanyId: CompanyID.toString())));
                       },
-                      backgroundColor: colorGreen,
+
+                 //Color(0xff39c3aa) Green = Color(0xff39c3aa)
+                      backgroundColor: Color(0xff39c3aa),
                       foregroundColor: Colors.white,
                       icon: Icons.done,
                     ),
@@ -982,7 +980,7 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
 
                       });
                     },
-                    child: ExpansionTileCard(
+                    child: /*ExpansionTileCard(
                       elevationCurve: Curves.easeInOut,
                       trailing: SizedBox(
                         height: 1,
@@ -1001,7 +999,33 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
                         style: TextStyle(color: Colors.black),
                       ),
 
-                    ),
+                    ),*/
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+
+
+                        border: Border.all(
+                            color: colorWhite, // Set border color
+                            width: 1.0),   // Set border width
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(10.0)), // Set rounded corner radius
+                        // Make rounded corner of border
+                      ),
+                      child: Row(
+
+                        children: [
+                          Container(
+                              height: 35, width: 35, child: Icon(Icons.access_alarm,color: colorWhite,)),
+                          SizedBox(width: 2,),
+                          Expanded(
+                            child: Text( model.taskDescription,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(color: colorWhite),),
+                          )
+                        ],),
+                    )
                   ),
                 ),
               ));
@@ -1033,7 +1057,18 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
   ExpantionOverDueCustomer(BuildContext context, int index) {
     ToDoDetails model = _FollowupListOverDueResponse.details[index];
     return Container(
-        color: Color(0xff98e0ff),
+        /*width: double.infinity,
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+
+
+          border: Border.all(
+              color: colorWhite, // Set border color
+              width: 1.0),   // Set border width
+          borderRadius: BorderRadius.all(
+              Radius.circular(10.0)), // Set rounded corner radius
+          // Make rounded corner of border
+        ),*/
         // padding: EdgeInsets.only(left: 10, right: 10),
         child: _FollowupListOverDueResponse.details[index].taskStatus == "Pending"
             ? Slidable(
@@ -1117,7 +1152,8 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
                           ClosingRemarks: _FollowupListOverDueResponse.details[index].closingRemarks,
                           CompanyId: CompanyID.toString())));
                 },
-                backgroundColor: colorGreen,
+                backgroundColor: Color(0xff39c3aa),
+
                 foregroundColor: Colors.white,
                 icon: Icons.done,
               ),
@@ -1143,7 +1179,7 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
 
                 });
               },
-              child: ExpansionTileCard(
+              child: /*ExpansionTileCard(
                 elevationCurve: Curves.easeInOut,
                 trailing: SizedBox(height: 1,width: 1,),
                 shadowColor: Color(0xFF504F4F),
@@ -1157,9 +1193,34 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
                   model.taskDescription,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(color: Colors.black),
-                ),
+                ),*/
+              Container(
+                width: double.infinity,
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
 
-              ),
+
+          border: Border.all(
+              color: colorWhite, // Set border color
+              width: 1.0),   // Set border width
+          borderRadius: BorderRadius.all(
+              Radius.circular(10.0)), // Set rounded corner radius
+          // Make rounded corner of border
+        ),
+                child: Row(
+
+                  children: [
+                    Container(
+                        height: 35, width: 35, child: Icon(Icons.access_alarm,color: colorWhite,)),
+                    SizedBox(width: 2,),
+                    Expanded(
+                      child: Text( model.taskDescription,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: colorWhite),),
+                    )
+                  ],),
+              )
+
             ),
           ),
         )
@@ -1172,7 +1233,7 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
                   _FollowupListOverDueResponse.details[index],
                   index1: index);*/
             },
-            child: ExpansionTileCard(
+            child:/* ExpansionTileCard(
               elevationCurve: Curves.easeInOut,
               trailing: SizedBox(
                 height: 1,
@@ -1191,7 +1252,18 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
                 style: TextStyle(color: Colors.black),
               ),
 
-            ),
+            ),*/        Row(
+
+              children: [
+                Container(
+                    height: 35, width: 35, child: Icon(Icons.access_alarm,color: colorWhite,)),
+                SizedBox(width: 2,),
+                Expanded(
+                  child: Text( model.taskDescription,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: colorWhite),),
+                )
+              ],)
           ),
         ));
   }
@@ -1201,7 +1273,18 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
     ToDoDetails model = _FollowupListCompletedResponse.details[index];
 
     return Container(
-        color: Color(0xff98e0ff),
+      width: double.infinity,
+        padding: EdgeInsets.all(10),
+        decoration: BoxDecoration(
+
+
+            border: Border.all(
+                color: Color(0xff39c3aa), // Set border color
+                width: 1.0),   // Set border width
+            borderRadius: BorderRadius.all(
+                Radius.circular(10.0)), // Set rounded corner radius
+          // Make rounded corner of border
+        ),
         // padding: EdgeInsets.only(left: 10, right: 10),
         child: _FollowupListCompletedResponse.details[index].taskStatus == "Pending"
             ? Slidable(
@@ -1283,16 +1366,14 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
           // The child of the Slidable is what the user sees when the
           // component is not dragged.
           child: IgnorePointer(
-            child: ExpansionTileCard(
+            child: /*ExpansionTileCard(
               elevationCurve: Curves.easeInOut,
               trailing: SizedBox(
                 height: 1,
                 width: 1,
               ),
-              shadowColor: Color(0xFF504F4F),
-              baseColor: Color(0xFF9CF1A3),
-              expandedColor:
-              Color(0xFFC1E0FA), //Colors.deepOrange[50],ADD8E6
+
+
               leading: Container(
                   height: 35, width: 35, child: Icon(Icons.access_alarm)),
 
@@ -1302,20 +1383,19 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
                 style: TextStyle(color: Colors.black),
               ),
 
-            ),
+            ),*/Text( model.taskDescription,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(color: Color(0xff39c3aa)),)
           ),
         )
             : IgnorePointer(
-          child: ExpansionTileCard(
+          child: /*ExpansionTileCard(
             elevationCurve: Curves.easeInOut,
             trailing: SizedBox(
               height: 1,
               width: 1,
             ),
-            shadowColor: Color(0xFF504F4F),
-            baseColor: Color(0xFF9CF1A3),
-            expandedColor:
-            Color(0xFFC1E0FA), //Colors.deepOrange[50],ADD8E6
+
             leading: Container(
                 height: 35, width: 35, child: Icon(Icons.access_alarm)),
 
@@ -1325,7 +1405,21 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
               style: TextStyle(color: Colors.black),
             ),
 
-          ),
+          ),*/
+
+          Row(
+
+            children: [
+            Container(
+                height: 35, width: 35, child: Icon(Icons.access_alarm,color: Color(0xff39c3aa),)),
+            SizedBox(width: 2,),
+            Expanded(
+              child: Text( model.taskDescription,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: Color(0xff39c3aa)),),
+            )
+          ],)
+
         ));
   }
 
@@ -1638,7 +1732,7 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
       child: Card(
         elevation: 5,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        color: Color(0xff0066ff),
+        color: Color(0xffef6f6c),
         child: Container(
           padding: EdgeInsets.all(10),
           child: Row(
@@ -1683,7 +1777,8 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
       child: Card(
         elevation: 5,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        color:  Color(0xff0066ff),
+
+        color:  Color(0xffef6f6c),
         child: Container(
           padding: EdgeInsets.all(10),
           child: Row(
@@ -1733,7 +1828,7 @@ class _OfficeToDoScreenState extends BaseState<OfficeToDoScreen>
       child: Card(
         elevation: 5,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        color: Color(0xff0066ff),
+        color: Color(0xff39c3aa),
         child: Container(
           padding: EdgeInsets.all(10),
           child: Row(
