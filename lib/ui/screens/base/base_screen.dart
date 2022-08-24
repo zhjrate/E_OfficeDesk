@@ -164,7 +164,6 @@ mixin BasicScreen<Screen extends BaseStatefulWidget> on BaseState<Screen> {
             ),
           ),
         ),
-
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Visibility(
