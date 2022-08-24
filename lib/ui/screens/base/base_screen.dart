@@ -167,177 +167,181 @@ mixin BasicScreen<Screen extends BaseStatefulWidget> on BaseState<Screen> {
         StatefulBuilder(
           builder: (BuildContext context, StateSetter setState) {
             return Visibility(
-              visible: true, //_showProgressDialog,
-              child: Container(
-                  width: double.maxFinite,
-                  height: double.maxFinite,
-                  color: Colors.black26,
-                  child: ListView(
-                    children: [
-                      Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          color: Colors.white,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Lottie.asset(
-                                    'assets/lang/loader_json.json',
-                                    width: 100,
-                                    height: 100),
-                              ),
-                            ],
-                          )),
-                      Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          color: Colors.white,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Lottie.asset(
-                                    'assets/lang/sample_kishan_one.json',
-                                    width: 100,
-                                    height: 100),
-                              ),
-                            ],
-                          )),
-                      Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          color: Colors.white,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Lottie.asset(
-                                    'assets/lang/sample_kishan_two.json',
-                                    width: 100,
-                                    height: 100),
-                              ),
-                            ],
-                          )),
-                      Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          color: Colors.white,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Lottie.asset(
-                                    'assets/lang/sample_kishan_three.json',
-                                    width: 100,
-                                    height: 100),
-                              ),
-                            ],
-                          )),
-                      Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          color: Colors.white,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Lottie.asset(
-                                    'assets/lang/sample_kishan_four.json',
-                                    width: 100,
-                                    height: 100),
-                              ),
-                            ],
-                          )),
-                      Card(
-                          elevation: 5,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(15)),
-                          color: Colors.white,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                child: Lottie.asset(
-                                    'assets/lang/sample_kishan_five.json',
-                                    width: 100,
-                                    height: 100),
-                              ),
-                            ],
-                          )),
-                    ],
-                  )
+              visible: _showProgressDialog,
+              child: Center(
+                child: Container(
+                    width: double.maxFinite,
+                    height: double.maxFinite,
+                    color: Colors.black26,
+                    child: Center(
+                      child: ListView(
+                        children: [
+                          /*Card(
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    child: Lottie.asset(
+                                        'assets/lang/loader_json.json',
+                                        width: 100,
+                                        height: 100),
+                                  ),
+                                ],
+                              )),
+                          Card(
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    child: Lottie.asset(
+                                        'assets/lang/sample_kishan_one.json',
+                                        width: 100,
+                                        height: 100),
+                                  ),
+                                ],
+                              )),*/
+                          Card(
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    child: Lottie.asset(
+                                        'assets/lang/sample_kishan_two.json',
+                                        width: 100,
+                                        height: 100),
+                                  ),
+                                ],
+                              )),
+                          /* Card(
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    child: Lottie.asset(
+                                        'assets/lang/sample_kishan_three.json',
+                                        width: 100,
+                                        height: 100),
+                                  ),
+                                ],
+                              )),
+                          Card(
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    child: Lottie.asset(
+                                        'assets/lang/sample_kishan_four.json',
+                                        width: 100,
+                                        height: 100),
+                                  ),
+                                ],
+                              )),
+                          Card(
+                              elevation: 5,
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15)),
+                              color: Colors.white,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    child: Lottie.asset(
+                                        'assets/lang/sample_kishan_five.json',
+                                        width: 100,
+                                        height: 100),
+                                  ),
+                                ],
+                              )),*/
+                        ],
+                      ),
+                    )
 
-                  /*  Center(
-                  child: Container(
-                    height: 200,
-                    width: 200,
-                    padding: EdgeInsets.all(10),
-                    child: Card(
-                        elevation: 5,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15)),
-                        color: Colors.white,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              child: Container(
-                                child: Lottie.asset(
-                                    'assets/lang/loader_json.json',
-                                    width: 100,
-                                    height: 100),
+                    /*  Center(
+                    child: Container(
+                      height: 200,
+                      width: 200,
+                      padding: EdgeInsets.all(10),
+                      child: Card(
+                          elevation: 5,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15)),
+                          color: Colors.white,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(
+                                child: Container(
+                                  child: Lottie.asset(
+                                      'assets/lang/loader_json.json',
+                                      width: 100,
+                                      height: 100),
+                                ),
                               ),
-                            ),
-                            Text(
-                              "Loading...",
-                              style: TextStyle(color: Colors.black),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            )
-                          ],
-                        )),
-                  ),
-                ),*/
-                  /*CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(
-                      rnd.nextInt(255),
-                      rnd.nextInt(255),
-                      rnd.nextInt(255),
-                      1,
-                    )),
-                  ),*/
-                  /* LoadingBouncingGrid.circle(
-                    borderColor: Color.fromRGBO(
-                      rnd.nextInt(255),
-                      rnd.nextInt(255),
-                      rnd.nextInt(255),
-                      1,
+                              Text(
+                                "Loading...",
+                                style: TextStyle(color: Colors.black),
+                              ),
+                              SizedBox(
+                                height: 20,
+                              )
+                            ],
+                          )),
                     ),
-                    backgroundColor: Color.fromRGBO(
-                      rnd.nextInt(255),
-                      rnd.nextInt(255),
-                      rnd.nextInt(255),
-                      1,
-                    ),
-                    borderSize: 1,
-                    size: 100.0,
                   ),*/
+                    /*CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Color.fromRGBO(
+                        rnd.nextInt(255),
+                        rnd.nextInt(255),
+                        rnd.nextInt(255),
+                        1,
+                      )),
+                    ),*/
+                    /* LoadingBouncingGrid.circle(
+                      borderColor: Color.fromRGBO(
+                        rnd.nextInt(255),
+                        rnd.nextInt(255),
+                        rnd.nextInt(255),
+                        1,
+                      ),
+                      backgroundColor: Color.fromRGBO(
+                        rnd.nextInt(255),
+                        rnd.nextInt(255),
+                        rnd.nextInt(255),
+                        1,
+                      ),
+                      borderSize: 1,
+                      size: 100.0,
+                    ),*/
 
-                  ),
+                    ),
+              ),
             );
           },
           key: _progressBarKey,
