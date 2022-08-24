@@ -174,111 +174,15 @@ mixin BasicScreen<Screen extends BaseStatefulWidget> on BaseState<Screen> {
                     height: double.maxFinite,
                     color: Colors.black26,
                     child: Center(
-                      child: ListView(
-                        children: [
-                          /*Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)),
-                              color: Colors.white,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    child: Lottie.asset(
-                                        'assets/lang/loader_json.json',
-                                        width: 100,
-                                        height: 100),
-                                  ),
-                                ],
-                              )),
-                          Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)),
-                              color: Colors.white,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    child: Lottie.asset(
-                                        'assets/lang/sample_kishan_one.json',
-                                        width: 100,
-                                        height: 100),
-                                  ),
-                                ],
-                              )),*/
-                          Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)),
-                              color: Colors.white,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    child: Lottie.asset(
-                                        'assets/lang/sample_kishan_two.json',
-                                        width: 100,
-                                        height: 100),
-                                  ),
-                                ],
-                              )),
-                          /* Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)),
-                              color: Colors.white,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    child: Lottie.asset(
-                                        'assets/lang/sample_kishan_three.json',
-                                        width: 100,
-                                        height: 100),
-                                  ),
-                                ],
-                              )),
-                          Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)),
-                              color: Colors.white,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    child: Lottie.asset(
-                                        'assets/lang/sample_kishan_four.json',
-                                        width: 100,
-                                        height: 100),
-                                  ),
-                                ],
-                              )),
-                          Card(
-                              elevation: 5,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15)),
-                              color: Colors.white,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    child: Lottie.asset(
-                                        'assets/lang/sample_kishan_five.json',
-                                        width: 100,
-                                        height: 100),
-                                  ),
-                                ],
-                              )),*/
-                        ],
+                      child: Card(
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15)),
+                        color: Colors.white,
+                        child: Lottie.asset(
+                            'assets/lang/sample_kishan_two.json',
+                            width: 100,
+                            height: 100),
                       ),
                     )
 
